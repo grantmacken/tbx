@@ -34,7 +34,7 @@ DEVEL := gettext-devel \
  openssl-devel \
  perl-devel \
  readline-devel \
- zlib-devel
+ zlib-devel:w
 
 tr = printf "| %-14s | %-8s | %-83s |\n" "$(1)" "$(2)" "$(3)" | tee -a $(4)
 bdu = jq -r ".assets[] | select(.browser_download_url | contains(\"$1\")) | .browser_download_url" $2
@@ -103,14 +103,22 @@ build-tools: info/build-tools.md
 info/build-tools.md:
 	echo '##[ $@ ]##'
 	$(RUN) dnf update -y 
-	for item in $(DEPS)
-	do
-	$(RUN) dnf install --allowerasing --skip-unavailable --skip-broken --no-allow-downgrade -y $${item} &>/dev/null
-	done
+	#for item in $(DEPS)
+	# do
+	# $(RUN) dnf install --allowerasing --skip-unavailable --skip-broken --no-allow-downgrade -y $${item} &>/dev/null
+	# done
 	printf "\n$(HEADING2) %s\n\n" "Selected Build Tooling for Make Installs" | tee $@
 	$(call tr,"Name","Version","Summary",$@)
 	$(call tr,"----","-------","----------------------------",$@)
 	$(RUN) sh -c  'dnf info -q installed $(BUILDING) | \
+	grep -oP "(Name.+:\s\K.+)|(Ver.+:\s\K.+)|(Sum.+:\s\K.+)" | \
+	paste  - - -  | sort -u ' | \
+	awk -F'\t' '{printf "| %-14s | %-8s | %-83s |\n", $$1, $$2, $$3}' | \
+	tee -a $@
+	printf "\n$(HEADING2) %s\n\n" "Selected Development files for building" | tee $@
+	$(call tr,"Name","Version","Summary",$@)
+	$(call tr,"----","-------","----------------------------",$@)
+	$(RUN) sh -c  'dnf info -q installed $(DEVEL) | \
 	grep -oP "(Name.+:\s\K.+)|(Ver.+:\s\K.+)|(Sum.+:\s\K.+)" | \
 	paste  - - -  | sort -u ' | \
 	awk -F'\t' '{printf "| %-14s | %-8s | %-83s |\n", $$1, $$2, $$3}' | \
