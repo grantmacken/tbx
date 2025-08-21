@@ -105,16 +105,16 @@ info/build-tools.md:
 	$(RUN) dnf update -y 
 	for item in $(DEVEL)
 	do
-	(RUN) dnf install --allowerasing --skip-unavailable --skip-broken --no-allow-downgrade -y $${item} &>/dev/null
+	$(RUN) dnf install --allowerasing --skip-unavailable --skip-broken --no-allow-downgrade -y $${item} &>/dev/null
 	done
 	for item in $(BUILDING)
 	do
-	(RUN) dnf install --allowerasing --skip-unavailable --skip-broken --no-allow-downgrade -y $${item} &>/dev/null
+	$(RUN) dnf install --allowerasing --skip-unavailable --skip-broken --no-allow-downgrade -y $${item} &>/dev/null
 	done
 	printf "\n$(HEADING2) %s\n\n" "Selected Build Tooling for Make Installs" | tee $@
 	$(call tr,"Name","Version","Summary",$@)
 	$(call tr,"----","-------","----------------------------",$@)
-	$(RUN) sh -c  'dnf info -q installed $(BUILDING) | \
+	$(RUN) sh -c  'dnf info -q --installed $(BUILDING) | \
 	grep -oP "(Name.+:\s\K.+)|(Ver.+:\s\K.+)|(Sum.+:\s\K.+)" | \
 	paste  - - -  | sort -u ' | \
 	awk -F'\t' '{printf "| %-14s | %-8s | %-83s |\n", $$1, $$2, $$3}' | \
@@ -122,7 +122,7 @@ info/build-tools.md:
 	printf "\n$(HEADING2) %s\n\n" "Selected Development files for building" | tee $@
 	$(call tr,"Name","Version","Summary",$@)
 	$(call tr,"----","-------","----------------------------",$@)
-	$(RUN) sh -c  'dnf info -q installed $(DEVEL) | \
+	$(RUN) sh -c  'dnf info -q --installed $(DEVEL) | \
 	grep -oP "(Name.+:\s\K.+)|(Ver.+:\s\K.+)|(Sum.+:\s\K.+)" | \
 	paste  - - -  | sort -u ' | \
 	awk -F'\t' '{printf "| %-14s | %-8s | %-83s |\n", $$1, $$2, $$3}' | \
