@@ -21,14 +21,8 @@ WORKING_CONTAINER ?= fedora-toolbox-working-container
 FED_IMAGE := registry.fedoraproject.org/fedora-toolbox
 TBX_IMAGE := ghcr.io/grantmacken/tbx-build-tools
 
-ifdef GITHUB_ACTIONS
 RUN := buildah run $(WORKING_CONTAINER)
 ADD := buildah add --chmod 755 $(WORKING_CONTAINER)
-else
-
-RUN := flatpak-spawn --host buildah run $(WORKING_CONTAINER)
-ADD := flatpak-spawn --host buildah add --chmod 755 $(WORKING_CONTAINER)
-endif
 
 WGET := wget -q --no-check-certificate --timeout=10 --tries=3
 
@@ -45,7 +39,7 @@ DEVEL := gettext-devel \
 tr = printf "| %-14s | %-8s | %-83s |\n" "$(1)" "$(2)" "$(3)" | tee -a $(4)
 bdu = jq -r ".assets[] | select(.browser_download_url | contains(\"$1\")) | .browser_download_url" $2
 
-default: host-spawn build-tools neovim
+default: host-spawn build-tools
 	echo '##[ $@ ]##'
 	$(RUN) which wget
 	buildah config \
@@ -66,16 +60,14 @@ init: .env
 	printf "FROM_NAME=%s\n" "$$FROM_NAME" | tee $@
 	printf "FROM_REGISTRY=%s\n" "$$FROM_REGISTRY" | tee -a $@
 	printf "FROM_VERSION=%s\n" "$$FROM_VERSION" | tee -a $@
-	flatpak-spawn --host buildah pull "$$FROM_REGISTRY:$$FROM_VERSION" &> /dev/null
+	buildah pull "$$FROM_REGISTRY:$$FROM_VERSION" &> /dev/null
 	echo -n "WORKING_CONTAINER=" | tee -a .env
-	flatpak-spawn --host buildah from "$${FROM_REGISTRY}:$${FROM_VERSION}" | tee -a .env
-	echo -n "NPROC=" | tee -a .env
-	flatpak-spawn --host buildah run $(WORKING_CONTAINER) nproc | tee -a .env	echo 
+	buildah from "$${FROM_REGISTRY}:$${FROM_VERSION}" | tee -a .env
 	
 latest/fedora-toolbox.json:
 	echo '##[ $@ ]##'
 	mkdir -p $(dir $@)
-	flatpak-spawn --host skopeo inspect docker://${FED_IMAGE}:latest | jq '.' > $@
+	skopeo inspect docker://${FED_IMAGE}:latest | jq '.' > $@
 	
 ## HOST-SPAWN
 host-spawn: info/host-spawn.md
