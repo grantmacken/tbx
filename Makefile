@@ -103,10 +103,14 @@ build-tools: info/build-tools.md
 info/build-tools.md:
 	echo '##[ $@ ]##'
 	$(RUN) dnf update -y 
-	#for item in $(DEPS)
-	# do
-	# $(RUN) dnf install --allowerasing --skip-unavailable --skip-broken --no-allow-downgrade -y $${item} &>/dev/null
-	# done
+	for item in $(DEVEL)
+	do
+	(RUN) dnf install --allowerasing --skip-unavailable --skip-broken --no-allow-downgrade -y $${item} &>/dev/null
+	done
+	for item in $(BUILDING)
+	do
+	(RUN) dnf install --allowerasing --skip-unavailable --skip-broken --no-allow-downgrade -y $${item} &>/dev/null
+	done
 	printf "\n$(HEADING2) %s\n\n" "Selected Build Tooling for Make Installs" | tee $@
 	$(call tr,"Name","Version","Summary",$@)
 	$(call tr,"----","-------","----------------------------",$@)
