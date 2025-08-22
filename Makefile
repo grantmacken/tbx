@@ -27,12 +27,21 @@ RUN := buildah run $(WORKING_CONTAINER)
 
 CLI := eza fd-find fzf gh wl-clipboard zoxide
 
-WGET := wget -q --no-check-certificate --timeout=10 --tries=3
-
 WORKING_CONTAINER ?= tbx-build-tools-working-container
 
 tr = printf "| %-14s | %-8s | %-83s |\n" "$(1)" "$(2)" "$(3)" | tee -a $(4)
 bdu = jq -r ".assets[] | select(.browser_download_url | contains(\"$1\")) | .browser_download_url" $2
+
+
+default: info/cli-tools.md
+ifdef GITHUB_ACTIONS
+	buildah config \
+	--label summary='a toolbox with cli tool' \
+	--label maintainer='Grant MacKenzie <grantmacken@gmail.com>' \
+	--env lang=C.UTF-8 $(WORKING_CONTAINER)
+	buildah commit $(WORKING_CONTAINER) $(TBX_IMAGE)
+	buildah push $(TBX_IMAGE):latest
+endif
 	
 latest/tbx-build-tools.json:
 	echo '##[ $@ ]##'

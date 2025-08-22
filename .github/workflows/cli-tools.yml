@@ -25,4 +25,5 @@ jobs:
         - name: Toolbox Build
           run: |
             make .env
+            make
 
