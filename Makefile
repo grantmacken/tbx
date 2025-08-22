@@ -17,9 +17,15 @@ HEADING2 := $(HEADING1)$(HEADING1)
 HEADING3 := $(HEADING2)$(HEADING1)
 
 include .env
-# WORKING_CONTAINER ?= fedora-toolbox-working-container
+
+
 FROM_IMAGE := ghcr.io/grantmacken/tbx-build-tools
 TBX_IMAGE := ghcr.io/grantmacken/tbx-cli-tools
+WORKING_CONTAINER ?= tbx-cli-tools-working-container
+
+RUN := buildah run $(WORKING_CONTAINER)
+
+CLI := eza fd-find fzf gh wl-clipboard zoxide
 
 WGET := wget -q --no-check-certificate --timeout=10 --tries=3
 
@@ -40,5 +46,27 @@ latest/tbx-build-tools.json:
 	buildah pull "$$FROM" &> /dev/null
 	echo -n "WORKING_CONTAINER=" | tee -a .env
 	buildah from "$$FROM" | tee -a .env
+	
+	
+info/cli-tools.md:
+	mkdir -p $(dir $@)
+	RUN $(WORKING_CONTAINER) dnf upgrade -y --minimal &>/dev/null
+	for item in $(CLI)
+	do
+	$(RUN) $(WORKING_CONTAINER) dnf install \
+		--allowerasing \
+		--skip-unavailable \
+		--skip-broken \
+		--no-allow-downgrade \
+		-y \
+		$${item} &>/dev/null
+	done
+	printf "\n$(HEADING2) %s\n\n" "Handpicked CLI tools available in the toolbox" | tee $@
+	$(call tr,"Name","Version","Summary",$@)
+	$(call tr,"----","-------","----------------------------",$@)
+	buildah run $(WORKING_CONTAINER) sh -c  'dnf info -q installed $(CLI) | \
+	   grep -oP "(Name.+:\s\K.+)|(Ver.+:\s\K.+)|(Sum.+:\s\K.+)" | \
+	   paste  - - -  | sort -u ' | \
+	   awk -F'\t' '{printf "| %-14s | %-8s | %-83s |\n", $$1, $$2, $$3}' | tee -a $@
 	
 
