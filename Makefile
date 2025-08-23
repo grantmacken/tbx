@@ -25,6 +25,7 @@ TBX_IMAGE :=  ghcr.io/grantmacken/$(NAME)
 
 RUN := buildah run $(WORKING_CONTAINER)
 ADD := buildah add --chmod 755 $(WORKING_CONTAINER)
+WGET := wget -q --no-check-certificate --timeout=10 --tries=3
 #LISTS
 CLI := eza fd-find fzf gh wl-clipboard zoxide
 
