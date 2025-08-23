@@ -8,7 +8,7 @@ on:
     paths-ignore:
     - '**/README.md'
 jobs:
-  buildah_images:
+  coding_toolbox:
     runs-on: ubuntu-latest
     timeout-minutes: 20
     continue-on-error: false
@@ -26,5 +26,5 @@ jobs:
         - uses: actions/checkout@v4
         - name: Toolbox Build
           run: |
-            make .env
+            make init
             make
