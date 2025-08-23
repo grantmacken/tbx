@@ -30,6 +30,9 @@ CLI := eza fd-find fzf gh wl-clipboard zoxide
 
 tr = printf "| %-14s | %-8s | %-83s |\n" "$(1)" "$(2)" "$(3)" | tee -a $(4)
 bdu = jq -r ".assets[] | select(.browser_download_url | contains(\"$1\")) | .browser_download_url" $2
+
+default:	
+	echo '##[ $@ ]##'
 	
 init: .env
 	echo '##[ $@ ]##'
