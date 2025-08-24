@@ -16,7 +16,7 @@ HEADING1 := \#
 HEADING2 := $(HEADING1)$(HEADING1)
 HEADING3 := $(HEADING2)$(HEADING1)
 
-include .env
+include .env 
 
 FROM_IMAGE := ghcr.io/grantmacken/tbx-build-tools
 NAME := tbx-coding
@@ -28,12 +28,12 @@ INSTALL := $(RUN) dnf install --allowerasing --skip-unavailable --skip-broken --
 ADD := buildah add --chmod 755 $(WORKING_CONTAINER)
 WGET := wget -q --no-check-certificate --timeout=10 --tries=3
 #LISTS
-CLI := eza fd-find fzf gh wl-clipboard zoxide
+CLI := eza fd-find fzf gh pass wl-clipboard zoxideacd
 
 tr = printf "| %-14s | %-8s | %-83s |\n" "$(1)" "$(2)" "$(3)" | tee -a $(4)
 bdu = jq -r ".assets[] | select(.browser_download_url | contains(\"$1\")) | .browser_download_url" $2
 
-default: neovim
+default: neovim cli
 	echo '##[ $@ ]##'
 	echo 'image built'
 ifdef GITHUB_ACTIONS
@@ -68,6 +68,8 @@ files/nvim.tar.gz:
 	
 ##[[ NEOVIM ]]#
 neovim: info/neovim.md
+	echo '✅ latest pre-release neovim added'
+
 info/neovim.md: files/nvim.tar.gz
 	echo '##[ $@ ]##'
 	mkdir -p $(dir $@)
@@ -85,13 +87,17 @@ info/neovim.md: files/nvim.tar.gz
 	printf "| %-10s | %-13s | %-83s |\n" "$${NAME}" "$${VERSION}" "$${SUM}" | tee -a $@
 	
 cli: info/cli-tools.md
+	echo '##[ $@ ]##'
+	echo '✅ CLI tools added'
+
 info/cli-tools.md:
+	echo '##[ $@ ]##'
 	mkdir -p $(dir $@)
 	$(INSTALL) $(CLI)
 	printf "\n$(HEADING2) %s\n\n" "Handpicked CLI tools available in the toolbox" | tee $@
 	$(call tr,"Name","Version","Summary",$@)
 	$(call tr,"----","-------","----------------------------",$@)
-	buildah run $(WORKING_CONTAINER) sh -c  'dnf info -q installed $(CLI) | \
+	buildah run $(WORKING_CONTAINER) sh -c  'dnf info -q --installed $(CLI) | \
 	   grep -oP "(Name.+:\s\K.+)|(Ver.+:\s\K.+)|(Sum.+:\s\K.+)" | \
 	   paste  - - -  | sort -u ' | \
 	   awk -F'\t' '{printf "| %-14s | %-8s | %-83s |\n", $$1, $$2, $$3}' | tee -a $@
