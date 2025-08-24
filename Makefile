@@ -24,6 +24,7 @@ WORKING_CONTAINER ?= $(NAME)-working-container
 TBX_IMAGE :=  ghcr.io/grantmacken/$(NAME)
 
 RUN := buildah run $(WORKING_CONTAINER)
+INSTALL := $(RUN) dnf install --allowerasing --skip-unavailable --skip-broken --no-allow-downgrade -y
 ADD := buildah add --chmod 755 $(WORKING_CONTAINER)
 WGET := wget -q --no-check-certificate --timeout=10 --tries=3
 #LISTS
@@ -35,6 +36,14 @@ bdu = jq -r ".assets[] | select(.browser_download_url | contains(\"$1\")) | .bro
 default: neovim
 	echo '##[ $@ ]##'
 	echo 'image built'
+ifdef GITHUB_ACTIONS
+	buildah config \
+	--label summary='a toolbox with cli tools, neovim' \
+	--label maintainer='Grant MacKenzie <grantmacken@gmail.com>' \
+	--env lang=C.UTF-8 $(WORKING_CONTAINER)
+	buildah commit $(WORKING_CONTAINER) $(TBX_IMAGE)
+	buildah push $(TBX_IMAGE):latest
+endif
 	
 init: .env
 	echo '##[ $@ ]##'
@@ -74,5 +83,17 @@ info/neovim.md: files/nvim.tar.gz
 	VERSION=$$($(RUN) nvim -v | grep -oP 'NVIM \K.+' | cut -d'-' -f1 )
 	SUM='The text editor with a focus on extensibility and usability'
 	printf "| %-10s | %-13s | %-83s |\n" "$${NAME}" "$${VERSION}" "$${SUM}" | tee -a $@
+	
+cli: info/cli-tools.md
+info/cli-tools.md:
+	mkdir -p $(dir $@)
+	$(INSTALL) $(CLI)
+	printf "\n$(HEADING2) %s\n\n" "Handpicked CLI tools available in the toolbox" | tee $@
+	$(call tr,"Name","Version","Summary",$@)
+	$(call tr,"----","-------","----------------------------",$@)
+	buildah run $(WORKING_CONTAINER) sh -c  'dnf info -q installed $(CLI) | \
+	   grep -oP "(Name.+:\s\K.+)|(Ver.+:\s\K.+)|(Sum.+:\s\K.+)" | \
+	   paste  - - -  | sort -u ' | \
+	   awk -F'\t' '{printf "| %-14s | %-8s | %-83s |\n", $$1, $$2, $$3}' | tee -a $@
 	
 	
