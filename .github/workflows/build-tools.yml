@@ -1,4 +1,4 @@
-name: Build  tbx image
+name: worktree tbx-build-tools
 on:
   #schedule:
   # - cron: '0 1 * * 1'  #  1am every monday
