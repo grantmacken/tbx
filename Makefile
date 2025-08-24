@@ -23,10 +23,11 @@ TBX_IMAGE := ghcr.io/grantmacken/tbx-build-tools
 
 RUN := buildah run $(WORKING_CONTAINER)
 ADD := buildah add --chmod 755 $(WORKING_CONTAINER)
+INSTALL := $(RUN) dnf install --allowerasing --skip-unavailable --skip-broken --no-allow-downgrade -y
 
 WGET := wget -q --no-check-certificate --timeout=10 --tries=3
 
-BUILDING := make jq gcc gcc-c++ pcre2 autoconf pkgconf
+BUILDING := make jq cgcc gcc-c++ pcre2 autoconf pkgconf
 DEVEL := gettext-devel \
  glibc-devel \
  libevent-devel \
@@ -34,7 +35,7 @@ DEVEL := gettext-devel \
  openssl-devel \
  perl-devel \
  readline-devel \
- zlib-devel:w
+ zlib-devel
 
 tr = printf "| %-14s | %-8s | %-83s |\n" "$(1)" "$(2)" "$(3)" | tee -a $(4)
 bdu = jq -r ".assets[] | select(.browser_download_url | contains(\"$1\")) | .browser_download_url" $2
@@ -102,15 +103,9 @@ build-tools: info/build-tools.md
 
 info/build-tools.md:
 	echo '##[ $@ ]##'
-	$(RUN) dnf update -y 
-	for item in $(DEVEL)
-	do
-	$(RUN) dnf install --allowerasing --skip-unavailable --skip-broken --no-allow-downgrade -y $${item} &>/dev/null
-	done
-	for item in $(BUILDING)
-	do
-	$(RUN) dnf install --allowerasing --skip-unavailable --skip-broken --no-allow-downgrade -y $${item} &>/dev/null
-	done
+	$(RUN) dnf update -y
+	$(INSTALL) $(DEVEL)
+	$(INSTALL) $(BUILDING)
 	printf "\n$(HEADING2) %s\n\n" "Selected Build Tooling for Make Installs" | tee $@
 	$(call tr,"Name","Version","Summary",$@)
 	$(call tr,"----","-------","----------------------------",$@)
@@ -127,30 +122,5 @@ info/build-tools.md:
 	paste  - - -  | sort -u ' | \
 	awk -F'\t' '{printf "| %-14s | %-8s | %-83s |\n", $$1, $$2, $$3}' | \
 	tee -a $@
-	
-	
-files/nvim.tar.gz:
-	echo '##[ $@ ]##'
-	mkdir -p $(dir $@)
-	$(WGET) "https://github.com/neovim/neovim/releases/download/nightly/nvim-linux-x86_64.tar.gz" -O $@
-	
-	
-	
-##[[ NEOVIM ]]#
-neovim: info/neovim.md
-info/neovim.md: files/nvim.tar.gz
-	echo '##[ $@ ]##'
-	NAME=$(basename $(notdir $@))
-	TARGET=files/$${NAME}/usr/local
-	mkdir -p $${TARGET}
-	tar xz --strip-components=1 -C $${TARGET} -f $<
-	$(ADD) files/$${NAME} &>/dev/null
-	# CHECK:
-	$(RUN) nvim -v
-	$(RUN) whereis nvim
-	$(RUN) which nvim
-	VERSION=$$($(RUN) nvim -v | grep -oP 'NVIM \K.+' | cut -d'-' -f1 )
-	SUM='The text editor with a focus on extensibility and usability'
-	printf "| %-10s | %-13s | %-83s |\n" "$${NAME}" "$${VERSION}" "$${SUM}" | tee -a $@
 	
 	
