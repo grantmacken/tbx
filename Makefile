@@ -28,7 +28,7 @@ INSTALL := $(RUN) dnf install --allowerasing --skip-unavailable --skip-broken --
 ADD := buildah add --chmod 755 $(WORKING_CONTAINER)
 WGET := wget -q --no-check-certificate --timeout=10 --tries=3
 #LISTS
-CLI := eza fd-find fzf gh pass wl-clipboard zoxide xq
+CLI := eza fd-find fzf gh pass wl-clipboard zoxide
 
 tr = printf "| %-14s | %-8s | %-83s |\n" "$(1)" "$(2)" "$(3)" | tee -a $(4)
 bdu = jq -r ".assets[] | select(.browser_download_url | contains(\"$1\")) | .browser_download_url" $2
@@ -101,5 +101,10 @@ info/cli-tools.md:
 	   grep -oP "(Name.+:\s\K.+)|(Ver.+:\s\K.+)|(Sum.+:\s\K.+)" | \
 	   paste  - - -  | sort -u ' | \
 	   awk -F'\t' '{printf "| %-14s | %-8s | %-83s |\n", $$1, $$2, $$3}' | tee -a $@
+
+pull:
+	echo '##[ $@ ]##'
+	podman pull ghcr.io/grantmacken/tbx-coding:latest
+
 	
 	
