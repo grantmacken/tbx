@@ -28,7 +28,7 @@ INSTALL := $(RUN) dnf install --allowerasing --skip-unavailable --skip-broken --
 ADD := buildah add --chmod 755 $(WORKING_CONTAINER)
 WGET := wget -q --no-check-certificate --timeout=10 --tries=3
 #LISTS
-CLI := eza fd-find fzf gh pass ripgrep wl-clipboard zoxide
+CLI := eza fd-find fzf gh pass ripgrep stow wl-clipboard zoxide
 
 tr = printf "| %-14s | %-8s | %-83s |\n" "$(1)" "$(2)" "$(3)" | tee -a $(4)
 bdu = jq -r ".assets[] | select(.browser_download_url | contains(\"$1\")) | .browser_download_url" $2
