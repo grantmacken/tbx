@@ -16,9 +16,9 @@ HEADING1 := \#
 HEADING2 := $(HEADING1)$(HEADING1)
 HEADING3 := $(HEADING2)$(HEADING1)
 
-include .env 
+include .env
 
-FROM_IMAGE := ghcr.io/grantmacken/tbx-build-tools
+FROM_IMAGE := ghcr.io/grantmacken/tbx-runtimes
 NAME := tbx-coding
 WORKING_CONTAINER ?= $(NAME)-working-container
 TBX_IMAGE :=  ghcr.io/grantmacken/$(NAME)
@@ -27,6 +27,7 @@ RUN := buildah run $(WORKING_CONTAINER)
 INSTALL := $(RUN) dnf install --allowerasing --skip-unavailable --skip-broken --no-allow-downgrade -y
 ADD := buildah add --chmod 755 $(WORKING_CONTAINER)
 WGET := wget -q --no-check-certificate --timeout=10 --tries=3
+TAR  := tar xz --strip-components=1 -C
 #LISTS
 CLI := eza fd-find fzf gh pass ripgrep stow wl-clipboard zoxide
 
@@ -44,15 +45,15 @@ ifdef GITHUB_ACTIONS
 	buildah commit $(WORKING_CONTAINER) $(TBX_IMAGE)
 	buildah push $(TBX_IMAGE):latest
 endif
-	
+
 init: .env
 	echo '##[ $@ ]##'
-	
+
 latest/tbx-build-tools.json:
 	echo '##[ $@ ]##'
 	mkdir -p $(dir $@)
 	skopeo inspect docker://${FROM_IMAGE}:latest | jq '.' > $@
-	
+
 .env: latest/tbx-build-tools.json
 	echo '##[ $@ ]##'
 	FROM=$$(cat $< | jq -r '.Name')
@@ -60,12 +61,12 @@ latest/tbx-build-tools.json:
 	buildah pull "$$FROM" &> /dev/null
 	echo -n "WORKING_CONTAINER=" | tee -a .env
 	buildah from "$$FROM" | tee -a .env
-	
+
 files/nvim.tar.gz:
 	echo '##[ $@ ]##'
 	mkdir -p $(dir $@)
 	$(WGET) "https://github.com/neovim/neovim/releases/download/nightly/nvim-linux-x86_64.tar.gz" -O $@
-	
+
 ##[[ NEOVIM ]]#
 neovim: info/neovim.md
 	echo '✅ latest pre-release neovim added'
@@ -85,7 +86,7 @@ info/neovim.md: files/nvim.tar.gz
 	VERSION=$$($(RUN) nvim -v | grep -oP 'NVIM \K.+' | cut -d'-' -f1 )
 	SUM='The text editor with a focus on extensibility and usability'
 	printf "| %-10s | %-13s | %-83s |\n" "$${NAME}" "$${VERSION}" "$${SUM}" | tee -a $@
-	
+
 cli: info/cli-tools.md
 	echo '##[ $@ ]##'
 	echo '✅ CLI tools added'
@@ -105,6 +106,3 @@ info/cli-tools.md:
 pull:
 	echo '##[ $@ ]##'
 	podman pull ghcr.io/grantmacken/tbx-coding:latest
-
-	
-	
