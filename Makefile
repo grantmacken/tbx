@@ -61,6 +61,7 @@ latest/tbx-build-tools.json:
 ##[[ RUNTIMES ]]##
 runtimes: info/runtimes.md
 info/runtimes.md: nodejs # otp rebar3 elixir gleam
+	mkdir -p $(dir $@)
 	printf "\n$(HEADING2) %s\n\n" "Runtimes and associated languages" | tee $@
 	# cat << EOF | tee -a $@
 	# Included in this toolbox are the latest releases of the Erlang, Elixir and Gleam programming languages.
@@ -81,6 +82,7 @@ info/runtimes.md: nodejs # otp rebar3 elixir gleam
 
 ##[[ NODEJS ]]##
 nodejs: info/nodejs.md
+	echo '✅ latest nodejs added'
 
 latest/nodejs.json:
 	# echo '##[ $@ ]##'
@@ -89,7 +91,7 @@ latest/nodejs.json:
 
 info/nodejs.md: latest/nodejs.json
 	# echo '##[ $@ ]##'
-	echo '✅ latest nodejs added'
+	mkdir -p $(dir $@)
 	VER=$$(jq -r '.tag_name' $< )
 	mkdir -p files/nodejs/usr/local
 	wget -q https://nodejs.org/download/release/$${VER}/node-$${VER}-linux-x64.tar.gz -O- |
@@ -101,4 +103,8 @@ info/nodejs.md: latest/nodejs.json
 	echo -n 'checking npm version...'
 	NPM_VER=$$(buildah run $(WORKING_CONTAINER) npm --version | tee)
 	$(call tr,npm,$${NPM_VER},Node Package Manager, $@)
+
+pull:
+	echo '##[ $@ ]##'
+	podman pull ghcr.io/grantmacken/tbx-runtimes:latest
 
