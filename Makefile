@@ -18,139 +18,87 @@ HEADING3 := $(HEADING2)$(HEADING1)
 
 include .env
 WORKING_CONTAINER ?= fedora-toolbox-working-container
-FED_IMAGE := registry.fedoraproject.org/fedora-toolbox
-TBX_IMAGE := ghcr.io/grantmacken/tbx-build-tools
+FROM_IMAGE := ghcr.io/grantmacken/tbx-build-tools
+NAME := tbx-runtimes
+WORKING_CONTAINER ?= $(NAME)-working-container
 
 RUN := buildah run $(WORKING_CONTAINER)
+INSTALL := $(RUN) dnf install --allowerasing --skip-unavailable --skip-broken --no-allow-downgrade -y
+ADD := buildah add --chmod 755 $(WORKING_CONTAINER)
+WGET := wget -q --no-check-certificate --timeout=10 --tries=3
 ADD := buildah add --chmod 755 $(WORKING_CONTAINER)
 
 WGET := wget -q --no-check-certificate --timeout=10 --tries=3
 
-BUILDING := make gcc gcc-c++ pcre2 autoconf pkgconf
-DEVEL := gettext-devel \
- glibc-devel \
- libevent-devel \
- ncurses-devel \
- openssl-devel \
- perl-devel \
- readline-devel \
- zlib-devel:w
-
 tr = printf "| %-14s | %-8s | %-83s |\n" "$(1)" "$(2)" "$(3)" | tee -a $(4)
 bdu = jq -r ".assets[] | select(.browser_download_url | contains(\"$1\")) | .browser_download_url" $2
 
-default: host-spawn build-tools
+default: runtimes
 	echo '##[ $@ ]##'
-	$(RUN) which wget
 	buildah config \
 	--label summary='a toolbox with cli tools, neovim' \
 	--label maintainer='Grant MacKenzie <grantmacken@gmail.com>' \
 	--env lang=C.UTF-8 $(WORKING_CONTAINER)
 	buildah commit $(WORKING_CONTAINER) $(TBX_IMAGE)
 	buildah push $(TBX_IMAGE):latest
-	
+
 init: .env
 	echo '##[ $@ ]##'
 
-.env: latest/fedora-toolbox.json
+latest/tbx-build-tools.json:
 	echo '##[ $@ ]##'
-	FROM_REGISTRY=$$(cat $< | jq -r '.Name')
-	FROM_VERSION=$$(cat $< | jq -r '.Labels.version')
-	FROM_NAME=$$(cat $< | jq -r '.Labels.name')
-	printf "FROM_NAME=%s\n" "$$FROM_NAME" | tee $@
-	printf "FROM_REGISTRY=%s\n" "$$FROM_REGISTRY" | tee -a $@
-	printf "FROM_VERSION=%s\n" "$$FROM_VERSION" | tee -a $@
-	buildah pull "$$FROM_REGISTRY:$$FROM_VERSION" &> /dev/null
+	mkdir -p $(dir $@)
+	skopeo inspect docker://${FROM_IMAGE}:latest | jq '.' > $@
+
+.env: latest/tbx-build-tools.json
+	echo '##[ $@ ]##'
+	FROM=$$(cat $< | jq -r '.Name')
+	printf "FROM=%s\n" "$$FROM" | tee $@
+	buildah pull "$$FROM" &> /dev/null
 	echo -n "WORKING_CONTAINER=" | tee -a .env
-	buildah from "$${FROM_REGISTRY}:$${FROM_VERSION}" | tee -a .env
-	
-latest/fedora-toolbox.json:
-	echo '##[ $@ ]##'
-	mkdir -p $(dir $@)
-	skopeo inspect docker://${FED_IMAGE}:latest | jq '.' > $@
-	
-## HOST-SPAWN
-host-spawn: info/host-spawn.md
-latest/host-spawn.json:
-	echo '##[ $@ ]##'
-	mkdir -p $(dir $@)
-	wget -q https://api.github.com/repos/1player/host-spawn/releases/latest -O $@
+	buildah from "$$FROM" | tee -a .env
 
-info/host-spawn.md: latest/host-spawn.json
-	echo '##[ $@ ]##'
-	mkdir -p $(dir $@)
-	SRC=$$(jq -r ".assets[] | select(.browser_download_url | contains(\"x86_64\")) | .browser_download_url" $<)
-	echo $${SRC}
-	$(ADD) $${SRC} /usr/local/bin/host-spawn &>/dev/null
-	echo -n 'checking host-spawn version...'
-	VER=$$($(RUN) host-spawn --version | tee )
-	printf "\n$(HEADING2) %s\n\n" "Do More With host-spawn" | tee -a $@
-	$(call tr,"Name","Version","Summary",$@)
-	$(call tr,"----","-------","----------------------------",$@)
-	$(call tr,host-spawn,$${VER},Run commands on your host machine from inside toolbox,$@)
-	echo >> $@
-	cat << EOF | tee -a $@
-	The host-spawn tool is a wrapper around the toolbox command that allows you to run
-	commands on your host machine from inside the toolbox.
-	To use the host-spawn tool, either run the following command: host-spawn <command>
-	Or just call host-spawn with no argument and this will pop you into you host shell.
-	When doing this remember to pop back into the toolbox with exit.
-	EOF
-	printf "Checkout the %s for more information.\n\n" "[host-spawn repo](https://github.com/1player/host-spawn)" | tee -a $@
+##[[ RUNTIMES ]]##
+runtimes: info/runtimes.md
+info/runtimes.md: nodejs # otp rebar3 elixir gleam
+	printf "\n$(HEADING2) %s\n\n" "Runtimes and associated languages" | tee $@
+	# cat << EOF | tee -a $@
+	# Included in this toolbox are the latest releases of the Erlang, Elixir and Gleam programming languages.
+	# The Erlang programming language is a general-purpose, concurrent, functional programming language
+	# and **runtime** system. It is used to build massively scalable soft real-time systems with high availability.
+	# The BEAM is the virtual machine at the core of the Erlang Open Telecom Platform (OTP).
+	# The included Elixir and Gleam programming languages also run on the BEAM.
+	# BEAM tooling included is the latest versions of the Rebar3 and the Mix build tools.
+	# The latest nodejs **runtime** is also installed, as Gleam can compile to javascript as well a Erlang.
+	# EOF
+	# $(call tr,"Name","Version","Summary",$@)
+	# $(call tr,"----","-------","----------------------------",$@)
+	# cat info/otp.md    | tee -a $@
+	# cat info/rebar3.md | tee -a $@
+	# cat info/elixir.md | tee -a $@
+	# cat info/gleam.md  | tee -a $@
+	# cat info/nodejs.md | tee -a $@
 
-build-tools: info/build-tools.md
+##[[ NODEJS ]]##
+nodejs: info/nodejs.md
 
-info/build-tools.md:
-	echo '##[ $@ ]##'
-	$(RUN) dnf update -y 
-	for item in $(DEVEL)
-	do
-	$(RUN) dnf install --allowerasing --skip-unavailable --skip-broken --no-allow-downgrade -y $${item} &>/dev/null
-	done
-	for item in $(BUILDING)
-	do
-	$(RUN) dnf install --allowerasing --skip-unavailable --skip-broken --no-allow-downgrade -y $${item} &>/dev/null
-	done
-	printf "\n$(HEADING2) %s\n\n" "Selected Build Tooling for Make Installs" | tee $@
-	$(call tr,"Name","Version","Summary",$@)
-	$(call tr,"----","-------","----------------------------",$@)
-	$(RUN) sh -c  'dnf info -q --installed $(BUILDING) | \
-	grep -oP "(Name.+:\s\K.+)|(Ver.+:\s\K.+)|(Sum.+:\s\K.+)" | \
-	paste  - - -  | sort -u ' | \
-	awk -F'\t' '{printf "| %-14s | %-8s | %-83s |\n", $$1, $$2, $$3}' | \
-	tee -a $@
-	printf "\n$(HEADING2) %s\n\n" "Selected Development files for building" | tee $@
-	$(call tr,"Name","Version","Summary",$@)
-	$(call tr,"----","-------","----------------------------",$@)
-	$(RUN) sh -c  'dnf info -q --installed $(DEVEL) | \
-	grep -oP "(Name.+:\s\K.+)|(Ver.+:\s\K.+)|(Sum.+:\s\K.+)" | \
-	paste  - - -  | sort -u ' | \
-	awk -F'\t' '{printf "| %-14s | %-8s | %-83s |\n", $$1, $$2, $$3}' | \
-	tee -a $@
-	
-	
-files/nvim.tar.gz:
-	echo '##[ $@ ]##'
+latest/nodejs.json:
+	# echo '##[ $@ ]##'
 	mkdir -p $(dir $@)
-	$(WGET) "https://github.com/neovim/neovim/releases/download/nightly/nvim-linux-x86_64.tar.gz" -O $@
-	
-	
-	
-##[[ NEOVIM ]]#
-neovim: info/neovim.md
-info/neovim.md: files/nvim.tar.gz
-	echo '##[ $@ ]##'
-	NAME=$(basename $(notdir $@))
-	TARGET=files/$${NAME}/usr/local
-	mkdir -p $${TARGET}
-	tar xz --strip-components=1 -C $${TARGET} -f $<
-	$(ADD) files/$${NAME} &>/dev/null
-	# CHECK:
-	$(RUN) nvim -v
-	$(RUN) whereis nvim
-	$(RUN) which nvim
-	VERSION=$$($(RUN) nvim -v | grep -oP 'NVIM \K.+' | cut -d'-' -f1 )
-	SUM='The text editor with a focus on extensibility and usability'
-	printf "| %-10s | %-13s | %-83s |\n" "$${NAME}" "$${VERSION}" "$${SUM}" | tee -a $@
-	
-	
+	wget -q 'https://api.github.com/repos/nodejs/node/releases/latest' -O $@
+
+info/nodejs.md: latest/nodejs.json
+	# echo '##[ $@ ]##'
+	echo '✅ latest nodejs added'
+	VER=$$(jq -r '.tag_name' $< )
+	mkdir -p files/nodejs/usr/local
+	wget -q https://nodejs.org/download/release/$${VER}/node-$${VER}-linux-x64.tar.gz -O- |
+	tar xz --strip-components=1 -C files/nodejs/usr/local
+	buildah add --chmod 755  $(WORKING_CONTAINER) files/nodejs &>/dev/null
+	echo -n 'checking node version...'
+	NODE_VER=$$(buildah run $(WORKING_CONTAINER) node --version | tee)
+	$(call tr,node,$${NODE_VER},Nodejs runtime, $@)
+	echo -n 'checking npm version...'
+	NPM_VER=$$(buildah run $(WORKING_CONTAINER) npm --version | tee)
+	$(call tr,npm,$${NPM_VER},Node Package Manager, $@)
+
