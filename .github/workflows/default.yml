@@ -27,3 +27,4 @@ jobs:
         - name: Toolbox Build
           run: |
             make init
+            make
