@@ -14,21 +14,19 @@ unexport MAKEFLAGS
 
 HEADING1 := \#
 HEADING2 := $(HEADING1)$(HEADING1)
-HEADING3 := $(HEADING2)$(HEADING1)
 
 include .env
-WORKING_CONTAINER ?= fedora-toolbox-working-container
 FROM_IMAGE := ghcr.io/grantmacken/tbx-build-tools
 NAME := tbx-runtimes
 WORKING_CONTAINER ?= $(NAME)-working-container
+TBX_IMAGE :=  ghcr.io/grantmacken/$(NAME)
 
 RUN := buildah run $(WORKING_CONTAINER)
 INSTALL := $(RUN) dnf install --allowerasing --skip-unavailable --skip-broken --no-allow-downgrade -y
 ADD := buildah add --chmod 755 $(WORKING_CONTAINER)
-WGET := wget -q --no-check-certificate --timeout=10 --tries=3
-ADD := buildah add --chmod 755 $(WORKING_CONTAINER)
 
 WGET := wget -q --no-check-certificate --timeout=10 --tries=3
+TAR  := tar xz --strip-components=1 -C
 
 tr = printf "| %-14s | %-8s | %-83s |\n" "$(1)" "$(2)" "$(3)" | tee -a $(4)
 bdu = jq -r ".assets[] | select(.browser_download_url | contains(\"$1\")) | .browser_download_url" $2
@@ -87,21 +85,21 @@ nodejs: info/nodejs.md
 latest/nodejs.json:
 	# echo '##[ $@ ]##'
 	mkdir -p $(dir $@)
-	wget -q 'https://api.github.com/repos/nodejs/node/releases/latest' -O $@
+	$(WGET) 'https://api.github.com/repos/nodejs/node/releases/latest' -O $@
 
 info/nodejs.md: latest/nodejs.json
 	# echo '##[ $@ ]##'
 	mkdir -p $(dir $@)
 	VER=$$(jq -r '.tag_name' $< )
 	mkdir -p files/nodejs/usr/local
-	wget -q https://nodejs.org/download/release/$${VER}/node-$${VER}-linux-x64.tar.gz -O- |
-	tar xz --strip-components=1 -C files/nodejs/usr/local
-	buildah add --chmod 755  $(WORKING_CONTAINER) files/nodejs &>/dev/null
+	$(WGET) https://nodejs.org/download/release/$${VER}/node-$${VER}-linux-x64.tar.gz -O- | 
+	$(TAR) files/nodejs/usr/local
+	$(ADD) files/nodejs &>/dev/null
 	echo -n 'checking node version...'
-	NODE_VER=$$(buildah run $(WORKING_CONTAINER) node --version | tee)
+	NODE_VER=$$($(RUN) node --version | tee)
 	$(call tr,node,$${NODE_VER},Nodejs runtime, $@)
 	echo -n 'checking npm version...'
-	NPM_VER=$$(buildah run $(WORKING_CONTAINER) npm --version | tee)
+	NPM_VER=$$($(RUN) npm --version | tee)
 	$(call tr,npm,$${NPM_VER},Node Package Manager, $@)
 
 pull:
