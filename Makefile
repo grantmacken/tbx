@@ -89,7 +89,7 @@ info/neovim.md: files/nvim.tar.gz
 
 info/nvim_plugins.md: scripts/nvim_plugins
 	$(ADD) $(<) /usr/local/bin/nvim_plugins
-	$(RUN) $(<)
+	$(RUN) ls -alR /usr/local/bin/
 
 
 
