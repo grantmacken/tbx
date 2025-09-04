@@ -68,7 +68,7 @@ files/nvim.tar.gz:
 	$(WGET) "https://github.com/neovim/neovim/releases/download/nightly/nvim-linux-x86_64.tar.gz" -O $@
 
 ##[[ NEOVIM ]]#
-neovim: info/neovim.md
+neovim: info/neovim.md info/nvim.md
 	echo '✅ latest pre-release neovim added'
 
 info/neovim.md: files/nvim.tar.gz
@@ -86,6 +86,15 @@ info/neovim.md: files/nvim.tar.gz
 	VERSION=$$($(RUN) nvim -v | grep -oP 'NVIM \K.+' | cut -d'-' -f1 )
 	SUM='The text editor with a focus on extensibility and usability'
 	printf "| %-10s | %-13s | %-83s |\n" "$${NAME}" "$${VERSION}" "$${SUM}" | tee -a $@
+
+info/nvim_plugins.md: scripts/nvim_plugins
+	$(ADD) $(<) /usr/local/bin/nvim_plugins
+	$(RUN) $(<)
+
+
+
+
+
 
 cli: info/cli-tools.md
 	echo '##[ $@ ]##'

@@ -1,0 +1,26 @@
+#!/usr/bin/env -S nvim -l
+vim.print(vim.uv.os_getenv("XDG_DATA_DIRS"))
+vim.uv.os_setenv("XDG_DATA_HOME", "/usr/local/share")
+vim.pack.add({
+ 'https://github.com/mason-org/mason.nvim',
+})
+vim.print( 'Mason Packages' ) 
+local mason_install = "/usr/local/share"
+require("mason").setup({
+  install_root_dir = mason_install,
+  PATH = "skip",
+})
+
+local registry = require("mason-registry")
+local package = registry.get_package("lua-language-server")
+
+-- Install with callback
+package:install(nil, function(success, result)
+    if success then
+        print("Successfully installed " .. package.name)
+    else
+        print("Failed to install " .. package.name .. ": " .. result)
+    end
+end)
+
+
