@@ -3,21 +3,21 @@ vim.print(vim.fn.stdpath('data'))
 -- vim.print(vim.fn.stdpath('config_dirs'))
 -- vim.print( 'config_dirs: ' ..  vim.fn.stdpath('config_dirs')[1])
 -- vim.print( 'data_dirs: ' ..  vim.fn.stdpath('data_dirs')[3])
-# local data_dir = vim.fn.stdpath('data_dirs')[3]
-# -- vim.print( vim.api.nvim_list_runtime_paths())
-# -- vim.print( vim.api.nvim_get_runtime_file("lua",true))
-# --XDG_DATA_HOME 
-# --vim.print( vim.pack )
-# vim.print(vim.uv.os_getenv("HOME"))
-# vim.print(vim.uv.os_getenv("XDG_DATA_DIRS"))
-# vim.uv.os_setenv("XDG_DATA_HOME", "/usr/local/share")
-# vim.print(vim.uv.os_getenv("XDG_DATA_HOME"))
-# vim.print(vim.fn.stdpath('data'))
-# vim.pack.add({
-#  'https://github.com/mason-org/mason.nvim',
-# })
-#
-#
+--  local data_dir = vim.fn.stdpath('data_dirs')[3]
+--  -- vim.print( vim.api.nvim_list_runtime_paths())
+--  -- vim.print( vim.api.nvim_get_runtime_file("lua",true))
+--  --XDG_DATA_HOME 
+--  --vim.print( vim.pack )
+--  vim.print(vim.uv.os_getenv("HOME"))
+--  vim.print(vim.uv.os_getenv("XDG_DATA_DIRS"))
+--  vim.uv.os_setenv("XDG_DATA_HOME", "/usr/local/share")
+--  vim.print(vim.uv.os_getenv("XDG_DATA_HOME"))
+--  vim.print(vim.fn.stdpath('data'))
+--  vim.pack.add({
+--   'https://github.com/mason-org/mason.nvim',
+--  })
+-- 
+-- 
 
 --vim.print(vim.stdpath)
 
