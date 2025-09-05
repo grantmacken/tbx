@@ -71,7 +71,7 @@ files/nvim.tar.gz:
 neovim: nvim plugins packages
 	echo '✅ neovim task completed'
 
-nvim: info/neovim.md:
+nvim: info/neovim.md
 info/neovim.md: files/nvim.tar.gz
 	echo '##[ $@ ]##'
 	mkdir -p $(dir $@)
