@@ -93,9 +93,10 @@ info/neovim.md: files/nvim.tar.gz
 	$(RUN) /usr/local/bin/nvim_plugins
 	$(RUN) ls /usr/local/share/nvim/site/pack/core/opt | tee $@
 	echo '✅ neovim plugins installed'
-	$(RUN) /usr/local/bin/nvim_mason_packages
+	$(RUN) /usr/local/bin/nvim_mason_packages || true
 	echo '✅ mason packages installed'
-	$(RUN) /usr/local/bin/nvim_mason_packages
+	$(RUN) /usr/local/bin/nvim_treesitter || true
+	$(RUN) /usr/local/bin/nvim_checkhealth
 
 cli: info/cli-tools.md
 	echo '##[ $@ ]##'

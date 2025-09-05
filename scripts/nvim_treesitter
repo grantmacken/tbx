@@ -1,4 +1,5 @@
 #!/usr/bin/env -S nvim -l
 vim.print( 'Treesitters' )
 vim.cmd.packadd('treesitter.nvim')
+vim.print(vim.cmd.checkhealth('treesitter'))
 
