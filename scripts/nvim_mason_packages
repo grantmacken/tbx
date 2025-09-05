@@ -18,15 +18,12 @@ print( 'Mason install_root_dir: ' .. mason_install)
 
 local registry = require("mason-registry")
 registry.refresh()
-local packages = registry.get_all_packages()
+-- local packages = registry.get_all_packages()
 local packages = {"lua-language-server"}
-
-local package = registry.get_package("lua-language-server")
--- Install with callback
---
 for _, pkg_name in ipairs(packages) do
   local ok, pkg = pcall(registry.get_package, pkg_name)
   if ok and not pkg:is_installed() then
     pkg:install()
+  else print( 'No ' .. pkg_name)
   end
 end
