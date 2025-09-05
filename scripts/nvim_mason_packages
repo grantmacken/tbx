@@ -21,14 +21,14 @@ local registry = require("mason-registry")
 
 registry.refresh()
 local packages = registry.get_all_packages()
+local packages = {"lua-language-server"}
+
 local package = registry.get_package("lua-language-server")
 -- Install with callback
-package:install(nil, function(success, result)
-    if success then
-        print("Successfully installed " .. package.name)
-    else
-        print("Failed to install " .. package.name .. ": " .. result)
-    end
-end)
-
-
+--
+for _, pkg_name in ipairs(packages) do
+  local ok, pkg = pcall(registry.get_package, pkg_name)
+  if ok and not pkg:is_installed() then
+    pkg:install()
+  end
+end
