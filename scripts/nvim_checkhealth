@@ -1,3 +1,2 @@
 #!/usr/bin/env -S nvim -l
-vim.print("I can access the vim module!")
-vim.print(vim.fn.stdpath('data'))
+vim.cmd.checkhealth()
