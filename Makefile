@@ -68,7 +68,7 @@ files/nvim.tar.gz:
 	$(WGET) "https://github.com/neovim/neovim/releases/download/nightly/nvim-linux-x86_64.tar.gz" -O $@
 
 ##[[ NEOVIM ]]#
-neovim: nvim plugins packages
+neovim: nvim xtra
 	echo '✅ neovim task completed'
 
 nvim: info/neovim.md
@@ -90,6 +90,16 @@ info/neovim.md: files/nvim.tar.gz
 	printf "| %-10s | %-13s | %-83s |\n" "$${NAME}" "$${VERSION}" "$${SUM}" | tee -a $@
 	echo '✅ latest pre-release neovim installed'
 
+xtra: info/mason_packages.md
+	$(ADD) scripts/ /usr/local/bin/
+	$(RUN) ls /usr/local/bin
+
+	# $(RUN) /usr/local/bin/nvim_plugins
+	# $(RUN) ls /usr/local/share/nvim/site/pack/core/opt | tee $@
+	# $(ADD) $(<) /usr/local/bin/mason_packages
+
+
+
 plugins: info/nvim_plugins.md
 info/nvim_plugins.md: scripts/nvim_plugins
 	echo '##[ $@ ]##'
@@ -99,11 +109,11 @@ info/nvim_plugins.md: scripts/nvim_plugins
 	echo '✅ neovim plugins installed'
 
 packages: info/mason_packages.md
-info/mason_packages.md: scripts/mason_packages
+info/mason_packages.md: scripts/mason_packages 
 	echo '##[ $@ ]##'
 	$(ADD) $(<) /usr/local/bin/mason_packages
 	$(RUN) ls -al /usr/local/bin/
-	$(RUN) /usr/local/bin/mason_packages
+	$(RUN) /usr/local/bin/mason_packages | tee $@
 	echo '✅ language servers for neovim installed'
 #
 # info/nvim_ts.md: scripts/nvim_ts
