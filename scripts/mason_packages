@@ -10,14 +10,14 @@ require("mason").setup({
 
 local registry = require("mason-registry")
 local package = registry.get_package("lua-language-server")
---
--- -- Install with callback
--- package:install(nil, function(success, result)
---     if success then
---         print("Successfully installed " .. package.name)
---     else
---         print("Failed to install " .. package.name .. ": " .. result)
---     end
--- end)
+-
+-- Install with callback
+package:install(nil, function(success, result)
+    if success then
+        print("Successfully installed " .. package.name)
+    else
+        print("Failed to install " .. package.name .. ": " .. result)
+    end
+end)
 
 
