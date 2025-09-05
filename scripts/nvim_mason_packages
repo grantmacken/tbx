@@ -20,19 +20,24 @@ local pending = 0
 registry.refresh(function()
   for _, name in ipairs(packages) do
     local ok, pkg = pcall(registry.get_package, name)
-    if ok and not pkg:is_installed() then
-      vim.print(pkg)
-      pending = pending + 1
-      pkg:on("install:success", function()
-        pending = pending - 1
-        if pending == 0 then
-          print("All Mason packages installed!")
-        end
-      end)
-      pkg:install()
-    end
-  end
+      if ok then
+        vim.print(pkg)
+      end
+  --   if ok and not pkg:is_installed() then
+  --     vim.print(pkg)
+  --     pending = pending + 1
+  --     pkg:on("install:success", function()
+  --       pending = pending - 1
+  --       if pending == 0 then
+  --         print("All Mason packages installed!")
+  --       end
+  --     end)
+  --     pkg:install()
+  --   end
+   end
 end)
+
+vim.uv.sleep(5000)
 
 vim.print(registry.get_installed_package_names())
 
