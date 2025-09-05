@@ -15,30 +15,9 @@ mason.setup({
 
 local registry = require("mason-registry")
 local packages = { "lua-language-server"}
-local pending = 0
-
-registry.refresh(function()
-  for _, name in ipairs(packages) do
-    local ok, pkg = pcall(registry.get_package, name)
-      if ok then
-        vim.print(pkg)
-      end
-  --   if ok and not pkg:is_installed() then
-  --     vim.print(pkg)
-  --     pending = pending + 1
-  --     pkg:on("install:success", function()
-  --       pending = pending - 1
-  --       if pending == 0 then
-  --         print("All Mason packages installed!")
-  --       end
-  --     end)
-  --     pkg:install()
-  --   end
-   end
-end)
-
+registry.refresh()
 vim.uv.sleep(5000)
-
+print( 'package names')
+vim.print(registry.get_all_package_names())
+print( 'installed package names')
 vim.print(registry.get_installed_package_names())
-
--- vim.print(vim.cmd.checkhealth('mason'))
