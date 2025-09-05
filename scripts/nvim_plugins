@@ -26,9 +26,11 @@ vim.print( vim.cmd.set('packpath?'))
  -- 'https://github.com/stevearc/resession.nvim',
  })
 
+print( '--------------------------------------------')
 vim.print( vim.cmd.set('runtimepath?'))
+print( '--------------------------------------------')
 vim.print( vim.pack.get())
-
+print( '--------------------------------------------')
 
 
  -- vim.cmd.restart()

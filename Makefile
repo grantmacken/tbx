@@ -83,6 +83,7 @@ info/neovim.md: files/nvim.tar.gz
 	$(RUN) nvim -v
 	$(RUN) whereis nvim
 	$(RUN) which nvim
+	# Write to file
 	VERSION=$$($(RUN) nvim -v | grep -oP 'NVIM \K.+' | cut -d'-' -f1 )
 	SUM='The text editor with a focus on extensibility and usability'
 	printf "| %-10s | %-13s | %-83s |\n" "$${NAME}" "$${VERSION}" "$${SUM}" | tee -a $@
@@ -91,14 +92,14 @@ info/neovim.md: files/nvim.tar.gz
 info/nvim_plugins.md: scripts/nvim_plugins
 	$(ADD) $(<) /usr/local/bin/nvim_plugins
 	$(RUN) /usr/local/bin/nvim_plugins || true
-	$(RUN) ls /usr/local/share/nvim/site/pack/core/opt || true
+	$(RUN) ls /usr/local/share/nvim/site/pack/core/opt | tee $@
 	echo '✅ neovim plugins installed'
 
-# info/mason_packages.md: scripts/mason_packages
-# 	$(ADD) $(<) /usr/local/bin/mason_packages
-# 	$(RUN) ls -al /usr/local/bin/
-# 	$(RUN) /usr/local/bin/mason_packages
-# 	echo '✅ language servers for neovim installed'
+info/mason_packages.md: scripts/mason_packages
+	$(ADD) $(<) /usr/local/bin/mason_packages
+	$(RUN) ls -al /usr/local/bin/
+	$(RUN) /usr/local/bin/mason_packages
+	echo '✅ language servers for neovim installed'
 #
 # info/nvim_ts.md: scripts/nvim_ts
 # 	$(ADD) $(<) /usr/local/bin/nvim_ts
