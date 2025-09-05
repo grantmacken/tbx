@@ -90,39 +90,11 @@ info/neovim.md: files/nvim.tar.gz
 	printf "| %-10s | %-13s | %-83s |\n" "$${NAME}" "$${VERSION}" "$${SUM}" | tee -a $@
 	echo '✅ latest pre-release neovim installed'
 	$(ADD) scripts/ /usr/local/bin/
-	$(RUN) ls /usr/local/bin
-
-
-xtra:
-	$(ADD) scripts/ /usr/local/bin/
-	$(RUN) ls /usr/local/bin
-
-	# $(RUN) /usr/local/bin/nvim_plugins
-	# $(RUN) ls /usr/local/share/nvim/site/pack/core/opt | tee $@
-	# $(ADD) $(<) /usr/local/bin/mason_packages
-
-
-
-plugins: info/nvim_plugins.md
-info/nvim_plugins.md: scripts/nvim_plugins
-	echo '##[ $@ ]##'
-	$(ADD) $(<) /usr/local/bin/nvim_plugins
 	$(RUN) /usr/local/bin/nvim_plugins
 	$(RUN) ls /usr/local/share/nvim/site/pack/core/opt | tee $@
 	echo '✅ neovim plugins installed'
-
-packages: info/mason_packages.md
-info/mason_packages.md: scripts/mason_packages 
-	echo '##[ $@ ]##'
-	$(ADD) $(<) /usr/local/bin/mason_packages
-	$(RUN) ls -al /usr/local/bin/
-	$(RUN) /usr/local/bin/mason_packages | tee $@
+	$(RUN) /usr/local/bin/nvim_mason_packages
 	echo '✅ language servers for neovim installed'
-#
-# info/nvim_ts.md: scripts/nvim_ts
-# 	$(ADD) $(<) /usr/local/bin/nvim_ts
-# 	$(RUN) ls -al /usr/local/bin/
-# 	$(RUN) /usr/local/bin/nvim_ts
 
 cli: info/cli-tools.md
 	echo '##[ $@ ]##'

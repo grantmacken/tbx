@@ -1,0 +1,2 @@
+#!/usr/bin/env -S nvim -l
+vim.print(vim.uv.os_getenv("HOME"))
