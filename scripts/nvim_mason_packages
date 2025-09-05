@@ -17,8 +17,6 @@ print( 'Mason install_root_dir: ' .. mason_install)
 
 
 local registry = require("mason-registry")
-
-
 registry.refresh()
 local packages = registry.get_all_packages()
 local packages = {"lua-language-server"}
