@@ -24,5 +24,8 @@ vim.print(vim.fn.stdpath('data'))
  'https://github.com/stevearc/resession.nvim',
  })
 
+ -- vim.cmd.restart()
+
+
 --vim.print(vim.stdpath)
 

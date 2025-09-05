@@ -68,7 +68,7 @@ files/nvim.tar.gz:
 	$(WGET) "https://github.com/neovim/neovim/releases/download/nightly/nvim-linux-x86_64.tar.gz" -O $@
 
 ##[[ NEOVIM ]]#
-neovim: info/neovim.md info/nvim_plugins.md
+neovim: info/neovim.md info/nvim_plugins.md info/mason_packages.md
 	echo '✅ latest pre-release neovim added'
 
 info/neovim.md: files/nvim.tar.gz
@@ -89,13 +89,19 @@ info/neovim.md: files/nvim.tar.gz
 
 info/nvim_plugins.md: scripts/nvim_plugins
 	$(ADD) $(<) /usr/local/bin/nvim_plugins
-	$(RUN) ls -alR /usr/local/bin/
+	$(RUN) ls -al /usr/local/bin/
 	$(RUN) /usr/local/bin/nvim_plugins
+	$(RUN) tree /usr/local/share/nvim/site/pack
 
+info/mason_packages.md: scripts/mason_packages
+	$(ADD) $(<) /usr/local/bin/mason_packages
+	$(RUN) ls -al /usr/local/bin/
+	$(RUN) /usr/local/bin/mason_packages
 
-
-
-
+info/nvim_ts.md: scripts/nvim_ts
+	$(ADD) $(<) /usr/local/bin/nvim_ts
+	$(RUN) ls -al /usr/local/bin/
+	$(RUN) /usr/local/bin/nvim_ts
 
 cli: info/cli-tools.md
 	echo '##[ $@ ]##'
