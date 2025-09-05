@@ -1,0 +1,23 @@
+#!/usr/bin/env -S nvim -l
+
+vim.print( 'Mason Packages' )
+vim.cmd.packadd('mason.nvim')
+local mason_install = "/usr/local/share"
+require("mason").setup({
+  install_root_dir = mason_install,
+  PATH = "skip",
+})
+
+local registry = require("mason-registry")
+local package = registry.get_package("lua-language-server")
+--
+-- -- Install with callback
+-- package:install(nil, function(success, result)
+--     if success then
+--         print("Successfully installed " .. package.name)
+--     else
+--         print("Failed to install " .. package.name .. ": " .. result)
+--     end
+-- end)
+
+
