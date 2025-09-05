@@ -68,7 +68,7 @@ files/nvim.tar.gz:
 	$(WGET) "https://github.com/neovim/neovim/releases/download/nightly/nvim-linux-x86_64.tar.gz" -O $@
 
 ##[[ NEOVIM ]]#
-neovim: nvim xtra
+neovim: nvim
 	echo '✅ neovim task completed'
 
 nvim: info/neovim.md
@@ -89,8 +89,11 @@ info/neovim.md: files/nvim.tar.gz
 	SUM='The text editor with a focus on extensibility and usability'
 	printf "| %-10s | %-13s | %-83s |\n" "$${NAME}" "$${VERSION}" "$${SUM}" | tee -a $@
 	echo '✅ latest pre-release neovim installed'
+	$(ADD) scripts/ /usr/local/bin/
+	$(RUN) ls /usr/local/bin
 
-xtra: info/mason_packages.md
+
+xtra:
 	$(ADD) scripts/ /usr/local/bin/
 	$(RUN) ls /usr/local/bin
 
