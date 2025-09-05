@@ -92,7 +92,7 @@ info/nvim_plugins.md: scripts/nvim_plugins
 	$(ADD) $(<) /usr/local/bin/nvim_plugins
 	$(RUN) ls -al /usr/local/bin/
 	$(RUN) /usr/local/bin/nvim_plugins
-	$(RUN) tree /usr/local/share/nvim/site/pack
+	$(RUN) ls /usr/local/share/nvim/site/pack/core/opt
 	echo '✅ neovim plugins installed'
 
 info/mason_packages.md: scripts/mason_packages
