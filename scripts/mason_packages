@@ -1,21 +1,29 @@
 #!/usr/bin/env -S nvim -l
+print('###############################')
+vim.print(vim.fn.stdpath('data'))
+vim.print( vim.cmd.set('packpath?'))
 
 vim.print( 'Mason Packages' )
 vim.cmd.packadd('mason.nvim')
 local mason_install = "/usr/local/share"
-require("mason").setup({
+
+local mason = require("mason")
+mason.setup({
   install_root_dir = mason_install,
   PATH = "skip",
 })
 
-local registry = require("mason-registry")
-registry.refresh(function()
-  local ok, pkg = pcall(registry.get_package, "lua-language-server")
-  if ok and not pkg:is_installed() then
-    pkg:install()
-  end
-end)
+print( 'Mason install_root_dir: ' .. mason_install)
 
+
+local registry = require("mason-registry")
+
+
+registry.refresh()
+local packages = registry.get_all_packages()
+vim.print(packages)
+
+print('###############################')
 
 -- local package = registry.get_package("lua-language-server")
 -- -

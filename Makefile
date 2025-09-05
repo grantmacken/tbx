@@ -94,7 +94,7 @@ plugins: info/nvim_plugins.md
 info/nvim_plugins.md: scripts/nvim_plugins
 	echo '##[ $@ ]##'
 	$(ADD) $(<) /usr/local/bin/nvim_plugins
-	$(RUN) /usr/local/bin/nvim_plugins || true
+	$(RUN) /usr/local/bin/nvim_plugins
 	$(RUN) ls /usr/local/share/nvim/site/pack/core/opt | tee $@
 	echo '✅ neovim plugins installed'
 
