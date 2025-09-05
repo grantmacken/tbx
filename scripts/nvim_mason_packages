@@ -34,4 +34,6 @@ registry.refresh(function()
   end
 end)
 
-vim.print(vim.cmd.checkhealth('mason'))
+vim.print(registry.get_installed_package_names())
+
+-- vim.print(vim.cmd.checkhealth('mason'))
