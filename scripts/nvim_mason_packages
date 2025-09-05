@@ -15,9 +15,35 @@ mason.setup({
 
 print( 'Mason install_root_dir: ' .. mason_install)
 local registry = require("mason-registry")
-registry.refresh()
 -- local packages = registry.get_all_packages()
 local packages = {"lua-language-server"}
+
+local installs = {}
+
+registry.refresh(function()
+  for _, pkg_name in ipairs(packages) do
+    local ok, pkg = pcall(registry.get_package, pkg_name)
+    if ok and not pkg:is_installed() then
+      table.insert(installs, pkg)
+      pkg:on("install:success", function()
+        installs[pkg_name] = nil
+      end)
+      pkg:install()
+    end
+  end
+
+  -- Wait for all installs to finish before exiting
+  vim.schedule(function()
+    if next(installs) == nil then
+      vim.cmd("qa!")
+    end
+  end)
+end)
+
+
+
+
+
 for _, pkg_name in ipairs(packages) do
   local ok, pkg = pcall(registry.get_package, pkg_name)
   if ok and not pkg:is_installed() then
