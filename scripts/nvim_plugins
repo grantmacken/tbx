@@ -1,5 +1,7 @@
 #!/usr/bin/env -S nvim -l
 vim.print(vim.fn.stdpath('data'))
+vim.print( vim.cmd.set('packpath?'))
+
 -- vim.print(vim.fn.stdpath('config_dirs'))
 -- vim.print( 'config_dirs: ' ..  vim.fn.stdpath('config_dirs')[1])
 -- vim.print( 'data_dirs: ' ..  vim.fn.stdpath('data_dirs')[3])
@@ -14,15 +16,20 @@ vim.print(vim.fn.stdpath('data'))
  vim.print(vim.uv.os_getenv("XDG_DATA_HOME"))
 --  vim.print(vim.fn.stdpath('data'))
  vim.pack.add({
-  'https://github.com/echasnovski/mini.nvim',
- 'https://github.com/hiphish/rainbow-delimiters.nvim',
- 'https://github.com/ibhagwan/fzf-lua',
- 'https://github.com/lewis6991/gitsigns.nvim',
+  --'https://github.com/echasnovski/mini.nvim',
+ -- 'https://github.com/hiphish/rainbow-delimiters.nvim',
+ -- 'https://github.com/ibhagwan/fzf-lua',
+ -- 'https://github.com/lewis6991/gitsigns.nvim',
  'https://github.com/mason-org/mason.nvim',
- 'https://github.com/neanias/everforest-nvim',
- 'https://github.com/stevearc/oil.nvim',
- 'https://github.com/stevearc/resession.nvim',
+ -- 'https://github.com/neanias/everforest-nvim',
+ -- 'https://github.com/stevearc/oil.nvim',
+ -- 'https://github.com/stevearc/resession.nvim',
  })
+
+vim.print( vim.cmd.set('runtimepath?'))
+vim.print( vim.pack.get())
+
+
 
  -- vim.cmd.restart()
 
