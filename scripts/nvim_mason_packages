@@ -13,31 +13,25 @@ mason.setup({
   PATH = "skip",
 })
 
-print( 'Mason install_root_dir: ' .. mason_install)
 local registry = require("mason-registry")
--- local packages = registry.get_all_packages()
-local packages = {"lua-language-server"}
-local installs = {}
+local packages = { "lua-language-server"}
+local pending = 0
 
 registry.refresh(function()
-  for _, pkg_name in ipairs(packages) do
-    local ok, pkg = pcall(registry.get_package, pkg_name)
+  for _, name in ipairs(packages) do
+    local ok, pkg = pcall(registry.get_package, name)
     if ok and not pkg:is_installed() then
-      table.insert(installs, pkg)
+      vim.print(pkg)
+      pending = pending + 1
       pkg:on("install:success", function()
-        installs[pkg_name] = nil
+        pending = pending - 1
+        if pending == 0 then
+          print("All Mason packages installed!")
+        end
       end)
       pkg:install()
     end
   end
-
-  -- Wait for all installs to finish before exiting
-  vim.schedule(function()
-    if next(installs) == nil then
-      vim.cmd("qa!")
-    end
-  end)
 end)
-
 
 vim.print(vim.cmd.checkhealth('mason'))
