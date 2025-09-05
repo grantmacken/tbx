@@ -25,3 +25,5 @@ for _, pkg_name in ipairs(packages) do
   else print( 'No ' .. pkg_name)
   end
 end
+
+vim.cmd.checkhealth('mason')
