@@ -111,7 +111,7 @@ info/node_pkgs.md:
 	$(NPM) $(LSP_VIA_NODE)
 	# Checks
 	$(RUN) which bash-language-server 
-	$(RUN) whereis lua-language-server
+	$(RUN) whereis bash-language-server
 	$(RUN) bash-language-server  --version
 
 dnf_lsp_pkgs: info/lsp_tooling_via_dnf.md
@@ -127,7 +127,7 @@ latest/lua-language-server.json:
 	mkdir -p $(dir $@)
 	REPO=LuaLS/lua-language-server
 	# https://api.github.com/repos/LuaLS/lua-language-server/releases/latest
-	SRC=https://api.github.com/repos/$(REPO)/releases/latest
+	SRC=https://api.github.com/repos/$${REPO}/releases/latest
 	$(WGET) $${SRC} -O $@
 
 info/lua-language-server.md: latest/lua-language-server.json
