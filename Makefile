@@ -127,11 +127,8 @@ latest/lua-language-server.json:
 	mkdir -p $(dir $@)
 	REPO=LuaLS/lua-language-server
 	# https://api.github.com/repos/LuaLS/lua-language-server/releases/latest
-	mkdir -p $(dir $@)
-	$(WGET) $${SRC}
-		mkdir -p files/otp && wget -q --timeout=10 --tries=3  $${SRC} -O- |
-	tar xz --strip-components=1 -C files/otp &>/dev/null
-	wget -q https://api.github.com/repos/$${REPO}/releases/latest -O $@
+	SRC=https://api.github.com/repos/$(REPO)/releases/latest
+	$(WGET) $${SRC} -O $@
 
 info/lua-language-server.md: latest/lua-language-server.json
 	echo '##[ $@ ]##'
