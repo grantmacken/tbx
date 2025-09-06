@@ -146,15 +146,17 @@ files/lua-language-server.tar.gz: latest/lua-language-server.json
 
 info/lua-language-server.md: files/lua-language-server.tar.gz
 	mkdir -p $(dir $@)
+	echo '##[ $(basename $(notdir $@)) ]##'
 	NAME=lua-language-server
 	TARGET=files/$${NAME}
 	mkdir -p $${TARGET}
-	$(TAR) $${TARGET}
+	$(TAR) $${TARGET} -f $<
 	ls -al  $${TARGET} || true
 
 harper: info/harper.md
 latest/harper.json:
-	echo '##[ $@ ]##'
+	echo '##[ $(basename $(notdir $@)) ]##'
+	NAME=$(basename $(notdir $@))
 	mkdir -p $(dir $@)
 	REPO=Automattic/harper
 	# https://github.com/Automattic/harper/releases
