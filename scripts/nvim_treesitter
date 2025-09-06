@@ -13,7 +13,7 @@ end
 ts.install { 'javascript' }
 vim.uv.sleep(10000)
 
-local iter = vim.uv.fs_scandir(mason_install)
+local iter = vim.uv.fs_scandir(install_dir)
 if iter then
   while true do
     local name, type = vim.uv.fs_scandir_next(iter)

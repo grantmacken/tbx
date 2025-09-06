@@ -75,6 +75,7 @@ nvim: info/neovim.md
 info/neovim.md: files/nvim.tar.gz
 	echo '##[ $@ ]##'
 	mkdir -p $(dir $@)
+	mkdir -p /etc/xdg/nvim
 	NAME=$(basename $(notdir $@))
 	TARGET=files/$${NAME}/usr/local
 	mkdir -p $${TARGET}
@@ -93,10 +94,10 @@ info/neovim.md: files/nvim.tar.gz
 	$(RUN) /usr/local/bin/nvim_plugins
 	$(RUN) ls /usr/local/share/nvim/site/pack/core/opt | tee $@
 	echo '✅ neovim plugins installed'
-	$(RUN) /usr/local/bin/nvim_mason_packages || true
-	echo '✅ mason packages installed'
-	$(RUN) /usr/local/bin/nvim_treesitter || true
-	$(RUN) /usr/local/bin/nvim_checkhealth
+	# $(RUN) /usr/local/bin/nvim_mason_packages || true
+	# echo '✅ mason packages installed'
+	$(RUN) /usr/local/bin/nvim_treesitter
+	# $(RUN) /usr/local/bin/nvim_checkhealth
 
 cli: info/cli-tools.md
 	echo '##[ $@ ]##'
