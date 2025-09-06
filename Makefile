@@ -126,6 +126,7 @@ releases: lua-language-server
 
 lua-language-server: info/lua-language-server.md
 latest/lua-language-server.json:
+	echo '##[ $(basename $(notdir $@)) ]##'
 	echo '##[ $@ ]##'
 	mkdir -p $(dir $@)
 	REPO=luals/lua-language-server
@@ -139,8 +140,8 @@ info/lua-language-server.md: latest/lua-language-server.json
 	TARGET=files/lls/usr/local
 	mkdir -p $${TARGET}
 	SRC=$(shell $(call bdu,linux-x64.tar.gz,$<))
-	$(WGET) $${SRC} -O- | $(TAR) -c $${TARGET}
-	ls $${TARGET}
+	$(WGET) $${SRC} -O- | $(TAR) $${TARGET}
+	ls $${TARGET} || true
 
 harper: info/harper.md
 latest/harper.json:
@@ -157,7 +158,7 @@ info/harper.md: latest/harper.json
 	TARGET=files//usr/local
 	mkdir -p $${TARGET}
 	SRC=$(shell $(call bdu,linux-x64.tar.gz,$<))
-	$(WGET) $${SRC} -O- | $(TAR) -c $${TARGET}
+	$(WGET) $${SRC} -O- | $(TAR) $${TARGET}
 	ls $${TARGET}
 
 
