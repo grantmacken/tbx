@@ -30,11 +30,16 @@ WGET := wget -q --no-check-certificate --timeout=10 --tries=3
 TAR  := tar xz --strip-components=1 -C
 #LISTS
 CLI := eza fd-find fzf gh pass ripgrep stow wl-clipboard zoxide
+# lsp tooling for
+BASH := ShellCheck shfmt nodejs-bash-language-server
+LSP_SERVERS := $(BASH)
+# https://github.com/artempyanykh/marksman/releases
+LSP_VIA_RELEASES := artempyanykh/marksman
 
 tr = printf "| %-14s | %-8s | %-83s |\n" "$(1)" "$(2)" "$(3)" | tee -a $(4)
 bdu = jq -r ".assets[] | select(.browser_download_url | contains(\"$1\")) | .browser_download_url" $2
 
-default: neovim # cli
+default: neovim dnf_lsp_pkgs lsp_releases ## 
 	echo '##[ $@ ]##'
 	echo 'image built'
 ifdef GITHUB_ACTIONS
@@ -90,14 +95,33 @@ info/neovim.md: files/nvim.tar.gz
 	SUM='The text editor with a focus on extensibility and usability'
 	printf "| %-10s | %-13s | %-83s |\n" "$${NAME}" "$${VERSION}" "$${SUM}" | tee -a $@
 	echo '✅ latest pre-release neovim installed'
+
+plugins:
 	$(ADD) scripts/ /usr/local/bin/
 	$(RUN) /usr/local/bin/nvim_plugins
 	$(RUN) ls /usr/local/share/nvim/site/pack/core/opt | tee $@
-	echo '✅ neovim plugins installed'
-	# $(RUN) /usr/local/bin/nvim_mason_packages || true
-	# echo '✅ mason packages installed'
-	$(RUN) /usr/local/bin/nvim_treesitter
-	# $(RUN) /usr/local/bin/nvim_checkhealth
+
+dnf_lsp_pkgs: info/lsp_tooling_via_dnf.md
+info/lsp_tooling_via_dnf.md:
+	echo '##[ $@ ]##'
+	$(INSTALL) $(LSP_SERVERS)
+
+lsp_releases: lua-language-server:
+
+lua-language-server: info/lua-language-server.md
+latest/lua-language-server.json:
+	echo '##[ $@ ]##'
+	mkdir -p $(dir $@)
+	REPO=LuaLS/lua-language-server
+	# https://api.github.com/repos/LuaLS/lua-language-server/releases/latest
+	mkdir -p $(dir $@)
+	wget -q https://api.github.com/repos/$${REPO}/releases/latest -O $@
+
+info/lua-language-server.md: latest/lua-language-server.json
+	echo '##[ $@ ]##'
+	mkdir -p $(dir $@)
+	SRC=$(shell $(call bdu,linux-x64.tar.gz,$<))
+	echo $$SRC
 
 cli: info/cli-tools.md
 	echo '##[ $@ ]##'
