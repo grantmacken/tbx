@@ -125,10 +125,10 @@ lua-language-server: info/lua-language-server.md
 latest/lua-language-server.json:
 	echo '##[ $@ ]##'
 	mkdir -p $(dir $@)
-	REPO=LuaLS/lua-language-server
-	# https://api.github.com/repos/LuaLS/lua-language-server/releases/latest
+	REPO=luals/lua-language-server
+	# https://api.github.com/repos/luals/lua-language-server/releases/latest
 	SRC=https://api.github.com/repos/$${REPO}/releases/latest
-	$(WGET) $${SRC} -O $@
+	$(WGET) $${SRC} -o $@
 
 info/lua-language-server.md: latest/lua-language-server.json
 	echo '##[ $@ ]##'
@@ -136,8 +136,27 @@ info/lua-language-server.md: latest/lua-language-server.json
 	TARGET=files/lls/usr/local
 	mkdir -p $${TARGET}
 	SRC=$(shell $(call bdu,linux-x64.tar.gz,$<))
-	$(WGET) $${SRC} -O- | $(TAR) -C $${TARGET}
+	$(wget) $${SRC} -o- | $(tar) -c $${TARGET}
 	ls $${TARGET}
+
+harper: info/harper.md
+latest/harper.json:
+	echo '##[ $@ ]##'
+	mkdir -p $(dir $@)
+	REPO=Automattic/harper
+	# https://github.com/Automattic/harper/releases
+	SRC=https://api.github.com/repos/$${REPO}/releases/latest
+	$(WGET) $${SRC} -o $@
+
+info/harper.md: latest/harper.json
+	echo '##[ $@ ]##'
+	mkdir -p $(dir $@)
+	target=files/lls/usr/local
+	mkdir -p $${TARGET}
+	SRC=$(shell $(call bdu,linux-x64.tar.gz,$<))
+	$(WGET) $${SRC} -o- | $(TAR) -c $${TARGET}
+	ls $${TARGET}
+
 
 
 dnf_cli_pkgs: info/cli-tools.md
