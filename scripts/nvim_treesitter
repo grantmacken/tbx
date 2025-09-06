@@ -1,5 +1,5 @@
 #!/usr/bin/env -S nvim -l
-vim.print( 'Treesitters' )
+vim.print( 'Install Treesitter Parsers and Queries' )
 vim.cmd.packadd('nvim-treesitter')
 local install_dir = vim.fn.stdpath('config_dirs')[1]
 vim.print( 'install dir: ' .. install_dir)
@@ -9,6 +9,3 @@ if ok_ts then
    install_dir = install_dir
  })
 end
-
--- vim.print(vim.cmd.checkhealth('treesitter'))
-

@@ -2,8 +2,7 @@
 print('###############################')
 --vim.print(vim.fn.stdpath('data'))
 --vim.print( vim.cmd.set('packpath?'))
-vim.print( 'data_dirs: ' ..  vim.fn.stdpath('data_dirs')[3])
-
+vim.print( vim.fn.stdpath('data_dirs'))
 
 vim.print( 'Mason Packages' )
 vim.cmd.packadd('mason.nvim')
@@ -19,13 +18,21 @@ local packages = { "lua-language-server"}
 registry.refresh()
 vim.uv.sleep(5000)
 print( 'package names')
-
   for _, name in ipairs(packages) do
   local ok, pkg = pcall(registry.get_package, name)
    if ok then
      vim.print(pkg)
    end
   end
+
+local iter = vim.uv.fs_scandir(mason_install)
+if iter then
+  while true do
+    local name, type = vim.uv.fs_scandir_next(iter)
+    if not name then break end
+    print(name, type)  -- type is "file", "directory", etc.
+  end
+end
 
 
 -- vim.print(registry.get_all_package_names())
