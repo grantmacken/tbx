@@ -150,8 +150,22 @@ info/lua-language-server.md: files/lua-language-server.tar.gz
 	NAME=lua-language-server
 	TARGET=files/$${NAME}
 	mkdir -p $${TARGET}
-	$(TAR) $${TARGET} -f $<
+	tar xz -C $${TARGET} -f $<
 	ls -al  $${TARGET} || true
+
+
+marksman: latest/harper.json
+latest/harper.json:
+	echo '##[ $(basename $(notdir $@)) ]##'
+	NAME=$(basename $(notdir $@))
+	mkdir -p $(dir $@)
+	REPO=artempyanykh/marksman
+	# https://github.com/Automattic/harper/releases
+	SRC=https://api.github.com/repos/$${REPO}/releases/latest
+	$(WGET) $${SRC} -O $@
+
+
+
 
 harper: info/harper.md
 latest/harper.json:
