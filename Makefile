@@ -125,6 +125,9 @@ info/lsp_tooling_via_dnf.md:
 releases: lua-language-server
 
 lua-language-server: info/lua-language-server.md
+
+
+
 latest/lua-language-server.json:
 	echo '##[ $(basename $(notdir $@)) ]##'
 	echo '##[ $@ ]##'
@@ -134,14 +137,21 @@ latest/lua-language-server.json:
 	SRC=https://api.github.com/repos/$${REPO}/releases/latest
 	$(WGET) $${SRC} -O $@
 
-info/lua-language-server.md: latest/lua-language-server.json
-	echo '##[ $(basename $(notdir $@)) ]##'
+files/lua-language-server.tar.gz: latest/lua-language-server.json
+	echo '##[ $@ ]##'
 	mkdir -p $(dir $@)
-	TARGET=files/lls/usr/local
-	mkdir -p $${TARGET}
 	SRC=$(shell $(call bdu,linux-x64.tar.gz,$<))
-	$(WGET) $${SRC} -O- | $(TAR) $${TARGET}
-	ls $${TARGET} || true
+	echo $${SRC}
+	$(WGET) $${SRC} -O $@
+
+info/lua-language-server.md: files/lua-language-server.tar.gz
+	mkdir -p $(dir $@)
+	NAME=$(call getName,$@))
+	echo '##[ $(call getName,$@) ]##'
+	TARGET=files/$${NAME}/usr/local
+	mkdir -p $${TARGET}
+	$(TAR) $${TARGET}
+	ls -al  $${TARGET} || true
 
 harper: info/harper.md
 latest/harper.json:
