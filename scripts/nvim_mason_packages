@@ -21,6 +21,7 @@ for _, name in ipairs(packages) do
 local ok, pkg = pcall(registry.get_package, name)
   if ok then
     vim.print(pkg)
+    vim.cmd.MasonInstall(pkg)
   end
 end
 
