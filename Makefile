@@ -25,23 +25,22 @@ TBX_IMAGE :=  ghcr.io/grantmacken/$(NAME)
 
 RUN := buildah run $(WORKING_CONTAINER)
 INSTALL := $(RUN) dnf install --allowerasing --skip-unavailable --skip-broken --no-allow-downgrade -y
+NPM := $(RUN) npm install --global
 ADD := buildah add --chmod 755 $(WORKING_CONTAINER)
 WGET := wget -q --no-check-certificate --timeout=10 --tries=3
 TAR  := tar xz --strip-components=1 -C
 #LISTS
-CLI := eza fd-find fzf gh pass ripgrep stow wl-clipboard zoxide
-# lsp tooling for
-BASH := ShellCheck shfmt nodejs-bash-language-server
-LSP_SERVERS := $(BASH)
+CLI_VIA_DNF := eza fd-find fzf gh pass ripgrep stow wl-clipboard zoxide
+LSP_VIA_DNF := ShellCheck shfmt
 # https://github.com/artempyanykh/marksman/releases
 LSP_VIA_RELEASES := artempyanykh/marksman
-
-DNF_PKGS := $(CLI) $(LSP_SERVERS)
+LSP_VIA_NODE := bash-language-server
+DNF_PKGS := $(CLI_VIA_DNF) $(LSP_VIA_DNF)
 
 tr = printf "| %-14s | %-8s | %-83s |\n" "$(1)" "$(2)" "$(3)" | tee -a $(4)
 bdu = jq -r ".assets[] | select(.browser_download_url | contains(\"$1\")) | .browser_download_url" $2
 
-default: neovim dnf_lsp_pkgs lsp_releases ## 
+default: neovim node_pkgs #  lsp_releases ## 
 	echo '##[ $@ ]##'
 	echo 'image built'
 ifdef GITHUB_ACTIONS
@@ -102,6 +101,22 @@ plugins:
 	$(ADD) scripts/ /usr/local/bin/
 	$(RUN) /usr/local/bin/nvim_plugins
 	$(RUN) ls /usr/local/share/nvim/site/pack/core/opt | tee $@
+
+node_pkgs: info/node_pkgs.md
+info/node_pkgs.md:
+	echo '##[ $@ ]##'
+	$(NPM) $(LSP_VIA_NODE)
+	# Checks
+	$(RUN) which lua-language-server 
+	$(RUN) lua-language-server --version
+	$(RUN) whereis lua-language-server
+
+
+
+
+
+
+
 
 dnf_lsp_pkgs: info/lsp_tooling_via_dnf.md
 info/lsp_tooling_via_dnf.md:
