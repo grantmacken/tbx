@@ -32,6 +32,8 @@ NPM := $(RUN) npm install --global
 ADD := buildah add --chmod 755 $(WORKING_CONTAINER)
 WGET := wget -q --no-check-certificate --timeout=10 --tries=3
 TAR  := tar xz --strip-components=1 -C
+
+
 #LISTS
 CLI_VIA_DNF := eza fd-find fzf gh pass ripgrep stow wl-clipboard zoxide
 LSP_VIA_DNF := ShellCheck shfmt
@@ -42,6 +44,7 @@ DNF_PKGS := $(CLI_VIA_DNF) $(LSP_VIA_DNF)
 
 tr = printf "| %-14s | %-8s | %-83s |\n" "$(1)" "$(2)" "$(3)" | tee -a $(4)
 bdu = jq -r ".assets[] | select(.browser_download_url | contains(\"$1\")) | .browser_download_url" $2
+getName = $(basename $(notdir $1))
 
 default:  releases #neovim node_pkgs #  lsp_releases ## 
 	echo '##[ $@ ]##'
@@ -136,7 +139,7 @@ info/lua-language-server.md: latest/lua-language-server.json
 	TARGET=files/lls/usr/local
 	mkdir -p $${TARGET}
 	SRC=$(shell $(call bdu,linux-x64.tar.gz,$<))
-	$(wget) $${SRC} -O- | $(tar) -c $${TARGET}
+	$(WGET) $${SRC} -O- | $(TAR) -c $${TARGET}
 	ls $${TARGET}
 
 harper: info/harper.md
@@ -146,7 +149,7 @@ latest/harper.json:
 	REPO=Automattic/harper
 	# https://github.com/Automattic/harper/releases
 	SRC=https://api.github.com/repos/$${REPO}/releases/latest
-	$(WGET) $${SRC} -o $@
+	$(WGET) $${SRC} -O $@
 
 info/harper.md: latest/harper.json
 	echo '##[ $@ ]##'
@@ -154,7 +157,7 @@ info/harper.md: latest/harper.json
 	TARGET=files//usr/local
 	mkdir -p $${TARGET}
 	SRC=$(shell $(call bdu,linux-x64.tar.gz,$<))
-	$(WGET) $${SRC}  -O- | $(TAR) -c $${TARGET}
+	$(WGET) $${SRC} -O- | $(TAR) -c $${TARGET}
 	ls $${TARGET}
 
 
