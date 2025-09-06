@@ -128,15 +128,15 @@ latest/lua-language-server.json:
 	REPO=luals/lua-language-server
 	# https://api.github.com/repos/luals/lua-language-server/releases/latest
 	SRC=https://api.github.com/repos/$${REPO}/releases/latest
-	$(WGET) $${SRC} -o $@
+	$(WGET) $${SRC} -O $@
 
 info/lua-language-server.md: latest/lua-language-server.json
-	echo '##[ $@ ]##'
+	echo '##[ $(basename $(notdir $@)) ]##'
 	mkdir -p $(dir $@)
 	TARGET=files/lls/usr/local
 	mkdir -p $${TARGET}
 	SRC=$(shell $(call bdu,linux-x64.tar.gz,$<))
-	$(wget) $${SRC} -o- | $(tar) -c $${TARGET}
+	$(wget) $${SRC} -O- | $(tar) -c $${TARGET}
 	ls $${TARGET}
 
 harper: info/harper.md
@@ -151,10 +151,10 @@ latest/harper.json:
 info/harper.md: latest/harper.json
 	echo '##[ $@ ]##'
 	mkdir -p $(dir $@)
-	target=files/lls/usr/local
+	TARGET=files//usr/local
 	mkdir -p $${TARGET}
 	SRC=$(shell $(call bdu,linux-x64.tar.gz,$<))
-	$(WGET) $${SRC} -o- | $(TAR) -c $${TARGET}
+	$(WGET) $${SRC}  -O- | $(TAR) -c $${TARGET}
 	ls $${TARGET}
 
 
