@@ -107,9 +107,10 @@ info/node_pkgs.md:
 	echo '##[ $@ ]##'
 	$(NPM) $(LSP_VIA_NODE)
 	# Checks
-	$(RUN) which lua-language-server 
-	$(RUN) lua-language-server --version
+	$(RUN) which bash-language-server 
 	$(RUN) whereis lua-language-server
+	$(RUN) bash-language-server  --version
+
 
 
 
