@@ -1,12 +1,14 @@
 #!/usr/bin/env -S nvim -l
 vim.print( 'Treesitters' )
-vim.cmd.packadd('treesitter.nvim')
-vim.print( 'config_dirs: ' ..  vim.fn.stdpath('config_dirs')[1])
-vim.print( 'data_dirs: ' ..  vim.fn.stdpath('data_dirs')[3])
+vim.cmd.packadd('nvim-treesitter')
+local install_dir = vim.fn.stdpath('config_dirs')[1]
+vim.print( 'install dir: ' .. install_dir)
+local ok_ts, ts =  pcall(require, 'nvim-treesitter')
+if ok_ts then
+  ts.setup({
+   install_dir = install_dir
+ })
+end
 
-require'nvim-treesitter'.setup {
-   install_dir = vim.fn.stdpath('data') .. '/site'
- }
-
-vim.print(vim.cmd.checkhealth('treesitter'))
+-- vim.print(vim.cmd.checkhealth('treesitter'))
 
