@@ -148,10 +148,12 @@ info/lua-language-server.md: files/lua-language-server.tar.gz
 	mkdir -p $(dir $@)
 	echo '##[ $(basename $(notdir $@)) ]##'
 	NAME=lua-language-server
-	TARGET=files/$${NAME}
-	mkdir -p $${TARGET}
-	tar xz -C $${TARGET} -f $<
+	TARGET=files/usr/local
+	mkdir -p $${TARGET}/$${NAME}
+	tar xz -C $${TARGET}/$${NAME} -f $<
 	ls -al  $${TARGET} || true
+	$(ADD) ${TARGET} &>/dev/null
+	$(RUN) ls -al /usr/local
 
 
 marksman: latest/harper.json
