@@ -10,7 +10,12 @@ if ok_ts then
  })
 end
 
-ts.install({ 'javascript', 'gleam'})
+-- 'awk','bash','comment','css','csv','diff','djot','dtd','ebnf','elixir',
+-- 'erlang','git_config','gitignore','gleam','gnuplot','html','http','javascript',
+-- 'jq','json','just','latex','ledger','make','markdown_inline','mermaid',
+-- 'nginx','printf','readline','regex','ssh_config','toml','xml','yaml'
+
+ts.install({'awk','bash','comment','css'})
 vim.uv.sleep(1000)
 
 local iter = vim.uv.fs_scandir(install_dir)
