@@ -146,9 +146,8 @@ files/lua-language-server.tar.gz: latest/lua-language-server.json
 
 info/lua-language-server.md: files/lua-language-server.tar.gz
 	mkdir -p $(dir $@)
-	NAME=$(call getName,$@))
-	echo '##[ $(call getName,$@) ]##'
-	TARGET=files/$${NAME}/usr/local
+	NAME=lua-language-server
+	TARGET=files/$${NAME}
 	mkdir -p $${TARGET}
 	$(TAR) $${TARGET}
 	ls -al  $${TARGET} || true
