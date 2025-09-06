@@ -75,7 +75,7 @@ nvim: info/neovim.md
 info/neovim.md: files/nvim.tar.gz
 	echo '##[ $@ ]##'
 	mkdir -p $(dir $@)
-	mkdir -p /etc/xdg/nvim
+	$(RUN) mkdir -p /etc/xdg/nvim
 	NAME=$(basename $(notdir $@))
 	TARGET=files/$${NAME}/usr/local
 	mkdir -p $${TARGET}
