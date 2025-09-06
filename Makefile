@@ -36,6 +36,8 @@ LSP_SERVERS := $(BASH)
 # https://github.com/artempyanykh/marksman/releases
 LSP_VIA_RELEASES := artempyanykh/marksman
 
+DNF_PKGS := $(CLI) $(LSP_SERVERS)
+
 tr = printf "| %-14s | %-8s | %-83s |\n" "$(1)" "$(2)" "$(3)" | tee -a $(4)
 bdu = jq -r ".assets[] | select(.browser_download_url | contains(\"$1\")) | .browser_download_url" $2
 
@@ -106,7 +108,7 @@ info/lsp_tooling_via_dnf.md:
 	echo '##[ $@ ]##'
 	$(INSTALL) $(LSP_SERVERS)
 
-lsp_releases: lua-language-server:
+lsp_releases: lua-language-server
 
 lua-language-server: info/lua-language-server.md
 latest/lua-language-server.json:
@@ -123,7 +125,7 @@ info/lua-language-server.md: latest/lua-language-server.json
 	SRC=$(shell $(call bdu,linux-x64.tar.gz,$<))
 	echo $$SRC
 
-cli: info/cli-tools.md
+dnf_cli_pkgs: info/cli-tools.md
 	echo '##[ $@ ]##'
 	echo '✅ CLI tools added'
 
