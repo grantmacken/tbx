@@ -17,13 +17,12 @@ local registry = require("mason-registry")
 local packages = { "lua-language-server"}
 registry.refresh()
 vim.uv.sleep(5000)
-print( 'package names')
-  for _, name in ipairs(packages) do
-  local ok, pkg = pcall(registry.get_package, name)
-   if ok then
-     vim.print(pkg)
-   end
+for _, name in ipairs(packages) do
+local ok, pkg = pcall(registry.get_package, name)
+  if ok then
+    vim.print(pkg)
   end
+end
 
 local iter = vim.uv.fs_scandir(mason_install)
 if iter then
