@@ -3,6 +3,9 @@ SHELL=/usr/bin/bash
 # -e Exit immediately if a pipeline fails
 # -u Error if there are unset variables and parameters
 # -o option-name Set the option corresponding to option-name
+#
+# https://mason-registry.dev/registry/list
+#
 .ONESHELL:
 .DELETE_ON_ERROR:
 .SECONDARY:
@@ -40,7 +43,7 @@ DNF_PKGS := $(CLI_VIA_DNF) $(LSP_VIA_DNF)
 tr = printf "| %-14s | %-8s | %-83s |\n" "$(1)" "$(2)" "$(3)" | tee -a $(4)
 bdu = jq -r ".assets[] | select(.browser_download_url | contains(\"$1\")) | .browser_download_url" $2
 
-default: neovim node_pkgs #  lsp_releases ## 
+default:  releases #neovim node_pkgs #  lsp_releases ## 
 	echo '##[ $@ ]##'
 	echo 'image built'
 ifdef GITHUB_ACTIONS
@@ -111,20 +114,12 @@ info/node_pkgs.md:
 	$(RUN) whereis lua-language-server
 	$(RUN) bash-language-server  --version
 
-
-
-
-
-
-
-
-
 dnf_lsp_pkgs: info/lsp_tooling_via_dnf.md
 info/lsp_tooling_via_dnf.md:
 	echo '##[ $@ ]##'
 	$(INSTALL) $(LSP_SERVERS)
 
-lsp_releases: lua-language-server
+releases: lua-language-server
 
 lua-language-server: info/lua-language-server.md
 latest/lua-language-server.json:
@@ -133,13 +128,20 @@ latest/lua-language-server.json:
 	REPO=LuaLS/lua-language-server
 	# https://api.github.com/repos/LuaLS/lua-language-server/releases/latest
 	mkdir -p $(dir $@)
+	$(WGET) $${SRC}
+		mkdir -p files/otp && wget -q --timeout=10 --tries=3  $${SRC} -O- |
+	tar xz --strip-components=1 -C files/otp &>/dev/null
 	wget -q https://api.github.com/repos/$${REPO}/releases/latest -O $@
 
 info/lua-language-server.md: latest/lua-language-server.json
 	echo '##[ $@ ]##'
 	mkdir -p $(dir $@)
+	TARGET=files/lls/usr/local
+	mkdir -p $${TARGET}
 	SRC=$(shell $(call bdu,linux-x64.tar.gz,$<))
-	echo $$SRC
+	$(WGET) $${SRC} -O- | $(TAR) -C $${TARGET}
+	ls $${TARGET}
+
 
 dnf_cli_pkgs: info/cli-tools.md
 	echo '##[ $@ ]##'
