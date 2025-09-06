@@ -15,7 +15,7 @@ mason.setup({
 
 local registry = require("mason-registry")
 local packages = { "lua-language-server"}
-registry.refresh()
+registry.refresh(function() end)
 vim.uv.sleep(5000)
 for _, name in ipairs(packages) do
 local ok, pkg = pcall(registry.get_package, name)
