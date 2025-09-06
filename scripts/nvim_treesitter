@@ -10,14 +10,14 @@ if ok_ts then
  })
 end
 
-ts.install { 'javascript' }
-vim.uv.sleep(10000)
+ts.install({ 'javascript', 'gleam'})
+vim.uv.sleep(1000)
 
 local iter = vim.uv.fs_scandir(install_dir)
 if iter then
   while true do
-    local name, type = vim.uv.fs_scandir_next(iter)
+    local name, t = vim.uv.fs_scandir_next(iter)
     if not name then break end
-    print(name, type)  -- type is "file", "directory", etc.
+    print(name, t)
   end
 end
