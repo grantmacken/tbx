@@ -154,6 +154,9 @@ info/lua-language-server.md: files/lua-language-server.tar.gz
 	ls -al  $${TARGET} || true
 	$(ADD) ${TARGET} &>/dev/null
 	$(RUN) ls -al /usr/local
+	$(RUN) ls -al /usr/local/$${NAME}
+	$(RUN) ls -al /usr/local/$${NAME}/bin
+
 
 
 marksman: latest/harper.json
