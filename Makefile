@@ -122,12 +122,18 @@ info/luajit.md:
 
 
 
-luarocks: info/luarocks.md
+luarocks: files/luarocks.tar.gz
 
 latest/luarocks.json:
 	echo '##[ $@ ]##'
 	mkdir -p $(dir $@)
 	$(WGET) https://api.github.com/repos/luarocks/luarocks/tags -O- | jq '.[0]' | tee $@
+
+files/luarocks.tar.gz: latest/luarocks.json
+	echo '##[ $@ ]##'
+	mkdir -p $(dir $@)
+	$(WGET) $(call tarball,$<) -O $@
+	ls -al files
 
 
 info/luarocks.md: latest/luarocks.json
@@ -140,8 +146,8 @@ info/luarocks.md: latest/luarocks.json
 	mkdir -p $${TARGET}	
 	SRC=$(shell $(call tarball,$<))
 	echo $$SRC
-	$(RUN) mkdir -p $${TMP} /etc/xdg/luarocks
 	$(WGET) $${SRC} -O- | $(TAR) $${TARGET} &>/dev/null
+	$(RUN) mkdir -p $${TMP} /etc/xdg/luarocks
 	$(ADD) $${TARGET} $${TMP} &>/dev/null
 	$(RUN) sh -c "cd $${TMP} && ./configure \
 		--lua-version=5.1 \
