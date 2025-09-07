@@ -110,6 +110,7 @@ luajit: info/luajit.md
 
 
 info/luajit.md:
+	echo '##[ $@ ]##'
 	mkdir -p $(dir $@)
 	$(INSTALL) luajit-devel luajit 
 	echo -n 'checking luajit version...'
@@ -130,7 +131,7 @@ latest/luarocks.json:
 info/luarocks.md: latest/luarocks.json
 	echo '##[ $@ ]##'
 	mkdir -p $(dir $@)
-	MAME=$(basename $(notdir $@))
+	NAME=$(basename $(notdir $@))
 	echo $${NAME}
 	TARGET=files/$${NAME}
 	mkdir -p $${TARGET}	
