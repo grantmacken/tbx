@@ -143,13 +143,14 @@ info/lua-language-server.md: files/lua-language-server.tar.gz
 	mkdir -p $(dir $@)
 	echo '##[ $(basename $(notdir $@)) ]##'
 	NAME=lua-language-server
-	TARGET=files/$${NAME}/usr/local
+	TARGET=files/$${NAME}
 	mkdir -p $${TARGET}
 	$(TAR_NO_STRIP) $${TARGET} -f $<
+	ls $${TARGET} 
 	$(ADD) $${TARGET} /usr/local
 	$(RUN) ls -al /usr/local/
 	# $(RUN) ln -sf /usr/local/lua-language-server/bin/lua-language-server /usr/local/bin/lua-language-server
-	$(RUN) ls -al /usr/local/bin
+	# $(RUN) ls -al /usr/local/bin
 	# $(RUN) $${NAME} --version
 
 marksman: latest/marksman.json
