@@ -123,7 +123,7 @@ info/lsp_tooling_via_dnf.md:
 	echo '##[ $@ ]##'
 	$(INSTALL) $(LSP_VIA_DNF)
 
-releases: lua-language-server
+releases: lua-language-server marksman harper
 
 lua-language-server: info/lua-language-server.md
 
@@ -146,11 +146,10 @@ info/lua-language-server.md: files/lua-language-server.tar.gz
 	TARGET=files/$${NAME}
 	mkdir -p $${TARGET}
 	$(TAR_NO_STRIP) $${TARGET} -f $<
-	ls $${TARGET} 
-	$(ADD) $${TARGET} /usr/local
-	$(RUN) ls -al /usr/local/
-	# $(RUN) ln -sf /usr/local/lua-language-server/bin/lua-language-server /usr/local/bin/lua-language-server
-	# $(RUN) ls -al /usr/local/bin
+	$(ADD) $${TARGET} /usr/local/$${NAME}
+	# $(RUN) ls -al /usr/local/
+	$(RUN) ln -sf /usr/local/lua-language-server/bin/lua-language-server /usr/local/bin/lua-language-server
+	$(RUN) ls -al /usr/local/bin
 	# $(RUN) $${NAME} --version
 
 marksman: latest/marksman.json
