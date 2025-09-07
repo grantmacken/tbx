@@ -114,16 +114,21 @@ info/luajit.md:
 	VERSION=$$($(RUN) luajit -v | grep -oP 'LuaJIT \K\d+\.\d+\.\d{1,3}')
 	$(call tr,luajit,$${VERSION},The LuaJIT compiler,$@)
 
+
+
+luarocks: info/luarocks.md
+
 latest/luarocks.json:
 	echo '##[ $@ ]##'
 	mkdir -p $(dir $@)
-	$(WGET) https://api.github.com/repos/luarocks/luarocks/tags -O- | jq '.[0]' > $@
+	$(WGET) https://api.github.com/repos/luarocks/luarocks/tags -O- | jq '.[0]' | tee $@
 
-luarocks: info/luarocks.md
+
 info/luarocks.md: latest/luarocks.json
 	echo '##[ $@ ]##'
 	mkdir -p $(dir $@)
-	NAME=$(basename $(notdir $@))
+	MAME=$(basename $(notdir $@))
+	echo $${NAME}
 	TARGET=files/$${NAME}
 	mkdir -p $${TARGET}	
 	SRC=$$(jq -r '.tarball_url' $<)
