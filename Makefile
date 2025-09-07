@@ -40,14 +40,14 @@ CLI_VIA_DNF := eza fd-find fzf gh pass ripgrep stow wl-clipboard zoxide
 LSP_VIA_DNF := ShellCheck shfmt
 # https://github.com/artempyanykh/marksman/releases
 LSP_VIA_RELEASES := artempyanykh/marksman
-LSP_VIA_NPM := bash-language-server
+LSP_VIA_NPM := bash-language-server  @github/copilot-language-server
 DNF_PKGS := $(CLI_VIA_DNF) $(LSP_VIA_DNF)
 
 tr = printf "| %-14s | %-8s | %-83s |\n" "$(1)" "$(2)" "$(3)" | tee -a $(4)
 bdu = jq -r ".assets[] | select(.browser_download_url | contains(\"$1\")) | .browser_download_url" $2
 getName = $(basename $(notdir $1))
 
-default:  releases #neovim node_pkgs #  lsp_releases ## 
+default: dnf_lsp_pkgs gh_releases
 	echo '##[ $@ ]##'
 	echo 'image built'
 ifdef GITHUB_ACTIONS
@@ -123,7 +123,7 @@ info/lsp_tooling_via_dnf.md:
 	echo '##[ $@ ]##'
 	$(INSTALL) $(LSP_VIA_DNF)
 
-releases: lua-language-server marksman harper
+gh_releases: lua-language-server marksman harper
 
 lua-language-server: info/lua-language-server.md
 
@@ -172,19 +172,35 @@ latest/harper.json:
 	# https://github.com/Automattic/harper/releases
 	$(WGET) https://api.github.com/repos/$${REPO}/releases/latest -O $@
 
+# DNF
+dnf_lsp_pkgs: info/lsp-tooling.md
+	echo '##[ $@ ]##'
+	echo '✅ LSP servers added'
+	echo '✅ Additional formaters and linters added'
+
+info/lsp-tooling.md:
+	echo '##[ $@ ]##'
+	mkdir -p $(dir $@)
+	$(INSTALL) $(LSP_VIA_DNF)
+	printf "\n$(HEADING2) %s\n\n" "Handpicked CLI tools available in the toolbox" | tee $@
+	$(call tr,"Name","Version","Summary",$@)
+	$(call tr,"----","-------","----------------------------",$@)
+	buildah run $(WORKING_CONTAINER) sh -c  'dnf info -q --installed $(LSP_VIA_DNF) | \
+	   grep -oP "(Name.+:\s\K.+)|(Ver.+:\s\K.+)|(Sum.+:\s\K.+)" | \
+	   paste  - - -  | sort -u ' | \
+	   awk -F'\t' '{printf "| %-14s | %-8s | %-83s |\n", $$1, $$2, $$3}' | tee -a $@
 
 dnf_cli_pkgs: info/cli-tools.md
-	echo '##[ $@ ]##'
 	echo '✅ CLI tools added'
 
 info/cli-tools.md:
 	echo '##[ $@ ]##'
 	mkdir -p $(dir $@)
-	$(INSTALL) $(CLI)
+	$(INSTALL) $(CLI_VIA_DNF)
 	printf "\n$(HEADING2) %s\n\n" "Handpicked CLI tools available in the toolbox" | tee $@
 	$(call tr,"Name","Version","Summary",$@)
 	$(call tr,"----","-------","----------------------------",$@)
-	buildah run $(WORKING_CONTAINER) sh -c  'dnf info -q --installed $(CLI) | \
+	buildah run $(WORKING_CONTAINER) sh -c  'dnf info -q --installed $(CLI_VIA_DNF) | \
 	   grep -oP "(Name.+:\s\K.+)|(Ver.+:\s\K.+)|(Sum.+:\s\K.+)" | \
 	   paste  - - -  | sort -u ' | \
 	   awk -F'\t' '{printf "| %-14s | %-8s | %-83s |\n", $$1, $$2, $$3}' | tee -a $@
