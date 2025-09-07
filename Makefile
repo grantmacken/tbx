@@ -122,7 +122,7 @@ info/luajit.md:
 
 
 
-luarocks: files/luarocks.tar.gz
+luarocks: info/luarocks.md
 
 latest/luarocks.json:
 	echo '##[ $@ ]##'
@@ -133,24 +133,19 @@ files/luarocks.tar.gz: latest/luarocks.json
 	echo '##[ $@ ]##'
 	mkdir -p $(dir $@)
 	SRC=$(shell $(call tarball,$<))
-	echo $$SRC
 	$(WGET) $$SRC -O $@
 
 
-info/luarocks.md: latest/luarocks.json
+info/luarocks.md: files/luarocks.tar.gz
 	echo '##[ $@ ]##'
 	mkdir -p $(dir $@)
-	NAME=$(basename $(notdir $@))
-	echo $${NAME}
-	TARGET=files/$${NAME}
-	TMP=/tmp/$${NAME}
-	mkdir -p $${TARGET}	
-	SRC=$(shell $(call tarball,$<))
-	echo $$SRC
-	$(WGET) $${SRC} -O- | $(TAR) $${TARGET} &>/dev/null
-	$(RUN) mkdir -p $${TMP} /etc/xdg/luarocks
-	$(ADD) $${TARGET} $${TMP} &>/dev/null
-	$(RUN) sh -c "cd $${TMP} && ./configure \
+	$(RUN) mkdir -p  /etc/xdg/luarocks
+	$(ADD) files/luarocks.tar.gz /tmp/luarocks.tar.gz &>/dev/null
+	$(RUN) $(TAR) . -f /tmp/luarocks.tar.gz
+	$(RUN) ls -al /tmp
+
+xxxx:
+	$(RUN) sh -c "cd /tmp && ./configure \
 		--lua-version=5.1 \
 		--with-lua-interpreter=luajit \
 		--sysconfdir=/etc/xdg \
