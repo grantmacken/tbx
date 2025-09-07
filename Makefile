@@ -110,7 +110,8 @@ luajit: info/luajit.md
 
 
 info/luajit.md:
-	$(INSTALL) luajit-devel luajit  &>/dev/null
+	mkdir -p $(dir $@)
+	$(INSTALL) luajit-devel luajit 
 	echo -n 'checking luajit version...'
 	$(RUN) luajit -v | tee $@
 	# VERSION=$$($(RUN) luajit -v | grep -oP 'LuaJIT \K\d+\.\d+\.\d{1,3}')
