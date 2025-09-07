@@ -27,11 +27,12 @@ ADD := buildah add --chmod 755 $(WORKING_CONTAINER)
 
 WGET := wget -q --no-check-certificate --timeout=10 --tries=3
 TAR  := tar xz --strip-components=1 -C
+TAR_NO_STRIP := tar xz -C
 
 tr = printf "| %-14s | %-8s | %-83s |\n" "$(1)" "$(2)" "$(3)" | tee -a $(4)
 bdu = jq -r ".assets[] | select(.browser_download_url | contains(\"$1\")) | .browser_download_url" $2
 
-default: nodejs lua
+default: lua
 	echo '##[ $@ ]##'
 	buildah config \
 	--label summary='a toolbox with cli tools, neovim' \
@@ -122,9 +123,14 @@ luarocks: info/luarocks.md
 info/luarocks.md: latest/luarocks.json
 	echo '##[ $@ ]##'
 	mkdir -p $(dir $@)
-	mkdir -p files/luarocks
+	NAME=$(basename $(notdir $@))
+	TARGET=files/$${NAME}
+	mkdir -p $${TARGET}	
 	SRC=$$(jq -r '.tarball_url' $<)
+	echo $$SRC
 	$(RUN) mkdir -p /tmp/luarocks /etc/xdg/luarocks
+
+xxx:
 	$(WGET) $${SRC} -O- | $(TAR) files/luarocks &>/dev/null
 	$(ADD) files/luarocks /tmp/luarocks &>/dev/null
 	$(RUN) sh -c 'cd /tmp/luarocks && ./configure \
