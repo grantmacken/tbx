@@ -31,6 +31,8 @@ TAR_NO_STRIP := tar xz -C
 
 tr = printf "| %-14s | %-8s | %-83s |\n" "$(1)" "$(2)" "$(3)" | tee -a $(4)
 bdu = jq -r ".assets[] | select(.browser_download_url | contains(\"$1\")) | .browser_download_url" $2
+tarball = jq -r '.tarball_url' $1
+ 
 
 default: luajit luarocks
 	echo '##[ $@ ]##'
@@ -134,20 +136,19 @@ info/luarocks.md: latest/luarocks.json
 	NAME=$(basename $(notdir $@))
 	echo $${NAME}
 	TARGET=files/$${NAME}
+	TMP=/tmp/$${NAME}
 	mkdir -p $${TARGET}	
-	SRC=$$(jq -r '.tarball_url' $<)
-	echo $${SRC}
-	$(RUN) mkdir -p /tmp/luarocks /etc/xdg/luarocks
-
-xxx:
-	$(WGET) $${SRC} -O- | $(TAR) files/luarocks &>/dev/null
-	$(ADD) files/luarocks /tmp/luarocks &>/dev/null
-	$(RUN) sh -c 'cd /tmp/luarocks && ./configure \
+	SRC=$(shell $(call tarball,$<))
+	echo $$SRC
+	$(RUN) mkdir -p $${TMP} /etc/xdg/luarocks
+	$(WGET) $${SRC} -O- | $(TAR) $${TARGET} &>/dev/null
+	$(ADD) $${TARGET} $${TMP} &>/dev/null
+	$(RUN) sh -c "cd $${TMP} && ./configure \
 		--lua-version=5.1 \
 		--with-lua-interpreter=luajit \
 		--sysconfdir=/etc/xdg \
 		--force-config \
-		--with-lua-include=/usr/include/luajit-2.1' &>/dev/null
+		--with-lua-include=/usr/include/luajit-2.1" &>/dev/null
 	# buildah run $(WORKING_CONTAINER) sh -c 'cd /tmp && make bootstrap' &>/dev/null
 	$(RUN) -c 'cd /tmp/luarocks && make && make install' &>/dev/null
 	echo -n 'checking luarocks version...'
