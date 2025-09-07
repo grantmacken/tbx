@@ -79,11 +79,18 @@ files/nvim.tar.gz:
 	mkdir -p $(dir $@)
 	$(WGET) "https://github.com/neovim/neovim/releases/download/nightly/nvim-linux-x86_64.tar.gz" -O $@
 
-##[[ NEOVIM ]]#
-neovim: nvim
-	echo '✅ neovim task completed'
+
+
+plugins:
+	$(ADD) scripts/ /usr/local/bin/
+	$(RUN) /usr/local/bin/nvim_plugins
+	$(RUN) ls /usr/local/share/nvim/site/pack/core/opt | tee $@
+
+gh_releases: nvim lua-language-server marksman harper
 
 nvim: info/neovim.md
+	echo '✅ neovim added'
+
 info/neovim.md: files/nvim.tar.gz
 	echo '##[ $@ ]##'
 	mkdir -p $(dir $@)
@@ -103,17 +110,8 @@ info/neovim.md: files/nvim.tar.gz
 	printf "| %-10s | %-13s | %-83s |\n" "$${NAME}" "$${VERSION}" "$${SUM}" | tee -a $@
 	echo '✅ latest pre-release neovim installed'
 
-plugins:
-	$(ADD) scripts/ /usr/local/bin/
-	$(RUN) /usr/local/bin/nvim_plugins
-	$(RUN) ls /usr/local/share/nvim/site/pack/core/opt | tee $@
 
 
-
-
-
-
-gh_releases: lua-language-server marksman harper
 
 lua-language-server: info/lua-language-server.md
 
