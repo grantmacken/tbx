@@ -32,6 +32,7 @@ NPM := $(RUN) npm install --global
 ADD := buildah add --chmod 755 $(WORKING_CONTAINER)
 WGET := wget -q --no-check-certificate --timeout=10 --tries=3
 TAR  := tar xz --strip-components=1 -C
+TAR_NO_STRIP := tar xz -C
 
 
 #LISTS
@@ -142,16 +143,17 @@ info/lua-language-server.md: files/lua-language-server.tar.gz
 	mkdir -p $(dir $@)
 	echo '##[ $(basename $(notdir $@)) ]##'
 	NAME=lua-language-server
-	TARGET=files/usr/local
-	mkdir -p $${TARGET}/$${NAME}
-	$(TAR) $${TARGET}/$${NAME} -f $<
-	$(ADD) $${TARGET} &>/dev/null
-	$(RUN) ln -sf /usr/local/lua-language-server/bin/lua-language-server /usr/local/bin/lua-language-server
+	TARGET=files/$${NAME}/usr/local
+	mkdir -p $${TARGET}
+	$(TAR_NO_STRIP) $${TARGET} -f $<
+	$(ADD) $${TARGET}
+	$(RUN) ls -al /usr/local/
+	# $(RUN) ln -sf /usr/local/lua-language-server/bin/lua-language-server /usr/local/bin/lua-language-server
 	$(RUN) ls -al /usr/local/bin
-	$(RUN) $${NAME} --version
+	# $(RUN) $${NAME} --version
 
-marksman: latest/harper.json
-latest/harper.json:
+marksman: latest/marksman.json
+latest/marksman.json:
 	echo '##[ $(basename $(notdir $@)) ]##'
 	NAME=$(basename $(notdir $@))
 	mkdir -p $(dir $@)
