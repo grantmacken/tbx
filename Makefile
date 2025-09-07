@@ -41,13 +41,12 @@ LSP_VIA_DNF := ShellCheck shfmt
 # https://github.com/artempyanykh/marksman/releases
 LSP_VIA_RELEASES := artempyanykh/marksman
 LSP_VIA_NPM := bash-language-server  @github/copilot-language-server
-DNF_PKGS := $(CLI_VIA_DNF) $(LSP_VIA_DNF)
 
 tr = printf "| %-14s | %-8s | %-83s |\n" "$(1)" "$(2)" "$(3)" | tee -a $(4)
 bdu = jq -r ".assets[] | select(.browser_download_url | contains(\"$1\")) | .browser_download_url" $2
 getName = $(basename $(notdir $1))
 
-default: dnf_lsp_pkgs gh_releases
+default:  gh_releases dnf_pkgs npm_pkgs
 	echo '##[ $@ ]##'
 	echo 'image built'
 ifdef GITHUB_ACTIONS
@@ -109,19 +108,10 @@ plugins:
 	$(RUN) /usr/local/bin/nvim_plugins
 	$(RUN) ls /usr/local/share/nvim/site/pack/core/opt | tee $@
 
-node_pkgs: info/node_pkgs.md
-info/node_pkgs.md:
-	echo '##[ $@ ]##'
-	$(NPM) $(LSP_VIA_NPM)
-	# Checks
-	$(RUN) which bash-language-server 
-	$(RUN) whereis bash-language-server
-	$(RUN) bash-language-server  --version
 
-dnf_lsp_pkgs: info/lsp_tooling_via_dnf.md
-info/lsp_tooling_via_dnf.md:
-	echo '##[ $@ ]##'
-	$(INSTALL) $(LSP_VIA_DNF)
+
+
+
 
 gh_releases: lua-language-server marksman harper
 
@@ -173,6 +163,24 @@ latest/harper.json:
 	$(WGET) https://api.github.com/repos/$${REPO}/releases/latest -O $@
 
 # DNF
+dnf_pkgs: dnf_cli_pkgs dnf_lsp_pkgs
+	echo '✅ Completed DNF installs'
+
+dnf_cli_pkgs: info/cli-tools.md
+	echo '✅ CLI tools added'
+
+info/cli-tools.md:
+	echo '##[ $@ ]##'
+	mkdir -p $(dir $@)
+	$(INSTALL) $(CLI_VIA_DNF) &>/dev/null
+	printf "\n$(HEADING2) %s\n\n" "Handpicked CLI tools available in the toolbox" | tee $@
+	$(call tr,"Name","Version","Summary",$@)
+	$(call tr,"----","-------","----------------------------",$@)
+	buildah run $(WORKING_CONTAINER) sh -c  'dnf info -q --installed $(CLI_VIA_DNF) | \
+	   grep -oP "(Name.+:\s\K.+)|(Ver.+:\s\K.+)|(Sum.+:\s\K.+)" | \
+	   paste  - - -  | sort -u ' | \
+	   awk -F'\t' '{printf "| %-14s | %-8s | %-83s |\n", $$1, $$2, $$3}' | tee -a $@
+
 dnf_lsp_pkgs: info/lsp-tooling.md
 	echo '##[ $@ ]##'
 	echo '✅ LSP servers added'
@@ -181,7 +189,7 @@ dnf_lsp_pkgs: info/lsp-tooling.md
 info/lsp-tooling.md:
 	echo '##[ $@ ]##'
 	mkdir -p $(dir $@)
-	$(INSTALL) $(LSP_VIA_DNF)
+	$(INSTALL) $(LSP_VIA_DNF) &>/dev/null
 	printf "\n$(HEADING2) %s\n\n" "Handpicked CLI tools available in the toolbox" | tee $@
 	$(call tr,"Name","Version","Summary",$@)
 	$(call tr,"----","-------","----------------------------",$@)
@@ -190,20 +198,20 @@ info/lsp-tooling.md:
 	   paste  - - -  | sort -u ' | \
 	   awk -F'\t' '{printf "| %-14s | %-8s | %-83s |\n", $$1, $$2, $$3}' | tee -a $@
 
-dnf_cli_pkgs: info/cli-tools.md
-	echo '✅ CLI tools added'
+###############
+##    NPM    ##
+###############
 
-info/cli-tools.md:
+npm_pkgs: info/npm_pkgs.md
+info/npm_pkgs.md:
 	echo '##[ $@ ]##'
-	mkdir -p $(dir $@)
-	$(INSTALL) $(CLI_VIA_DNF)
-	printf "\n$(HEADING2) %s\n\n" "Handpicked CLI tools available in the toolbox" | tee $@
-	$(call tr,"Name","Version","Summary",$@)
-	$(call tr,"----","-------","----------------------------",$@)
-	buildah run $(WORKING_CONTAINER) sh -c  'dnf info -q --installed $(CLI_VIA_DNF) | \
-	   grep -oP "(Name.+:\s\K.+)|(Ver.+:\s\K.+)|(Sum.+:\s\K.+)" | \
-	   paste  - - -  | sort -u ' | \
-	   awk -F'\t' '{printf "| %-14s | %-8s | %-83s |\n", $$1, $$2, $$3}' | tee -a $@
+	$(NPM) $(LSP_VIA_NPM)
+	# Checks
+	$(RUN) which bash-language-server 
+	$(RUN) whereis bash-language-server
+	$(RUN) bash-language-server  --version
+
+
 
 pull:
 	echo '##[ $@ ]##'
