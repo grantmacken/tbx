@@ -31,7 +31,7 @@ TAR  := tar xz --strip-components=1 -C
 tr = printf "| %-14s | %-8s | %-83s |\n" "$(1)" "$(2)" "$(3)" | tee -a $(4)
 bdu = jq -r ".assets[] | select(.browser_download_url | contains(\"$1\")) | .browser_download_url" $2
 
-default: runtimes
+default: nodejs lua
 	echo '##[ $@ ]##'
 	buildah config \
 	--label summary='a toolbox with cli tools, neovim' \
@@ -101,6 +101,50 @@ info/nodejs.md: latest/nodejs.json
 	echo -n 'checking npm version...'
 	NPM_VER=$$($(RUN) npm --version | tee)
 	$(call tr,npm,$${NPM_VER},Node Package Manager, $@)
+
+
+lua: luajit luarocks
+
+luajit: info/luajit.md
+info/luajit.md:
+	$(INSTALL) luajit-devel luajit  &>/dev/null
+	echo -n 'checking luajit version...'
+	$(RUN) luajit -v
+	VERSION=$$($(RUN) luajit -v | grep -oP 'LuaJIT \K\d+\.\d+\.\d{1,3}')
+	$(call tr,luajit,$${VERSION},The LuaJIT compiler,$@)
+
+latest/luarocks.json:
+	echo '##[ $@ ]##'
+	mkdir -p $(dir $@)
+	$(WGET) https://api.github.com/repos/luarocks/luarocks/tags -O- | jq '.[0]' > $@
+
+luarocks: info/luarocks.md
+info/luarocks.md: latest/luarocks.json
+	echo '##[ $@ ]##'
+	mkdir -p $(dir $@)
+	mkdir -p files/luarocks
+	SRC=$$(jq -r '.tarball_url' $<)
+	$(RUN) mkdir -p /tmp/luarocks /etc/xdg/luarocks
+	$(WGET) $${SRC} -O- | $(TAR) files/luarocks &>/dev/null
+	$(ADD) files/luarocks /tmp/luarocks &>/dev/null
+	$(RUN) sh -c 'cd /tmp/luarocks && ./configure \
+		--lua-version=5.1 \
+		--with-lua-interpreter=luajit \
+		--sysconfdir=/etc/xdg \
+		--force-config \
+		--with-lua-include=/usr/include/luajit-2.1' &>/dev/null
+	# buildah run $(WORKING_CONTAINER) sh -c 'cd /tmp && make bootstrap' &>/dev/null
+	$(RUN) -c 'cd /tmp/luarocks && make && make install' &>/dev/null
+	echo -n 'checking luarocks version...'
+	$(RUN) luarocks --version
+	# buildah run $(WORKING_CONTAINER) luarocks config --json | jq '.' &>/dev/null
+	LINE=$$($(RUN) luarocks | grep -oP '^Lua.+')
+	NAME=$$(echo $$LINE | grep -oP '^Lua\w+')
+	VER=$$(echo $$LINE | grep -oP '^Lua\w+\s\K.+' | cut -d, -f1)
+	SUM=$$(echo $$LINE | grep -oP '^Lua\w+\s\K.+' | cut -d, -f2)
+	$(call tr,$${NAME},$${VER},$${SUM},$@)
+	$(RUN) rm -fR tmp/luarocks
+	
 
 pull:
 	echo '##[ $@ ]##'
