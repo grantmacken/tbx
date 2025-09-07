@@ -150,7 +150,9 @@ info/lua-language-server.md: files/lua-language-server.tar.gz
 	# $(RUN) ls -al /usr/local/
 	$(RUN) ln -sf /usr/local/lua-language-server/bin/lua-language-server /usr/local/bin/lua-language-server
 	$(RUN) ls -al /usr/local/bin
-	# $(RUN) $${NAME} --version
+	$(RUN) which $${NAME}
+	$(RUN) whereis $${NAME}
+	$(RUN) $${NAME} --version
 
 marksman: latest/marksman.json
 latest/marksman.json:
@@ -161,8 +163,7 @@ latest/marksman.json:
 	# https://github.com/Automattic/harper/releases
 	$(WGET) https://api.github.com/repos/$${REPO}/releases/latest -O $@
 
-harper: info/harper.md
-latest/harper.json:
+harper: latest/harper.json:
 	echo '##[ $(basename $(notdir $@)) ]##'
 	NAME=$(basename $(notdir $@))
 	mkdir -p $(dir $@)
