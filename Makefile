@@ -153,9 +153,8 @@ info/lua-language-server.md: files/lua-language-server.tar.gz
 	tar xz -C $${TARGET}/$${NAME} -f $<
 	ls -al  $${TARGET} || true
 	$(ADD) ${TARGET} &>/dev/null
-	$(RUN) ls -al /usr/local
-	$(RUN) ls -al /usr/local/$${NAME}
-	$(RUN) ls -al /usr/local/$${NAME}/bin
+	$(RUN) ln -sf /usr/local/lua-language-server/bin/lua-language-server /usr/local/bin/lua-language-server
+	$(RUN) ls -al /usr/local/bin
 
 
 
