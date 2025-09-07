@@ -132,8 +132,9 @@ latest/luarocks.json:
 files/luarocks.tar.gz: latest/luarocks.json
 	echo '##[ $@ ]##'
 	mkdir -p $(dir $@)
-	$(WGET) $(call tarball,$<) -O $@
-	ls -al files
+	SRC=$(shell $(call tarball,$<))
+	echo $$SRC
+	$(WGET) $$SRC -O $@
 
 
 info/luarocks.md: latest/luarocks.json
