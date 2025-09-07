@@ -39,7 +39,7 @@ CLI_VIA_DNF := eza fd-find fzf gh pass ripgrep stow wl-clipboard zoxide
 LSP_VIA_DNF := ShellCheck shfmt
 # https://github.com/artempyanykh/marksman/releases
 LSP_VIA_RELEASES := artempyanykh/marksman
-LSP_VIA_NODE := bash-language-server
+LSP_VIA_NPM := bash-language-server
 DNF_PKGS := $(CLI_VIA_DNF) $(LSP_VIA_DNF)
 
 tr = printf "| %-14s | %-8s | %-83s |\n" "$(1)" "$(2)" "$(3)" | tee -a $(4)
@@ -91,7 +91,7 @@ info/neovim.md: files/nvim.tar.gz
 	NAME=$(basename $(notdir $@))
 	TARGET=files/$${NAME}/usr/local
 	mkdir -p $${TARGET}
-	tar xz --strip-components=1 -C $${TARGET} -f $<
+	$(TAR) $${TARGET} -f $<
 	$(ADD) files/$${NAME} &>/dev/null
 	# CHECK:
 	$(RUN) nvim -v
@@ -111,7 +111,7 @@ plugins:
 node_pkgs: info/node_pkgs.md
 info/node_pkgs.md:
 	echo '##[ $@ ]##'
-	$(NPM) $(LSP_VIA_NODE)
+	$(NPM) $(LSP_VIA_NPM)
 	# Checks
 	$(RUN) which bash-language-server 
 	$(RUN) whereis bash-language-server
@@ -120,29 +120,23 @@ info/node_pkgs.md:
 dnf_lsp_pkgs: info/lsp_tooling_via_dnf.md
 info/lsp_tooling_via_dnf.md:
 	echo '##[ $@ ]##'
-	$(INSTALL) $(LSP_SERVERS)
+	$(INSTALL) $(LSP_VIA_DNF)
 
 releases: lua-language-server
 
 lua-language-server: info/lua-language-server.md
-
-
 
 latest/lua-language-server.json:
 	echo '##[ $(basename $(notdir $@)) ]##'
 	echo '##[ $@ ]##'
 	mkdir -p $(dir $@)
 	REPO=luals/lua-language-server
-	# https://api.github.com/repos/luals/lua-language-server/releases/latest
-	SRC=https://api.github.com/repos/$${REPO}/releases/latest
-	$(WGET) $${SRC} -O $@
+	$(WGET) https://api.github.com/repos/$${REPO}/releases/latest -O $@
 
 files/lua-language-server.tar.gz: latest/lua-language-server.json
 	echo '##[ $@ ]##'
 	mkdir -p $(dir $@)
-	SRC=$(shell $(call bdu,linux-x64.tar.gz,$<))
-	echo $${SRC}
-	$(WGET) $${SRC} -O $@
+	$(WGET) $(shell $(call bdu,linux-x64.tar.gz,$<)) -O $@
 
 info/lua-language-server.md: files/lua-language-server.tar.gz
 	mkdir -p $(dir $@)
@@ -150,13 +144,11 @@ info/lua-language-server.md: files/lua-language-server.tar.gz
 	NAME=lua-language-server
 	TARGET=files/usr/local
 	mkdir -p $${TARGET}/$${NAME}
-	tar xz -C $${TARGET}/$${NAME} -f $<
-	ls -al  $${TARGET} || true
-	$(ADD) ${TARGET} &>/dev/null
+	$(TAR) $${TARGET}/$${NAME} -f $<
+	$(ADD) $${TARGET} &>/dev/null
 	$(RUN) ln -sf /usr/local/lua-language-server/bin/lua-language-server /usr/local/bin/lua-language-server
 	$(RUN) ls -al /usr/local/bin
-
-
+	$(RUN) $${NAME} --version
 
 marksman: latest/harper.json
 latest/harper.json:
@@ -165,11 +157,7 @@ latest/harper.json:
 	mkdir -p $(dir $@)
 	REPO=artempyanykh/marksman
 	# https://github.com/Automattic/harper/releases
-	SRC=https://api.github.com/repos/$${REPO}/releases/latest
-	$(WGET) $${SRC} -O $@
-
-
-
+	$(WGET) https://api.github.com/repos/$${REPO}/releases/latest -O $@
 
 harper: info/harper.md
 latest/harper.json:
@@ -178,18 +166,7 @@ latest/harper.json:
 	mkdir -p $(dir $@)
 	REPO=Automattic/harper
 	# https://github.com/Automattic/harper/releases
-	SRC=https://api.github.com/repos/$${REPO}/releases/latest
-	$(WGET) $${SRC} -O $@
-
-info/harper.md: latest/harper.json
-	echo '##[ $@ ]##'
-	mkdir -p $(dir $@)
-	TARGET=files//usr/local
-	mkdir -p $${TARGET}
-	SRC=$(shell $(call bdu,linux-x64.tar.gz,$<))
-	$(WGET) $${SRC} -O- | $(TAR) $${TARGET}
-	ls $${TARGET}
-
+	$(WGET) https://api.github.com/repos/$${REPO}/releases/latest -O $@
 
 
 dnf_cli_pkgs: info/cli-tools.md
