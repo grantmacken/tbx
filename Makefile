@@ -106,6 +106,9 @@ info/nodejs.md: latest/nodejs.json
 
 
 luajit: info/luajit.md
+	echo '✅ latest $@ installed'
+
+
 info/luajit.md:
 	$(INSTALL) luajit-devel luajit  &>/dev/null
 	echo -n 'checking luajit version...'
