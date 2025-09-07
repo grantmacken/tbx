@@ -134,14 +134,15 @@ files/luarocks.tar.gz: latest/luarocks.json
 	mkdir -p $(dir $@)
 	SRC=$(shell $(call tarball,$<))
 	$(WGET) $$SRC -O $@
+	ls $@
 
 
 info/luarocks.md: files/luarocks.tar.gz
 	echo '##[ $@ ]##'
 	mkdir -p $(dir $@)
-	$(RUN) mkdir -p  /etc/xdg/luarocks
+	$(RUN) mkdir -p /tmp/luarocks /etc/xdg/luarocks
 	$(ADD) files/luarocks.tar.gz /tmp/luarocks.tar.gz &>/dev/null
-	$(RUN) $(TAR) . -f /tmp/luarocks.tar.gz
+	$(RUN) $(TAR) /tmp/luarocks -f /tmp/luarocks.tar.gz
 	$(RUN) ls -al /tmp
 
 xxxx:
