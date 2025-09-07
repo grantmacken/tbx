@@ -163,7 +163,8 @@ latest/marksman.json:
 	# https://github.com/Automattic/harper/releases
 	$(WGET) https://api.github.com/repos/$${REPO}/releases/latest -O $@
 
-harper: latest/harper.json:
+harper: latest/harper.json
+latest/harper.json:
 	echo '##[ $(basename $(notdir $@)) ]##'
 	NAME=$(basename $(notdir $@))
 	mkdir -p $(dir $@)
