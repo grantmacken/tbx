@@ -32,7 +32,7 @@ TAR_NO_STRIP := tar xz -C
 tr = printf "| %-14s | %-8s | %-83s |\n" "$(1)" "$(2)" "$(3)" | tee -a $(4)
 bdu = jq -r ".assets[] | select(.browser_download_url | contains(\"$1\")) | .browser_download_url" $2
 
-default: lua
+default: luajit luarocks
 	echo '##[ $@ ]##'
 	buildah config \
 	--label summary='a toolbox with cli tools, neovim' \
@@ -104,15 +104,14 @@ info/nodejs.md: latest/nodejs.json
 	$(call tr,npm,$${NPM_VER},Node Package Manager, $@)
 
 
-lua: luajit luarocks
 
 luajit: info/luajit.md
 info/luajit.md:
 	$(INSTALL) luajit-devel luajit  &>/dev/null
 	echo -n 'checking luajit version...'
-	$(RUN) luajit -v
-	VERSION=$$($(RUN) luajit -v | grep -oP 'LuaJIT \K\d+\.\d+\.\d{1,3}')
-	$(call tr,luajit,$${VERSION},The LuaJIT compiler,$@)
+	$(RUN) luajit -v | tee $@
+	# VERSION=$$($(RUN) luajit -v | grep -oP 'LuaJIT \K\d+\.\d+\.\d{1,3}')
+	# $(call tr,luajit,$${VERSION},The LuaJIT compiler,$@)
 
 
 
@@ -132,7 +131,7 @@ info/luarocks.md: latest/luarocks.json
 	TARGET=files/$${NAME}
 	mkdir -p $${TARGET}	
 	SRC=$$(jq -r '.tarball_url' $<)
-	echo $$SRC
+	echo $${SRC}
 	$(RUN) mkdir -p /tmp/luarocks /etc/xdg/luarocks
 
 xxx:
