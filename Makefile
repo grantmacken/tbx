@@ -45,7 +45,6 @@ VIA_AT_NPM := @github/copilot-language-server @ast-grep/cli
 
 tr = printf "| %-14s | %-8s | %-83s |\n" "$(1)" "$(2)" "$(3)" | tee -a $(4)
 bdu = jq -r ".assets[] | select(.browser_download_url | contains(\"$1\")) | .browser_download_url" $2
-getName = $(basename $(notdir $1))
 
 default:  gh_releases dnf_pkgs npm_pkgs nvim_plugins nvim_xdg_config
 	echo '##[ $@ ]##'
@@ -88,7 +87,6 @@ files/nvim.tar.gz:
 info/neovim.md: files/nvim.tar.gz
 	echo '##[ $@ ]##'
 	mkdir -p $(dir $@)
-	$(RUN) mkdir -p /etc/xdg/nvim/{plugin,lsp,queries,parser}
 	NAME=$(basename $(notdir $@))
 	TARGET=files/$${NAME}/usr/local
 	mkdir -p $${TARGET}
@@ -112,8 +110,9 @@ nvim_plugins:
 
 nvim_xdg_config:
 	echo '##[ $@ ]##'
-	$(ADD) etc /etc
-	$(RUN) tree /etc
+	/var/home/gmack/Projects/tbx-coding/etc/xdg/nvim/plugin/02_options.lua
+	$(ADD) etc/xdg/nvim /etc/xdg/nvim 	
+	$(RUN) tree etc/xdg/nvim
 	echo '✅ nvim xdg config files installed'
 
 
