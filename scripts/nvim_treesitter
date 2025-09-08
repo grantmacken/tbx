@@ -1,28 +1,19 @@
 #!/usr/bin/env -S nvim -l
 vim.print( 'Install Treesitter Parsers and Queries' )
-vim.cmd.packadd('nvim-treesitter')
-local install_dir = vim.fn.stdpath('config_dirs')[1]
-vim.print( 'install dir: ' .. install_dir)
-local ok_ts, ts =  pcall(require, 'nvim-treesitter')
-if ok_ts then
-  ts.setup({
-   install_dir = install_dir
- })
-end
 
 -- 'awk','bash','comment','css','csv','diff','djot','dtd','ebnf','elixir',
 -- 'erlang','git_config','gitignore','gleam','gnuplot','html','http','javascript',
 -- 'jq','json','just','latex','ledger','make','markdown_inline','mermaid',
 -- 'nginx','printf','readline','regex','ssh_config','toml','xml','yaml'
+--
+-- ts.install({'awk','bash','comment','css'})
+-- vim.uv.sleep(10000)
 
-ts.install({'awk','bash','comment','css'})
-vim.uv.sleep(10000)
-
-local iter = vim.uv.fs_scandir(install_dir)
-if iter then
-  while true do
-    local name, type = vim.uv.fs_scandir_next(iter)
-    if not name then break end
-    print(name, type)
-  end
-end
+-- local iter = vim.uv.fs_scandir(install_dir)
+-- if iter then
+--   while true do
+--     local name, type = vim.uv.fs_scandir_next(iter)
+--     if not name then break end
+--     print(name, type)
+--   end
+-- end

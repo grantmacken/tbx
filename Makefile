@@ -34,13 +34,14 @@ WGET := wget -q --no-check-certificate --timeout=10 --tries=3
 TAR  := tar xz --strip-components=1 -C
 TAR_NO_STRIP := tar xz -C
 
-
 #LISTS
 CLI_VIA_DNF := eza fd-find fzf gh pass ripgrep stow wl-clipboard zoxide
 LSP_VIA_DNF := ShellCheck shfmt
 # https://github.com/artempyanykh/marksman/releases
 LSP_VIA_RELEASES := artempyanykh/marksman
-LSP_VIA_NPM := bash-language-server  @github/copilot-language-server
+VIA_NPM := bash-language-server 
+VIA_AT_NPM := @github/copilot-language-server @ast-grep/cli
+
 
 tr = printf "| %-14s | %-8s | %-83s |\n" "$(1)" "$(2)" "$(3)" | tee -a $(4)
 bdu = jq -r ".assets[] | select(.browser_download_url | contains(\"$1\")) | .browser_download_url" $2
@@ -79,8 +80,6 @@ files/nvim.tar.gz:
 	mkdir -p $(dir $@)
 	$(WGET) "https://github.com/neovim/neovim/releases/download/nightly/nvim-linux-x86_64.tar.gz" -O $@
 
-
-
 plugins:
 	$(ADD) scripts/ /usr/local/bin/
 	$(RUN) /usr/local/bin/nvim_plugins
@@ -89,7 +88,12 @@ plugins:
 gh_releases: nvim lua-language-server marksman harper
 
 nvim: info/neovim.md
-	echo '✅ neovim added'
+	echo '✅ latest pre-release neovim installed'
+
+files/nvim.tar.gz:
+	echo '##[ $@ ]##'
+	mkdir -p $(dir $@)
+	$(WGET) "https://github.com/neovim/neovim/releases/download/nightly/nvim-linux-x86_64.tar.gz" -O $@
 
 info/neovim.md: files/nvim.tar.gz
 	echo '##[ $@ ]##'
@@ -108,12 +112,9 @@ info/neovim.md: files/nvim.tar.gz
 	VERSION=$$($(RUN) nvim -v | grep -oP 'NVIM \K.+' | cut -d'-' -f1 )
 	SUM='The text editor with a focus on extensibility and usability'
 	printf "| %-10s | %-13s | %-83s |\n" "$${NAME}" "$${VERSION}" "$${SUM}" | tee -a $@
-	echo '✅ latest pre-release neovim installed'
-
-
-
 
 lua-language-server: info/lua-language-server.md
+	echo '✅ latest $@ installed'
 
 latest/lua-language-server.json:
 	echo '##[ $(basename $(notdir $@)) ]##'
@@ -137,7 +138,6 @@ info/lua-language-server.md: files/lua-language-server.tar.gz
 	$(ADD) $${TARGET} /usr/local/$${NAME}
 	# $(RUN) ls -al /usr/local/
 	$(RUN) ln -sf /usr/local/lua-language-server/bin/lua-language-server /usr/local/bin/lua-language-server
-	$(RUN) ls -al /usr/local/bin
 	$(RUN) which $${NAME}
 	$(RUN) whereis $${NAME}
 	$(RUN) $${NAME} --version
@@ -188,7 +188,7 @@ info/lsp-tooling.md:
 	echo '##[ $@ ]##'
 	mkdir -p $(dir $@)
 	$(INSTALL) $(LSP_VIA_DNF) &>/dev/null
-	printf "\n$(HEADING2) %s\n\n" "Handpicked CLI tools available in the toolbox" | tee $@
+	printf "\n$(HEADING2) %s\n\n" "dnf installed LSP tooling available in the toolbox" | tee $@
 	$(call tr,"Name","Version","Summary",$@)
 	$(call tr,"----","-------","----------------------------",$@)
 	buildah run $(WORKING_CONTAINER) sh -c  'dnf info -q --installed $(LSP_VIA_DNF) | \
@@ -201,10 +201,11 @@ info/lsp-tooling.md:
 ###############
 
 npm_pkgs: info/npm_pkgs.md
+	echo '✅ NPM packages installed'
+	
 info/npm_pkgs.md:
 	echo '##[ $@ ]##'
-	$(NPM) $(LSP_VIA_NPM)
-	# Checks
+	$(NPM) $(VIA_NPM) $(VIA_AT_NPM)
 	$(RUN) which bash-language-server 
 	$(RUN) whereis bash-language-server
 	$(RUN) bash-language-server  --version
