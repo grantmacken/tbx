@@ -47,7 +47,7 @@ tr = printf "| %-14s | %-8s | %-83s |\n" "$(1)" "$(2)" "$(3)" | tee -a $(4)
 bdu = jq -r ".assets[] | select(.browser_download_url | contains(\"$1\")) | .browser_download_url" $2
 getName = $(basename $(notdir $1))
 
-default:  gh_releases dnf_pkgs npm_pkgs nvim_plugins
+default:  gh_releases dnf_pkgs npm_pkgs nvim_plugins nvim_xdg_config
 	echo '##[ $@ ]##'
 	echo 'image built'
 ifdef GITHUB_ACTIONS
@@ -108,14 +108,13 @@ nvim_plugins:
 	$(ADD) scripts/ /usr/local/bin/
 	$(RUN) /usr/local/bin/nvim_plugins
 	$(RUN) ls /usr/local/share/nvim/site/pack/core/opt | tee $@
+	echo '✅ nvim plugins installed'
 
-nvim_etc:
+nvim_xdg_config:
 	echo '##[ $@ ]##'
-	$(ADD) etc
+	$(ADD) etc /etc
 	$(RUN) tree /etc
-
-
-
+	echo '✅ nvim xdg config files installed'
 
 
 lua-language-server: info/lua-language-server.md
