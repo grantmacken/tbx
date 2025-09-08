@@ -32,7 +32,7 @@ TAR_NO_STRIP := tar xz -C
 tr = printf "| %-14s | %-8s | %-83s |\n" "$(1)" "$(2)" "$(3)" | tee -a $(4)
 bdu = jq -r ".assets[] | select(.browser_download_url | contains(\"$1\")) | .browser_download_url" $2
 tarball = jq -r '.tarball_url' $1
- 
+
 
 default: luajit luarocks
 	echo '##[ $@ ]##'
@@ -129,41 +129,42 @@ latest/luarocks.json:
 	mkdir -p $(dir $@)
 	$(WGET) https://api.github.com/repos/luarocks/luarocks/tags -O- | jq '.[0]' | tee $@
 
-files/luarocks.tar.gz: latest/luarocks.json
+# files/luarocks.tar.gz: latest/luarocks.json
+# 	echo '##[ $@ ]##'
+# 	mkdir -p $(dir $@)
+# 	SRC=$(shell $(call tarball,$<))
+# 	$(WGET) $$SRC -O $@
+# 	ls -a $@
+
+
+info/luarocks.md: latest/luarocks.json
 	echo '##[ $@ ]##'
 	mkdir -p $(dir $@)
-	SRC=$(shell $(call tarball,$<))
-	$(WGET) $$SRC -O $@
-	ls $@
-
-
-info/luarocks.md: files/luarocks.tar.gz
-	echo '##[ $@ ]##'
-	mkdir -p $(dir $@)
-	$(RUN) mkdir -p /tmp/luarocks /etc/xdg/luarocks
-	$(ADD) files/luarocks.tar.gz /tmp/luarocks.tar.gz &>/dev/null
-	$(RUN) $(TAR) /tmp/luarocks -f /tmp/luarocks.tar.gz
-	$(RUN) ls -al /tmp
-
-xxxx:
-	$(RUN) sh -c "cd /tmp && ./configure \
+	mkdir -p files/luarocks
+	SRC=$$(jq -r '.tarball_url' $<)
+	buildah run $(WORKING_CONTAINER) mkdir -p 	/tmp/luarocks /etc/xdg/luarocks
+	wget -q --timeout=10 --tries=3 $${SRC} -O- | tar xz --strip-components=1 -C files/luarocks &>/dev/null
+	buildah add --chmod 755 $(WORKING_CONTAINER) files/luarocks /tmp/luarocks &>/dev/null
+	buildah run $(WORKING_CONTAINER) sh -c 'cd /tmp/luarocks && ./configure \
 		--lua-version=5.1 \
 		--with-lua-interpreter=luajit \
 		--sysconfdir=/etc/xdg \
 		--force-config \
-		--with-lua-include=/usr/include/luajit-2.1" &>/dev/null
+		--with-lua-include=/usr/include/luajit-2.1' &>/dev/null
 	# buildah run $(WORKING_CONTAINER) sh -c 'cd /tmp && make bootstrap' &>/dev/null
-	$(RUN) -c 'cd /tmp/luarocks && make && make install' &>/dev/null
+	buildah run $(WORKING_CONTAINER) sh -c 'cd /tmp/luarocks && make && make install' &>/dev/null
 	echo -n 'checking luarocks version...'
-	$(RUN) luarocks --version
+	buildah run $(WORKING_CONTAINER) luarocks --version
 	# buildah run $(WORKING_CONTAINER) luarocks config --json | jq '.' &>/dev/null
-	LINE=$$($(RUN) luarocks | grep -oP '^Lua.+')
+	LINE=$$(buildah run $(WORKING_CONTAINER) luarocks | grep -oP '^Lua.+')
 	NAME=$$(echo $$LINE | grep -oP '^Lua\w+')
 	VER=$$(echo $$LINE | grep -oP '^Lua\w+\s\K.+' | cut -d, -f1)
 	SUM=$$(echo $$LINE | grep -oP '^Lua\w+\s\K.+' | cut -d, -f2)
 	$(call tr,$${NAME},$${VER},$${SUM},$@)
-	$(RUN) rm -fR tmp/luarocks
-	
+	buildah run $(WORKING_CONTAINER) rm -fR tmp/luarocks
+
+
+
 
 pull:
 	echo '##[ $@ ]##'
