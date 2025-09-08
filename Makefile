@@ -110,7 +110,6 @@ nvim_plugins:
 
 nvim_xdg_config:
 	echo '##[ $@ ]##'
-	/var/home/gmack/Projects/tbx-coding/etc/xdg/nvim/plugin/02_options.lua
 	$(ADD) etc/xdg/nvim /etc/xdg/nvim 	
 	$(RUN) tree etc/xdg/nvim
 	echo '✅ nvim xdg config files installed'
