@@ -13,6 +13,7 @@ vim.pack.add({
  'https://github.com/neanias/everforest-nvim',
  'https://github.com/stevearc/oil.nvim',
  'https://github.com/stevearc/resession.nvim',
+ 'https://github.com/lambdalisue/vim-suda'
  })
 
 -- local install_dir = '/usr/local/share/nvim/site/pack/core/opt'

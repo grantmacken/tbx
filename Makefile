@@ -46,7 +46,7 @@ VIA_AT_NPM := @github/copilot-language-server @ast-grep/cli
 tr = printf "| %-14s | %-8s | %-83s |\n" "$(1)" "$(2)" "$(3)" | tee -a $(4)
 bdu = jq -r ".assets[] | select(.browser_download_url | contains(\"$1\")) | .browser_download_url" $2
 
-default:  gh_releases dnf_pkgs npm_pkgs nvim_plugins nvim_xdg_config
+default:  gh_releases dnf_pkgs npm_pkgs nvim_plugins
 	echo '##[ $@ ]##'
 	echo 'image built'
 ifdef GITHUB_ACTIONS
