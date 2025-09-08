@@ -26,25 +26,29 @@ NAME := tbx-coding
 WORKING_CONTAINER ?= $(NAME)-working-container
 TBX_IMAGE :=  ghcr.io/grantmacken/$(NAME)
 
+# actions
 RUN := buildah run $(WORKING_CONTAINER)
 INSTALL := $(RUN) dnf install --allowerasing --skip-unavailable --skip-broken --no-allow-downgrade -y
-NPM := $(RUN) npm install --global
-NPM_LIST := $(RUN) npm list -g --depth=0
 ADD := buildah add --chmod 755 $(WORKING_CONTAINER)
 WGET := wget -q --no-check-certificate --timeout=10 --tries=3
 TAR  := tar xz --strip-components=1 -C
 TAR_NO_STRIP := tar xz -C
+NPM := $(RUN) npm install --global
+NPM_LIST := $(RUN) npm list -g --depth=0
 
 #LISTS
-CLI_VIA_DNF := eza fd-find fzf gh pass ripgrep stow wl-clipboard zoxide
+CLI_VIA_DNF := eza fd-find fzf pass ripgrep stow wl-clipboard zoxide
 LSP_VIA_DNF := ShellCheck shfmt
 # https://github.com/artempyanykh/marksman/releases
-LSP_VIA_RELEASES := artempyanykh/marksman
+VIA_RELEASES := artempyanykh/marksman
+VIA_NPM := bash-language-server
+VIA_AT_NPM :=  @github/copilot-language-server @ast-grep/cli
+# @githubnext/copilot-cl
 
 tr = printf "| %-14s | %-8s | %-83s |\n" "$(1)" "$(2)" "$(3)" | tee -a $(4)
 bdu = jq -r ".assets[] | select(.browser_download_url | contains(\"$1\")) | .browser_download_url" $2
 
-default:  gh_releases dnf_pkgs npm_pkgs nvim_plugins
+default:  gh_releases dnf_pkgs # npm_pkgs nvim_plugins
 	echo '##[ $@ ]##'
 	echo 'image built'
 ifdef GITHUB_ACTIONS
@@ -161,8 +165,15 @@ latest/harper.json:
 	$(WGET) https://api.github.com/repos/$${REPO}/releases/latest -O $@
 
 # DNF
-dnf_pkgs: dnf_cli_pkgs dnf_lsp_pkgs
+dnf_pkgs: dnf_cli_pkgs dnf_lsp_pkgs dnf_gh
 	echo '✅ Completed DNF installs'
+
+dnf_gh:
+	$(INSTALL) dnf5-plugins
+	$(RUN) dnf config-manager addrepo --from-repofile=https://cli.github.com/packages/rpm/gh-cli.repo
+	$(INSTALL) gh --repo gh-cli
+	$(RUN) dnf info -q --installed gh
+
 
 dnf_cli_pkgs: info/cli-tools.md
 	echo '✅ CLI tools added'
@@ -200,8 +211,7 @@ info/lsp-tooling.md:
 ##    NPM    ##
 ###############
 
-VIA_NPM := bash-language-server
-VIA_AT_NPM := @githubnext/copilot-cli @github/copilot-language-server @ast-grep/cli
+
 
 npm_pkgs: info/npm_pkgs.md
 	echo '✅ NPM packages installed'
