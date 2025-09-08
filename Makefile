@@ -76,11 +76,6 @@ latest/tbx-build-tools.json:
 	echo -n "WORKING_CONTAINER=" | tee -a .env
 	buildah from "$$FROM" | tee -a .env
 
-files/nvim.tar.gz:
-	echo '##[ $@ ]##'
-	mkdir -p $(dir $@)
-	$(WGET) "https://github.com/neovim/neovim/releases/download/nightly/nvim-linux-x86_64.tar.gz" -O $@
-
 plugins:
 	$(ADD) scripts/ /usr/local/bin/
 	$(RUN) /usr/local/bin/nvim_plugins
@@ -208,8 +203,6 @@ info/npm_pkgs.md:
 	echo '##[ $@ ]##'
 	$(NPM) $(VIA_NPM) $(VIA_AT_NPM) &>/dev/null
 	$(NPM_LIST)
-
-
 
 pull:
 	echo '##[ $@ ]##'
