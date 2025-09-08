@@ -6,23 +6,24 @@ vim.print(vim.fn.stdpath('data'))
 -- use pack.add
 -- /usr/local/share/nvim/site/pack/core/opt/
 vim.pack.add({
- 'https://github.com/nvim-lua/plenary.nvim',
- 'https://github.com/CopilotC-Nvim/CopilotChat.nvim'
+ 'https://github.com/MagicDuck/grug-far.nvim',
+ 'https://github.com/catppuccin/nvim',
  'https://github.com/echasnovski/mini.nvim',
+ 'https://github.com/folke/flash.nvim',
+ 'https://github.com/gbprod/yanky.nvim',
  'https://github.com/hiphish/rainbow-delimiters.nvim',
  'https://github.com/ibhagwan/fzf-lua',
  'https://github.com/lambdalisue/vim-suda',
  'https://github.com/lewis6991/gitsigns.nvim',
+ 'https://github.com/mistweaverco/kulala.nvim'
  'https://github.com/neanias/everforest-nvim',
- 'https://github.com/catppuccin/nvim',
+ 'https://github.com/nvim-lua/plenary.nvim',
  'https://github.com/stevearc/oil.nvim',
  'https://github.com/stevearc/resession.nvim',
- 'https://github.com/zbirenbaum/copilot.lua',
- 'https://github.com/MagicDuck/grug-far.nvim',
- 'https://github.com/folke/flash.nvim',
- 'https://github.com/gbprod/yanky.nvim',
- 'https://github.com/mistweaverco/kulala.nvim'
  })
+
+-- 'https://github.com/CopilotC-Nvim/CopilotChat.nvim'
+-- 'https://github.com/zbirenbaum/copilot.lua',
 
 -- local install_dir = '/usr/local/share/nvim/site/pack/core/opt'
 --

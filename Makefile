@@ -40,8 +40,6 @@ CLI_VIA_DNF := eza fd-find fzf gh pass ripgrep stow wl-clipboard zoxide
 LSP_VIA_DNF := ShellCheck shfmt
 # https://github.com/artempyanykh/marksman/releases
 LSP_VIA_RELEASES := artempyanykh/marksman
-VIA_NPM := bash-language-server 
-VIA_AT_NPM := @github/copilot-language-server @ast-grep/cli
 
 tr = printf "| %-14s | %-8s | %-83s |\n" "$(1)" "$(2)" "$(3)" | tee -a $(4)
 bdu = jq -r ".assets[] | select(.browser_download_url | contains(\"$1\")) | .browser_download_url" $2
@@ -201,6 +199,9 @@ info/lsp-tooling.md:
 ###############
 ##    NPM    ##
 ###############
+
+VIA_NPM := bash-language-server
+VIA_AT_NPM := @githubnext/copilot-cli @github/copilot-language-server @ast-grep/cli
 
 npm_pkgs: info/npm_pkgs.md
 	echo '✅ NPM packages installed'
