@@ -43,12 +43,11 @@ LSP_VIA_RELEASES := artempyanykh/marksman
 VIA_NPM := bash-language-server 
 VIA_AT_NPM := @github/copilot-language-server @ast-grep/cli
 
-
 tr = printf "| %-14s | %-8s | %-83s |\n" "$(1)" "$(2)" "$(3)" | tee -a $(4)
 bdu = jq -r ".assets[] | select(.browser_download_url | contains(\"$1\")) | .browser_download_url" $2
 getName = $(basename $(notdir $1))
 
-default:  gh_releases dnf_pkgs npm_pkgs
+default:  gh_releases dnf_pkgs npm_pkgs nvim_plugins
 	echo '##[ $@ ]##'
 	echo 'image built'
 ifdef GITHUB_ACTIONS
@@ -75,11 +74,6 @@ latest/tbx-build-tools.json:
 	buildah pull "$$FROM" &> /dev/null
 	echo -n "WORKING_CONTAINER=" | tee -a .env
 	buildah from "$$FROM" | tee -a .env
-
-plugins:
-	$(ADD) scripts/ /usr/local/bin/
-	$(RUN) /usr/local/bin/nvim_plugins
-	$(RUN) ls /usr/local/share/nvim/site/pack/core/opt | tee $@
 
 gh_releases: nvim lua-language-server marksman harper
 
@@ -108,6 +102,12 @@ info/neovim.md: files/nvim.tar.gz
 	VERSION=$$($(RUN) nvim -v | grep -oP 'NVIM \K.+' | cut -d'-' -f1 )
 	SUM='The text editor with a focus on extensibility and usability'
 	printf "| %-10s | %-13s | %-83s |\n" "$${NAME}" "$${VERSION}" "$${SUM}" | tee -a $@
+
+nvim_plugins:
+	echo '##[ $@ ]##'
+	$(ADD) scripts/ /usr/local/bin/
+	$(RUN) /usr/local/bin/nvim_plugins
+	$(RUN) ls /usr/local/share/nvim/site/pack/core/opt | tee $@
 
 lua-language-server: info/lua-language-server.md
 	echo '✅ latest $@ installed'
@@ -206,4 +206,9 @@ info/npm_pkgs.md:
 
 pull:
 	echo '##[ $@ ]##'
+	hostspawn
 	podman pull ghcr.io/grantmacken/tbx-coding:latest
+	toolbox list --containers
+	# toolbox list --images
+	toolbox create --image ghcr.io/grantmacken/tbx-coding:latest coding 
+	exit
