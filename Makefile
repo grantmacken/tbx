@@ -62,6 +62,12 @@ endif
 
 init: .env
 	echo '##[ $@ ]##'
+	# the runtime should have
+	$(RUN) which make
+	$(RUN) which npm
+	$(RUN) which node
+	$(RUN) which luajit
+	$(RUN) which luarocks
 
 latest/tbx-build-tools.json:
 	echo '##[ $@ ]##'
@@ -165,15 +171,13 @@ latest/harper.json:
 	$(WGET) https://api.github.com/repos/$${REPO}/releases/latest -O $@
 
 # DNF
-dnf_pkgs: dnf_cli_pkgs dnf_lsp_pkgs dnf_gh
+dnf_pkgs: dnf_gh dnf_cli_pkgs dnf_lsp_pkgs 
 	echo '✅ Completed DNF installs'
 
 dnf_gh:
-	$(INSTALL) dnf5-plugins
 	$(RUN) dnf config-manager addrepo --from-repofile=https://cli.github.com/packages/rpm/gh-cli.repo
 	$(INSTALL) gh --repo gh-cli
 	$(RUN) dnf info -q --installed gh
-
 
 dnf_cli_pkgs: info/cli-tools.md
 	echo '✅ CLI tools added'
