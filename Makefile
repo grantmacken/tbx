@@ -176,7 +176,7 @@ dnf_pkgs: dnf_gh dnf_cli_pkgs dnf_lsp_pkgs
 
 dnf_gh:
 	$(RUN) dnf config-manager addrepo --from-repofile=https://cli.github.com/packages/rpm/gh-cli.repo
-	$(INSTALL) gh --repo gh-cli
+	$(INSTALL) gh --repo gh-cli &> /dev/null
 	$(RUN) dnf info -q --installed gh
 
 dnf_cli_pkgs: info/cli-tools.md
@@ -222,9 +222,9 @@ npm_pkgs: info/npm_pkgs.md
 
 info/npm_pkgs.md:
 	echo '##[ $@ ]##'
-	$(NPM) $(VIA_NPM) || true
-	$(NPM) $(VIA_AT_NPM) || true
-	$(NPM_LIST) || true
+	$(NPM) $(VIA_NPM) &>/dev/null
+	$(NPM) $(VIA_AT_NPM) &>/dev/null
+	$(NPM_LIST)
 
 pull:
 	echo '##[ $@ ]##'

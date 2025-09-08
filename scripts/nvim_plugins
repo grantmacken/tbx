@@ -5,9 +5,14 @@ vim.uv.os_setenv("XDG_DATA_HOME", "/usr/local/share")
 vim.print(vim.fn.stdpath('data'))
 -- use pack.add
 -- /usr/local/share/nvim/site/pack/core/opt/
+--
+vim.pack.add({ -- COLORSCHEMES
+ 'https://github.com/catppuccin/nvim',
+ 'https://github.com/neanias/everforest-nvim',
+ })
+--
 vim.pack.add({
  'https://github.com/MagicDuck/grug-far.nvim',
- 'https://github.com/catppuccin/nvim',
  'https://github.com/echasnovski/mini.nvim',
  'https://github.com/folke/flash.nvim',
  'https://github.com/gbprod/yanky.nvim',
@@ -15,8 +20,7 @@ vim.pack.add({
  'https://github.com/ibhagwan/fzf-lua',
  'https://github.com/lambdalisue/vim-suda',
  'https://github.com/lewis6991/gitsigns.nvim',
- 'https://github.com/mistweaverco/kulala.nvim'
- 'https://github.com/neanias/everforest-nvim',
+ 'https://github.com/mistweaverco/kulala.nvim',
  'https://github.com/nvim-lua/plenary.nvim',
  'https://github.com/stevearc/oil.nvim',
  'https://github.com/stevearc/resession.nvim',
@@ -24,26 +28,6 @@ vim.pack.add({
 
 -- 'https://github.com/CopilotC-Nvim/CopilotChat.nvim'
 -- 'https://github.com/zbirenbaum/copilot.lua',
-
--- local install_dir = '/usr/local/share/nvim/site/pack/core/opt'
---
--- local req = vim.uv.fs_scandir(install_dir)
--- if req then
---   while true do
---     local name, typ = vim.uv.fs_scandir_next(req)
---     if not name then break end
---     print(name, typ) -- typ: "file", "directory", etc.
---   end
--- else
---   print("Could not open directory: " .. dir)
--- end
---
--- print( '--------------------------------------------')
--- vim.print( vim.cmd.set('runtimepath?'))
--- print( '--------------------------------------------')
--- vim.print( vim.pack.get())
--- print( '--------------------------------------------')
--- --vim.print(vim.stdpath)
 
 vim.uv.os_unsetenv("XDG_DATA_HOME")
 
