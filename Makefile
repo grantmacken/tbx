@@ -29,6 +29,7 @@ TBX_IMAGE :=  ghcr.io/grantmacken/$(NAME)
 RUN := buildah run $(WORKING_CONTAINER)
 INSTALL := $(RUN) dnf install --allowerasing --skip-unavailable --skip-broken --no-allow-downgrade -y
 NPM := $(RUN) npm install --global
+NPM_LIST := $(RUN) npm list -g --depth=0
 ADD := buildah add --chmod 755 $(WORKING_CONTAINER)
 WGET := wget -q --no-check-certificate --timeout=10 --tries=3
 TAR  := tar xz --strip-components=1 -C
@@ -202,13 +203,11 @@ info/lsp-tooling.md:
 
 npm_pkgs: info/npm_pkgs.md
 	echo '✅ NPM packages installed'
-	
+
 info/npm_pkgs.md:
 	echo '##[ $@ ]##'
-	$(NPM) $(VIA_NPM) $(VIA_AT_NPM)
-	$(RUN) which bash-language-server 
-	$(RUN) whereis bash-language-server
-	$(RUN) bash-language-server  --version
+	$(NPM) $(VIA_NPM) $(VIA_AT_NPM) &>/dev/null
+	$(NPM_LIST)
 
 
 
