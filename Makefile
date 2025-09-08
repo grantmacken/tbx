@@ -34,7 +34,7 @@ bdu = jq -r ".assets[] | select(.browser_download_url | contains(\"$1\")) | .bro
 tarball = jq -r '.tarball_url' $1
 
 
-default: luajit luarocks
+default: nodejs luajit luarocks
 	echo '##[ $@ ]##'
 	buildah config \
 	--label summary='a toolbox with cli tools, neovim' \
@@ -120,22 +120,13 @@ info/luajit.md:
 	# VERSION=$$($(RUN) luajit -v | grep -oP 'LuaJIT \K\d+\.\d+\.\d{1,3}')
 	# $(call tr,luajit,$${VERSION},The LuaJIT compiler,$@)
 
-
-
 luarocks: info/luarocks.md
+	echo '✅ latest luarocks installed'
 
 latest/luarocks.json:
 	echo '##[ $@ ]##'
 	mkdir -p $(dir $@)
-	$(WGET) https://api.github.com/repos/luarocks/luarocks/tags -O- | jq '.[0]' | tee $@
-
-# files/luarocks.tar.gz: latest/luarocks.json
-# 	echo '##[ $@ ]##'
-# 	mkdir -p $(dir $@)
-# 	SRC=$(shell $(call tarball,$<))
-# 	$(WGET) $$SRC -O $@
-# 	ls -a $@
-
+	$(WGET) https://api.github.com/repos/luarocks/luarocks/tags -O- | jq '.[0]' > $@
 
 info/luarocks.md: latest/luarocks.json
 	echo '##[ $@ ]##'
@@ -163,8 +154,17 @@ info/luarocks.md: latest/luarocks.json
 	$(call tr,$${NAME},$${VER},$${SUM},$@)
 	buildah run $(WORKING_CONTAINER) rm -fR tmp/luarocks
 
-
-
+cargo:
+	echo '##[ $@ ]##'
+	buildah run $(WORKING_CONTAINER) mkdir -p /usr/local/cargo
+	buildah run $(WORKING_CONTAINER) cargo install cargo-binstall --root /usr/local/cargo
+	buildah run $(WORKING_CONTAINER) ls /usr/local/cargo/bin/
+	buildah run $(WORKING_CONTAINER) ln -sf /usr/local/cargo/bin/cargo-binstall /usr/local/bin/cargo-binstall
+	buildah run $(WORKING_CONTAINER) cargo-binstall --help
+	# buildah run $(WORKING_CONTAINER) cargo-binstall --no-confirm --no-symlinks --root /usr/local/cargo lux-cli
+	# buildah run $(WORKING_CONTAINER) ls /usr/local/cargo/bin/
+	# buildah run $(WORKING_CONTAINER) ln -sf /usr/local/cargo/bin/* /usr/local/bin/
+	# buildah run $(WORKING_CONTAINER) lx --help
 
 pull:
 	echo '##[ $@ ]##'
