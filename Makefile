@@ -29,6 +29,7 @@ TBX_IMAGE :=  ghcr.io/grantmacken/$(NAME)
 # actions
 RUN := buildah run $(WORKING_CONTAINER)
 INSTALL := $(RUN) dnf install --allowerasing --skip-unavailable --skip-broken --no-allow-downgrade -y
+$(SH) buildah run $(WORKING_CONTAINER) bash -c
 ADD := buildah add --chmod 755 $(WORKING_CONTAINER)
 WGET := wget -q --no-check-certificate --timeout=10 --tries=3
 TAR  := tar xz --strip-components=1 -C
@@ -213,41 +214,41 @@ info/npm_pkgs.md:
 	$(NPM) $(VIA_AT_NPM) &>/dev/null
 	$(NPM_LIST)
 
-TS_ROCKS := bash
-# \\
-# bash \
-# comment \
-# css \
-# csv \
-# diff \
-# djot \
-# dtd \
-# ebnf \
-# elixir \
-# erlang \
-# git_config \
-# gitignore \
-# gleam \
-# gnuplot \
-# html \
-# http \
-# javascript \
-# jq \
-# json \
-# just \
-# latex \
-# ledger \
-# make \
-# markdown_inline \
-# mermaid \
-# nginx \
-# printf \
-# readline \
-# regex \
-# ssh_config \
-# toml \
-# xml \
-# yaml
+TS_ROCKS := \
+awk \
+bash \
+comment \
+css \
+csv \
+diff \
+djot \
+dtd \
+ebnf \
+elixir \
+erlang \
+git_config \
+gitignore \
+gleam \
+gnuplot \
+html \
+http \
+javascript \
+jq \
+json \
+just \
+latex \
+ledger \
+make \
+markdown_inline \
+mermaid \
+nginx \
+printf \
+readline \
+regex \
+ssh_config \
+toml \
+xml \
+yaml
 
 ROCKS  := $(patsubst %,tree-sitter-%,$(TS_ROCKS))
 ROCKS_BINARIES := https://nvim-neorocks.github.io/rocks-binaries
@@ -267,8 +268,8 @@ parsers_queries:
 	DIR=$(ROCKS_LIB_PATH)/$$ROCK/$$VER
 	$(RUN) ls -al $$DIR
 	$(RUN) tree $$DIR
-	$(RUN) cp "$$DIR/parser/*" "/etc/xdg/nvim/parser/" || true
-	# $(RUN) cp -v -r $$DIR/queries/* /etc/xdg/nvim/queries || true
+	$(SH) "cp $$DIR/parser/* /etc/xdg/nvim/parser/"
+	$(SH) "$$DIR/queries/* /etc/xdg/nvim/queries/"
 	done
 	$(RUN) tree /etc/xdg/nvim
 
