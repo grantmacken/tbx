@@ -66,9 +66,9 @@ endif
 init: .env
 	# echo '##[ $@ ]##'
 	# the runtime should have
-	$(RUN) which make &>dev/null
-	$(RUN) which npm &>dev/null
-	$(RUN) which luarocks &>dev/null
+	$(RUN) which make &> /dev/null
+	$(RUN) which npm &> /dev/null
+	$(RUN) which luarocks &> /dev/null
 
 latest/tbx-build-tools.json:
 	# echo '##[ $@ ]##'
