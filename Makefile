@@ -265,9 +265,9 @@ parsers_queries:
 	VER=$$($(RUN) luarocks show --mversion --tree $(ROCKS_PATH) $$ROCK)
 	echo $$VER
 	DIR=$(ROCKS_LIB_PATH)/$$ROCK/$$VER
-	# $(RUN) ls -al $$DIR
-	$(RUN) cp  $${DIR}/parser/* /etc/xdg/nvim/parser &>/dev/null
-	$(RUN) cp -r $${DIR}/queries/* /etc/xdg/nvim/queries &>/dev/null
+	$(RUN) ls -al $$DIR
+	$(RUN) cp -v $${DIR}/parser/* /etc/xdg/nvim/parser || true
+	$(RUN) cp -v -r $${DIR}/queries/* /etc/xdg/nvim/queries || true
 	done
 	$(RUN) tree /etc/xdg/nvim
 
