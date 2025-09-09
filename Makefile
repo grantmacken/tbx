@@ -261,8 +261,8 @@ parsers_queries:
 	for ROCK in $(ROCKS)
 	do
 	$(RUN) luarocks install $(LR_OPTS) $$ROCK
-	$(RUN) luarocks show --mversion $$ROCK || true
-	$(RUN) luarocks show --mversion --tree $(ROCKS_PATH) $$ROCK || true
+	# $(RUN) luarocks show --mversion $$ROCK || true
+	# $(RUN) luarocks show --mversion --tree $(ROCKS_PATH) $$ROCK || true
 	$(RUN) luarocks show --mversion --rock-dir $(ROCKS_PATH) $$ROCK || true
 	# VER=$$($(RUN) luarocks show  --mversion $$ROCK)
 	# DIR="$(ROCKS_LIB_PATH)/$$ROCK/$$VER"
