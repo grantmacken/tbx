@@ -257,9 +257,9 @@ LR_OPTS := --tree $(ROCKS_PATH) --server $(ROCKS_BINARIES) --no-doc  --deps-mode
 
 parsers_queries:
 	$(RUN) mkdir -p /etc/xdg/nvim/{parser,queries}
-	for rock in $(ROCKS)
+	for ROCK in $(ROCKS)
 	do
-	$(RUN) luarocks install $(LR_OPTS) $$rock
+	$(RUN) luarocks install $(LR_OPTS) $$ROCK
 	VER=$$(luarocks show --mversion --tree $(ROCKS_PATH) $$ROCK)
 	DIR="$(ROCKS_LIB_PATH)/$$ROCK/$$VER"
 	$(RUN) cp -f $${DIR}/parser/* /etc/xdg/nvim/parser &>/dev/null
