@@ -267,7 +267,7 @@ parsers_queries:
 	DIR=$(ROCKS_LIB_PATH)/$$ROCK/$$VER
 	$(RUN) ls -al $$DIR
 	$(RUN) tree $$DIR
-	$(RUN) cp $$DIR/parser/*.so /etc/xdg/nvim/parser/ || true
+	$(RUN) cp "$$DIR/parser/*" "/etc/xdg/nvim/parser/" || true
 	# $(RUN) cp -v -r $$DIR/queries/* /etc/xdg/nvim/queries || true
 	done
 	$(RUN) tree /etc/xdg/nvim
