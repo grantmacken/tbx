@@ -44,7 +44,7 @@ CLI_VIA_DNF := eza fd-find fzf pass ripgrep stow wl-clipboard zoxide
 LSP_VIA_DNF := ShellCheck shfmt
 # https://github.com/artempyanykh/marksman/releases
 VIA_RELEASES := artempyanykh/marksman
-VIA_NPM      := bash-language-server yaml-language-server vscode-langservers-extracted stylelint-lsp
+VIA_NPM      := bash-language-server yaml-language-server vscode-langservers-extracted stylelint-lsp opencode-ai@latest
 VIA_AT_NPM   :=  @github/copilot-language-server @ast-grep/cli
 # @githubnext/copilot-cl
 
@@ -261,6 +261,7 @@ SHOW_OPTS := --tree $(ROCKS_PATH)
 
 parsers_queries:
 	$(RUN) mkdir -p /etc/xdg/nvim/parser
+	$(RUN) mkdir -p /etc/xdg/nvim/queries
 	for ROCK in $(ROCKS)
 	do
 	$(RUN) luarocks install $(LR_OPTS) $$ROCK
