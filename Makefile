@@ -51,7 +51,7 @@ VIA_AT_NPM   :=  @github/copilot-language-server @ast-grep/cli
 tr = printf "| %-14s | %-8s | %-83s |\n" "$(1)" "$(2)" "$(3)" | tee -a $(4)
 bdu = jq -r ".assets[] | select(.browser_download_url | contains(\"$1\")) | .browser_download_url" $2
 
-default:  parsers_queries # gh_releases dnf_pkgs npm_pkgs nvim_plugins parsers_queries
+default:  parsers_queries gh_releases dnf_pkgs npm_pkgs nvim_plugins
 	echo '##[ $@ ]##'
 	echo 'image built'
 ifdef GITHUB_ACTIONS
@@ -264,16 +264,13 @@ parsers_queries:
 	$(RUN) mkdir -p /etc/xdg/nvim/queries
 	for ROCK in $(ROCKS)
 	do
-	$(RUN) luarocks install $(LR_OPTS) $$ROCK
-	# $(RUN) luarocks show --mversion $$ROCK || true
+	$(RUN) luarocks install $(LR_OPTS) $$ROCK &>/dev/null
 	VER=$$($(RUN) luarocks show --mversion --tree $(ROCKS_PATH) $$ROCK)
-	echo $$VER
 	DIR=$(ROCKS_LIB_PATH)/$$ROCK/$$VER
-	$(RUN) ls -al $$DIR
-	$(RUN) tree $$DIR
 	$(SH) "cp $$DIR/parser/* /etc/xdg/nvim/parser/"
 	$(SH) "cp -r $$DIR/queries/* /etc/xdg/nvim/queries/"
 	done
+	$(RUN) luarocks purge --tree $(ROCKS_PATH) &>/dev/null
 	$(RUN) tree /etc/xdg/nvim
 
 pull:
