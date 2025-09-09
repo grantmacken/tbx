@@ -181,7 +181,7 @@ info/cli-tools.md:
 	printf "\n$(HEADING2) %s\n\n" "Handpicked CLI tools available in the toolbox" | tee $@
 	$(call tr,"Name","Version","Summary",$@)
 	$(call tr,"----","-------","----------------------------",$@)
-	$(RUN) sh -c  'dnf info -q --installed $(CLI_VIA_DNF) | \
+	$(SH) 'dnf info -q --installed $(CLI_VIA_DNF) | \
 	   grep -oP "(Name.+:\s\K.+)|(Ver.+:\s\K.+)|(Sum.+:\s\K.+)" | \
 	   paste  - - -  | sort -u ' | \
 	   awk -F'\t' '{printf "| %-14s | %-8s | %-83s |\n", $$1, $$2, $$3}' | tee -a $@
@@ -271,7 +271,7 @@ parsers_queries:
 	$(RUN) ls -al $$DIR
 	$(RUN) tree $$DIR
 	$(SH) "cp $$DIR/parser/* /etc/xdg/nvim/parser/"
-	$(SH) "$$DIR/queries/* /etc/xdg/nvim/queries/"
+	$(SH) "cp -r $$DIR/queries/* /etc/xdg/nvim/queries/"
 	done
 	$(RUN) tree /etc/xdg/nvim
 
