@@ -213,41 +213,41 @@ info/npm_pkgs.md:
 	$(NPM) $(VIA_AT_NPM) &>/dev/null
 	$(NPM_LIST)
 
-TS_ROCKS := \
-awk \
-bash \
-comment \
-css \
-csv \
-diff \
-djot \
-dtd \
-ebnf \
-elixir \
-erlang \
-git_config \
-gitignore \
-gleam \
-gnuplot \
-html \
-http \
-javascript \
-jq \
-json \
-just \
-latex \
-ledger \
-make \
-markdown_inline \
-mermaid \
-nginx \
-printf \
-readline \
-regex \
-ssh_config \
-toml \
-xml \
-yaml
+TS_ROCKS := bash
+# \\
+# bash \
+# comment \
+# css \
+# csv \
+# diff \
+# djot \
+# dtd \
+# ebnf \
+# elixir \
+# erlang \
+# git_config \
+# gitignore \
+# gleam \
+# gnuplot \
+# html \
+# http \
+# javascript \
+# jq \
+# json \
+# just \
+# latex \
+# ledger \
+# make \
+# markdown_inline \
+# mermaid \
+# nginx \
+# printf \
+# readline \
+# regex \
+# ssh_config \
+# toml \
+# xml \
+# yaml
 
 ROCKS  := $(patsubst %,tree-sitter-%,$(TS_ROCKS))
 ROCKS_BINARIES := https://nvim-neorocks.github.io/rocks-binaries
@@ -266,8 +266,9 @@ parsers_queries:
 	echo $$VER
 	DIR=$(ROCKS_LIB_PATH)/$$ROCK/$$VER
 	$(RUN) ls -al $$DIR
-	$(RUN) cp -v $${DIR}/parser/* /etc/xdg/nvim/parser || true
-	$(RUN) cp -v -r $${DIR}/queries/* /etc/xdg/nvim/queries || true
+	$(RUN) tree $$DIR
+	$(RUN) cp -v $$DIR/parser/* /etc/xdg/nvim/parser || true
+	$(RUN) cp -v -r $$DIR/queries/* /etc/xdg/nvim/queries || true
 	done
 	$(RUN) tree /etc/xdg/nvim
 
