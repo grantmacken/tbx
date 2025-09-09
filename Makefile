@@ -60,7 +60,7 @@ latest/tbx-build-tools.json:
 
 ##[[ RUNTIMES ]]##
 runtimes: info/runtimes.md
-info/runtimes.md: nodejs  # otp # rebar3 elixir gleam
+info/runtimes.md: otp # rebar3 elixir gleam
 	mkdir -p $(dir $@)
 	printf "\n$(HEADING2) %s\n\n" "Runtimes and associated languages" | tee $@
 	# cat << EOF | tee -a $@
@@ -85,12 +85,12 @@ nodejs: info/nodejs.md
 	echo '✅ latest nodejs added'
 
 latest/nodejs.json:
-	# echo '##[ $@ ]##'
+	echo '##[ $@ ]##'
 	mkdir -p $(dir $@)
 	$(WGET) 'https://api.github.com/repos/nodejs/node/releases/latest' -O $@
 
 info/nodejs.md: latest/nodejs.json
-	# echo '##[ $@ ]##'
+	echo '##[ $@ ]##'
 	mkdir -p $(dir $@)
 	VER=$$(jq -r '.tag_name' $< )
 	mkdir -p files/nodejs/usr/local
