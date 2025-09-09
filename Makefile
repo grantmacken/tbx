@@ -57,8 +57,6 @@ latest/tbx-build-tools.json:
 	buildah pull "$$FROM" &> /dev/null
 	echo -n "WORKING_CONTAINER=" | tee -a .env
 	buildah from "$$FROM" | tee -a .env
-	echo -n "NPROC=" | tee -a .env
-	buildah run $(WORKING_CONTAINER) nproc | tee -a .env
 
 ##[[ RUNTIMES ]]##
 runtimes: info/runtimes.md
@@ -196,7 +194,7 @@ info/otp.md: latest/otp.json
 		--without-megaco \
 		--without-cosEvent \
 		--without-odbc' &>/dev/null
-	$(RUN) sh -c 'cd /tmp/otp && make -j$(NPROC) && make -j$(NPROC) install' &>/dev/null
+	$(RUN) sh -c 'cd /tmp/otp && make && make install' &>/dev/null
 	echo -n 'checking otp version...'
 	$(RUN) erl -eval 'erlang:display(erlang:system_info(otp_release)), halt().'  -noshell
 	$(call tr ,Erlang/OTP,$(ver),the Erlang Open Telecom Platform OTP,$@)
@@ -216,7 +214,7 @@ info/elixir.md: latest/elixir.json
 	$(TAR) files/elixir &>/dev/null
 	$(RUN) mkdir -p /tmp/elixir
 	$(ADD) files/elixir /tmp/elixir &>/dev/null
-	$(RUN) sh -c 'cd /tmp/elixir && make -j$(NPROC) && make -j$(NPROC) install' &>/dev/null
+	$(RUN) sh -c 'cd /tmp/elixir && make && make install' &>/dev/null
 	echo -n 'checking elixir version...'
 	# buildah run $(WORKING_CONTAINER) erl -eval 'erlang:display(erlang:system_info(otp_release)), halt().'  -noshell
 	$(RUN) elixir --version
