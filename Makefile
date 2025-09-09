@@ -27,14 +27,16 @@ WORKING_CONTAINER ?= $(NAME)-working-container
 TBX_IMAGE :=  ghcr.io/grantmacken/$(NAME)
 
 # actions
-RUN := buildah run $(WORKING_CONTAINER)
+RUN     := buildah run $(WORKING_CONTAINER)
 INSTALL := $(RUN) dnf install --allowerasing --skip-unavailable --skip-broken --no-allow-downgrade -y
-$(SH) buildah run $(WORKING_CONTAINER) bash -c
-ADD := buildah add --chmod 755 $(WORKING_CONTAINER)
-WGET := wget -q --no-check-certificate --timeout=10 --tries=3
-TAR  := tar xz --strip-components=1 -C
+$(SH)   := buildah run $(WORKING_CONTAINER) bash -c
+ADD     := buildah add --chmod 755 $(WORKING_CONTAINER)
+WGET    := wget -q --no-check-certificate --timeout=10 --tries=3
+
+TAR     := tar xz --strip-components=1 -C
 TAR_NO_STRIP := tar xz -C
-NPM := $(RUN) npm install --global
+
+NPM      := $(RUN) npm install --global
 NPM_LIST := $(RUN) npm list -g --depth=0
 
 #LISTS
@@ -42,8 +44,8 @@ CLI_VIA_DNF := eza fd-find fzf pass ripgrep stow wl-clipboard zoxide
 LSP_VIA_DNF := ShellCheck shfmt
 # https://github.com/artempyanykh/marksman/releases
 VIA_RELEASES := artempyanykh/marksman
-VIA_NPM := bash-language-server yaml-language-server vscode-langservers-extracted stylelint-lsp
-VIA_AT_NPM :=  @github/copilot-language-server @ast-grep/cli
+VIA_NPM      := bash-language-server yaml-language-server vscode-langservers-extracted stylelint-lsp
+VIA_AT_NPM   :=  @github/copilot-language-server @ast-grep/cli
 # @githubnext/copilot-cl
 
 tr = printf "| %-14s | %-8s | %-83s |\n" "$(1)" "$(2)" "$(3)" | tee -a $(4)
@@ -279,5 +281,5 @@ pull:
 	podman pull ghcr.io/grantmacken/tbx-coding:latest
 	toolbox list --containers
 	# toolbox list --images
-	toolbox create --image ghcr.io/grantmacken/tbx-coding:latest coding 
+	toolbox create --image ghcr.io/grantmacken/tbx-coding:latest coding
 	exit
