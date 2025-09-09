@@ -83,11 +83,6 @@ info/host-spawn.md: latest/host-spawn.json
 	SRC=$$(jq -r ".assets[] | select(.browser_download_url | contains(\"x86_64\")) | .browser_download_url" $<)
 	echo $${SRC}
 	$(ADD) $${SRC} /usr/local/bin/host-spawn &>/dev/null
-	$(RUN) ln -s /usr/local/bin/host-spawn /usr/local/bin/flatpak
-	$(RUN) ln -s /usr/local/bin/host-spawn /usr/local/bin/firefox
-	$(RUN) ln -s /usr/local/bin/host-spawn /usr/local/bin/buildah
-	$(RUN) ln -s /usr/local/bin/host-spawn /usr/local/bin/podman
-	$(RUN) ln -s /usr/local/bin/host-spawn /usr/local/bin/skopeo
 	echo -n 'checking host-spawn version...'
 	VER=$$($(RUN) host-spawn --version | tee )
 	printf "\n$(HEADING2) %s\n\n" "Do More With host-spawn" | tee -a $@
