@@ -118,16 +118,14 @@ nvim_plugins:
 
 nvim_xdg_config:
 	echo '##[ $@ ]##'
-	$(ADD) etc/xdg/nvim /etc/xdg/nvim 	
+	$(ADD) etc/xdg/nvim /etc/xdg/nvim
 	$(RUN) tree etc/xdg/nvim
 	echo '✅ nvim xdg config files installed'
-
 
 lua-language-server: info/lua-language-server.md
 	echo '✅ latest $@ installed'
 
 latest/lua-language-server.json:
-	echo '##[ $(basename $(notdir $@)) ]##'
 	echo '##[ $@ ]##'
 	mkdir -p $(dir $@)
 	REPO=luals/lua-language-server
@@ -189,7 +187,7 @@ info/cli-tools.md:
 	printf "\n$(HEADING2) %s\n\n" "Handpicked CLI tools available in the toolbox" | tee $@
 	$(call tr,"Name","Version","Summary",$@)
 	$(call tr,"----","-------","----------------------------",$@)
-	buildah run $(WORKING_CONTAINER) sh -c  'dnf info -q --installed $(CLI_VIA_DNF) | \
+	$(RUN) sh -c  'dnf info -q --installed $(CLI_VIA_DNF) | \
 	   grep -oP "(Name.+:\s\K.+)|(Ver.+:\s\K.+)|(Sum.+:\s\K.+)" | \
 	   paste  - - -  | sort -u ' | \
 	   awk -F'\t' '{printf "| %-14s | %-8s | %-83s |\n", $$1, $$2, $$3}' | tee -a $@
@@ -214,8 +212,6 @@ info/lsp-tooling.md:
 ###############
 ##    NPM    ##
 ###############
-
-
 
 npm_pkgs: info/npm_pkgs.md
 	echo '✅ NPM packages installed'
