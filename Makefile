@@ -253,15 +253,18 @@ ROCKS  := $(patsubst %,tree-sitter-%,$(TS_ROCKS))
 ROCKS_BINARIES := https://nvim-neorocks.github.io/rocks-binaries
 ROCKS_PATH := /usr/local/rocks
 ROCKS_LIB_PATH := $(ROCKS_PATH)/lib/luarocks/rocks-5.1
-LR_OPTS := --tree $(ROCKS_PATH) --server $(ROCKS_BINARIES) --no-doc --force-fast  --deps-mode one
+LR_OPTS := --tree $(ROCKS_PATH) --server $(ROCKS_BINARIES) --no-doc  --deps-mode one
 
 parsers_queries:
 	$(RUN) mkdir -p /etc/xdg/nvim/{parser,queries}
 	for rock in $(ROCKS)
 	do
 	$(RUN) luarocks install $(LR_OPTS) $$rock
-	done
-	$(RUN) tree $(ROCKS_PATH)
+	VER=$$(luarocks show --mversion --tree $(ROCKS_PATH) $$ROCK)
+	DIR="$(ROCKS_LIB_PATH)/$$ROCK/$$VER"
+	$(RUN) cp -f $${DIR}/parser/* /etc/xdg/nvim/parser &>/dev/null
+	$(RUN) cp -fr $${DIR}/queries/* /etc/xdg/nvim/queries &>/dev/null
+	$(RUN) tree /etc/xdg/nvim
 
 pull:
 	echo '##[ $@ ]##'
