@@ -33,7 +33,7 @@ tr = printf "| %-14s | %-8s | %-83s |\n" "$(1)" "$(2)" "$(3)" | tee -a $(4)
 bdu = jq -r ".assets[] | select(.browser_download_url | contains(\"$1\")) | .browser_download_url" $2
 tarball = jq -r '.tarball_url' $1
 
-default: nodejs luajit luarocks otp
+default: nodejs luajit luarocks otp elixir
 	echo '##[ $@ ]##'
 	buildah config \
 	--label summary='a toolbox with cli tools, neovim' \
@@ -57,6 +57,8 @@ latest/tbx-build-tools.json:
 	buildah pull "$$FROM" &> /dev/null
 	echo -n "WORKING_CONTAINER=" | tee -a .env
 	buildah from "$$FROM" | tee -a .env
+	echo -n "NPROC=" | tee -a .env
+	buildah run $(WORKING_CONTAINER) nproc | tee -a .env
 
 ##[[ RUNTIMES ]]##
 runtimes: info/runtimes.md
@@ -130,7 +132,7 @@ info/luarocks.md: latest/luarocks.json
 	mkdir -p files/luarocks
 	SRC=$$(jq -r '.tarball_url' $<)
 	$(RUN) mkdir -p 	/tmp/luarocks /etc/xdg/luarocks
-	wget -q --timeout=10 --tries=3 $${SRC} -O- | tar xz --strip-components=1 -C files/luarocks &>/dev/null
+	$(WGET) $${SRC} -O- | tar xz --strip-components=1 -C files/luarocks &>/dev/null
 	$(ADD) files/luarocks /tmp/luarocks &>/dev/null
 	$(RUN) sh -c 'cd /tmp/luarocks && ./configure \
 		--lua-version=5.1 \
@@ -166,7 +168,7 @@ cargo:
 latest/otp.json: 
 	echo '##[ $@ ]##'
 	mkdir -p $(dir $@)
-	wget -q --timeout=10 --tries=3 https://api.github.com/repos/erlang/otp/releases/latest -O $@
+	$(WGET) https://api.github.com/repos/erlang/otp/releases/latest -O $@
 
 otp: info/otp.md
 info/otp.md: latest/otp.json
@@ -177,8 +179,8 @@ info/otp.md: latest/otp.json
 	$(eval ver := $(shell jq -r '.name' $< | cut -d' ' -f2))
 	ASSET=$$(jq -r '.assets[] | select(.name=="otp_src_$(ver).tar.gz") ' $<)
 	SRC=$$(echo $${ASSET} | jq -r '.browser_download_url')
-	mkdir -p files/otp && wget -q --timeout=10 --tries=3  $${SRC} -O- |
-	tar xz --strip-components=1 -C files/otp &>/dev/null
+	mkdir -p files/otp && $(WGET) $${SRC} -O- |
+	$(TAR) files/otp &>/dev/null
 	$(ADD) files/otp /tmp/otp &>/dev/null
 	$(RUN) sh -c 'cd /tmp/otp && ./configure \
 		--prefix=/usr/local \
@@ -200,6 +202,30 @@ info/otp.md: latest/otp.json
 	$(call tr ,Erlang/OTP,$(ver),the Erlang Open Telecom Platform OTP,$@)
 	$(RUN) rm -fR /tmp/otp
 
+latest/elixir.json:
+	echo '##[ $@ ]##'
+	mkdir -p $(dir $@)
+	$(WGET) https://api.github.com/repos/elixir-lang/elixir/releases/latest -O $@
+
+elixir: info/elixir.md
+info/elixir.md: latest/elixir.json
+	echo '##[ $@ ]##'
+	TAGNAME=$$(jq -r '.tag_name' $<)
+	SRC=https://github.com/elixir-lang/elixir/archive/$${TAGNAME}.tar.gz
+	mkdir -p files/elixir && $(WGET) $${SRC} -O- |
+	$(TAR) files/elixir &>/dev/null
+	$(RUN) mkdir -p /tmp/elixir
+	$(ADD) files/elixir /tmp/elixir &>/dev/null
+	$(RUN) sh -c 'cd /tmp/elixir && make -j$(NPROC) && make -j$(NPROC) install' &>/dev/null
+	echo -n 'checking elixir version...'
+	# buildah run $(WORKING_CONTAINER) erl -eval 'erlang:display(erlang:system_info(otp_release)), halt().'  -noshell
+	$(RUN) elixir --version
+	LINE=$$(buildah run $(WORKING_CONTAINER) elixir --version | grep -oP '^Elixir.+')
+	VER=$$(echo "$${LINE}" | grep -oP 'Elixir\s\K.+' | cut -d' ' -f1)
+	$(call tr,Elixir,$${VER},Elixir programming language, $@)
+	VER=$$(buildah run $(WORKING_CONTAINER) mix --version | grep -oP 'Mix \K.+' | cut -d' ' -f1)
+	$(call tr,Mix,$${VER},Elixir build tool, $@)
+	$(RUN) rm -fR /tmp/elixir
 
 
 
