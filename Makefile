@@ -21,9 +21,9 @@ NAME := tbx-runtimes
 WORKING_CONTAINER ?= $(NAME)-working-container
 TBX_IMAGE :=  ghcr.io/grantmacken/$(NAME)
 
-RUN := buildah run $(WORKING_CONTAINER)
+RUN := $(RUN)
 INSTALL := $(RUN) dnf install --allowerasing --skip-unavailable --skip-broken --no-allow-downgrade -y
-ADD := buildah add --chmod 755 $(WORKING_CONTAINER)
+ADD := $(ADD)
 
 WGET := wget -q --no-check-certificate --timeout=10 --tries=3
 TAR  := tar xz --strip-components=1 -C
@@ -32,7 +32,6 @@ TAR_NO_STRIP := tar xz -C
 tr = printf "| %-14s | %-8s | %-83s |\n" "$(1)" "$(2)" "$(3)" | tee -a $(4)
 bdu = jq -r ".assets[] | select(.browser_download_url | contains(\"$1\")) | .browser_download_url" $2
 tarball = jq -r '.tarball_url' $1
-
 
 default: nodejs luajit luarocks
 	echo '##[ $@ ]##'
@@ -61,7 +60,7 @@ latest/tbx-build-tools.json:
 
 ##[[ RUNTIMES ]]##
 runtimes: info/runtimes.md
-info/runtimes.md: nodejs # otp rebar3 elixir gleam
+info/runtimes.md: nodejs  otp # rebar3 elixir gleam
 	mkdir -p $(dir $@)
 	printf "\n$(HEADING2) %s\n\n" "Runtimes and associated languages" | tee $@
 	# cat << EOF | tee -a $@
@@ -105,11 +104,8 @@ info/nodejs.md: latest/nodejs.json
 	NPM_VER=$$($(RUN) npm --version | tee)
 	$(call tr,npm,$${NPM_VER},Node Package Manager, $@)
 
-
-
 luajit: info/luajit.md
 	echo '✅ latest $@ installed'
-
 
 info/luajit.md:
 	echo '##[ $@ ]##'
@@ -133,38 +129,80 @@ info/luarocks.md: latest/luarocks.json
 	mkdir -p $(dir $@)
 	mkdir -p files/luarocks
 	SRC=$$(jq -r '.tarball_url' $<)
-	buildah run $(WORKING_CONTAINER) mkdir -p 	/tmp/luarocks /etc/xdg/luarocks
+	$(RUN) mkdir -p 	/tmp/luarocks /etc/xdg/luarocks
 	wget -q --timeout=10 --tries=3 $${SRC} -O- | tar xz --strip-components=1 -C files/luarocks &>/dev/null
-	buildah add --chmod 755 $(WORKING_CONTAINER) files/luarocks /tmp/luarocks &>/dev/null
-	buildah run $(WORKING_CONTAINER) sh -c 'cd /tmp/luarocks && ./configure \
+	$(ADD) files/luarocks /tmp/luarocks &>/dev/null
+	$(RUN) sh -c 'cd /tmp/luarocks && ./configure \
 		--lua-version=5.1 \
 		--with-lua-interpreter=luajit \
 		--sysconfdir=/etc/xdg \
 		--force-config \
 		--with-lua-include=/usr/include/luajit-2.1' &>/dev/null
-	# buildah run $(WORKING_CONTAINER) sh -c 'cd /tmp && make bootstrap' &>/dev/null
-	buildah run $(WORKING_CONTAINER) sh -c 'cd /tmp/luarocks && make && make install' &>/dev/null
+	# $(RUN) sh -c 'cd /tmp && make bootstrap' &>/dev/null
+	$(RUN) sh -c 'cd /tmp/luarocks && make && make install' &>/dev/null
 	echo -n 'checking luarocks version...'
-	buildah run $(WORKING_CONTAINER) luarocks --version
-	# buildah run $(WORKING_CONTAINER) luarocks config --json | jq '.' &>/dev/null
-	LINE=$$(buildah run $(WORKING_CONTAINER) luarocks | grep -oP '^Lua.+')
+	$(RUN) luarocks --version
+	# $(RUN) luarocks config --json | jq '.' &>/dev/null
+	LINE=$$($(RUN) luarocks | grep -oP '^Lua.+')
 	NAME=$$(echo $$LINE | grep -oP '^Lua\w+')
 	VER=$$(echo $$LINE | grep -oP '^Lua\w+\s\K.+' | cut -d, -f1)
 	SUM=$$(echo $$LINE | grep -oP '^Lua\w+\s\K.+' | cut -d, -f2)
 	$(call tr,$${NAME},$${VER},$${SUM},$@)
-	buildah run $(WORKING_CONTAINER) rm -fR tmp/luarocks
+	$(RUN) rm -fR tmp/luarocks
 
 cargo:
 	echo '##[ $@ ]##'
-	buildah run $(WORKING_CONTAINER) mkdir -p /usr/local/cargo
-	buildah run $(WORKING_CONTAINER) cargo install cargo-binstall --root /usr/local/cargo
-	buildah run $(WORKING_CONTAINER) ls /usr/local/cargo/bin/
-	buildah run $(WORKING_CONTAINER) ln -sf /usr/local/cargo/bin/cargo-binstall /usr/local/bin/cargo-binstall
-	buildah run $(WORKING_CONTAINER) cargo-binstall --help
-	# buildah run $(WORKING_CONTAINER) cargo-binstall --no-confirm --no-symlinks --root /usr/local/cargo lux-cli
-	# buildah run $(WORKING_CONTAINER) ls /usr/local/cargo/bin/
-	# buildah run $(WORKING_CONTAINER) ln -sf /usr/local/cargo/bin/* /usr/local/bin/
-	# buildah run $(WORKING_CONTAINER) lx --help
+	$(RUN) mkdir -p /usr/local/cargo
+	$(RUN) cargo install cargo-binstall --root /usr/local/cargo
+	$(RUN) ls /usr/local/cargo/bin/
+	$(RUN) ln -sf /usr/local/cargo/bin/cargo-binstall /usr/local/bin/cargo-binstall
+	$(RUN) cargo-binstall --help
+	# $(RUN) cargo-binstall --no-confirm --no-symlinks --root /usr/local/cargo lux-cli
+	# $(RUN) ls /usr/local/cargo/bin/
+	# $(RUN) ln -sf /usr/local/cargo/bin/* /usr/local/bin/
+	# $(RUN) lx --help
+
+
+latest/otp.json: 
+	echo '##[ $@ ]##'
+	mkdir -p $(dir $@)
+	wget -q --timeout=10 --tries=3 https://api.github.com/repos/erlang/otp/releases/latest -O $@
+
+otp: info/otp.md
+info/otp.md: latest/otp.json
+	echo '##[ $@ ]##'
+	mkdir -p $(dir $@)
+	$(RUN) mkdir -p /tmp/otp
+	TAGNAME=$$(jq -r '.tag_name' $<)
+	$(eval ver := $(shell jq -r '.name' $< | cut -d' ' -f2))
+	ASSET=$$(jq -r '.assets[] | select(.name=="otp_src_$(ver).tar.gz") ' $<)
+	SRC=$$(echo $${ASSET} | jq -r '.browser_download_url')
+	mkdir -p files/otp && wget -q --timeout=10 --tries=3  $${SRC} -O- |
+	tar xz --strip-components=1 -C files/otp &>/dev/null
+	$(ADD) files/otp /tmp/otp &>/dev/null
+	$(RUN) sh -c 'cd /tmp/otp && ./configure \
+		--prefix=/usr/local \
+		--enable-threads \
+		--enable-shared-zlib \
+		--enable-ssl=dynamic-ssl-lib \
+		--enable-jit \
+		--enable-kernel-poll \
+		--without-debugger \
+		--without-observer \
+		--without-wx \
+		--without-et \
+		--without-megaco \
+		--without-cosEvent \
+		--without-odbc' &>/dev/null
+	$(RUN) sh -c 'cd /tmp/otp && make -j$(NPROC) && make -j$(NPROC) install' &>/dev/null
+	echo -n 'checking otp version...'
+	$(RUN) erl -eval 'erlang:display(erlang:system_info(otp_release)), halt().'  -noshell
+	$(call tr ,Erlang/OTP,$(ver),the Erlang Open Telecom Platform OTP,$@)
+	$(RUN) rm -fR /tmp/otp
+
+
+
+
 
 pull:
 	echo '##[ $@ ]##'
