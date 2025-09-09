@@ -257,7 +257,10 @@ LR_OPTS := --tree $(ROCKS_PATH) --server $(ROCKS_BINARIES) --no-doc --force-fast
 
 parsers_queries:
 	$(RUN) mkdir -p /etc/xdg/nvim/{parser,queries}
-	$(RUN) luarocks install $(LR_OPTS) $(ROCKS)
+	for rock in $(ROCKS)
+	do
+	$(RUN) luarocks install $(LR_OPTS) $$rock
+	done
 	$(RUN) tree $(ROCKS_PATH)
 
 pull:
