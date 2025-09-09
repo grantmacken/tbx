@@ -88,7 +88,6 @@ info/host-spawn.md: latest/host-spawn.json
 	$(RUN) ln -s /usr/local/bin/host-spawn /usr/local/bin/buildah
 	$(RUN) ln -s /usr/local/bin/host-spawn /usr/local/bin/podman
 	$(RUN) ln -s /usr/local/bin/host-spawn /usr/local/bin/skopeo
-	$(RUN) ln -s /usr/local/bin/host-spawn /usr/local/bin/toolbox
 	echo -n 'checking host-spawn version...'
 	VER=$$($(RUN) host-spawn --version | tee )
 	printf "\n$(HEADING2) %s\n\n" "Do More With host-spawn" | tee -a $@
