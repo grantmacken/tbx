@@ -128,8 +128,7 @@ lua-language-server: info/lua-language-server.md
 latest/lua-language-server.json:
 	echo '##[ $@ ]##'
 	mkdir -p $(dir $@)
-	REPO=luals/lua-language-server
-	$(WGET) https://api.github.com/repos/$${REPO}/releases/latest -O $@
+	$(WGET) https://api.github.com/repos/luals/lua-language-server/releases/latest -O $@
 
 files/lua-language-server.tar.gz: latest/lua-language-server.json
 	echo '##[ $@ ]##'
@@ -152,21 +151,13 @@ info/lua-language-server.md: files/lua-language-server.tar.gz
 
 marksman: latest/marksman.json
 latest/marksman.json:
-	echo '##[ $(basename $(notdir $@)) ]##'
-	NAME=$(basename $(notdir $@))
 	mkdir -p $(dir $@)
-	REPO=artempyanykh/marksman
-	# https://github.com/Automattic/harper/releases
-	$(WGET) https://api.github.com/repos/$${REPO}/releases/latest -O $@
+	$(WGET) https://api.github.com/repos/artempyanykh/marksman/releases/latest -O $@
 
 harper: latest/harper.json
 latest/harper.json:
-	echo '##[ $(basename $(notdir $@)) ]##'
-	NAME=$(basename $(notdir $@))
 	mkdir -p $(dir $@)
-	REPO=Automattic/harper
-	# https://github.com/Automattic/harper/releases
-	$(WGET) https://api.github.com/repos/$${REPO}/releases/latest -O $@
+	$(WGET) https://api.github.com/repos/Automattic/harper/releases/latest -O $@
 
 # DNF
 dnf_pkgs: dnf_gh dnf_cli_pkgs dnf_lsp_pkgs 
