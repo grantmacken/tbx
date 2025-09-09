@@ -48,7 +48,7 @@ VIA_AT_NPM :=  @github/copilot-language-server @ast-grep/cli
 tr = printf "| %-14s | %-8s | %-83s |\n" "$(1)" "$(2)" "$(3)" | tee -a $(4)
 bdu = jq -r ".assets[] | select(.browser_download_url | contains(\"$1\")) | .browser_download_url" $2
 
-default:  gh_releases dnf_pkgs npm_pkgs nvim_plugins
+default:  gh_releases dnf_pkgs npm_pkgs nvim_plugins parsers_queries
 	echo '##[ $@ ]##'
 	echo 'image built'
 ifdef GITHUB_ACTIONS
@@ -212,6 +212,53 @@ info/npm_pkgs.md:
 	$(NPM) $(VIA_NPM) &>/dev/null
 	$(NPM) $(VIA_AT_NPM) &>/dev/null
 	$(NPM_LIST)
+
+TS_ROCKS := \
+awk \
+bash \
+comment \
+css \
+csv \
+diff \
+djot \
+dtd \
+ebnf \
+elixir \
+erlang \
+git_config \
+gitignore \
+gleam \
+gnuplot \
+html \
+http \
+javascript \
+jq \
+json \
+just \
+latex \
+ledger \
+make \
+markdown_inline \
+mermaid \
+nginx \
+printf \
+readline \
+regex \
+ssh_config \
+toml \
+xml \
+yaml
+
+ROCKS  := $(patsubst %,tree-sitter-%,$(TS_ROCKS))
+ROCKS_BINARIES := https://nvim-neorocks.github.io/rocks-binaries
+ROCKS_PATH := /usr/local/rocks
+ROCKS_LIB_PATH := $(ROCKS_PATH)/lib/luarocks/rocks-5.1
+LR_OPTS := --tree $(ROCKS_PATH) --server $(ROCKS_BINARIES) --no-doc --force-fast  --deps-mode one
+
+parsers_queries:
+	mkdir -p /etc/xdg/nvim/{parser,queries}
+	$(RUN) luarocks install $(LR_OPTS) $(ROCKS)
+	$(RUN) tree $(ROCKS_PATH)
 
 pull:
 	echo '##[ $@ ]##'
