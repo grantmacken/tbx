@@ -262,13 +262,10 @@ parsers_queries:
 	do
 	$(RUN) luarocks install $(LR_OPTS) $$ROCK
 	# $(RUN) luarocks show --mversion $$ROCK || true
-	# $(RUN) luarocks show --mversion --tree $(ROCKS_PATH) $$ROCK || true
-	$(RUN) luarocks show --mversion --tree $(ROCKS_PATH) $$ROCK || true
-	echo 'xxx'
-	$(RUN) luarocks show --mversion --tree  $$ROCK || true
-	echo '---'
-	# VER=$$($(RUN) luarocks show  --mversion $$ROCK)
-	# DIR="$(ROCKS_LIB_PATH)/$$ROCK/$$VER"
+	VER=$$($(RUN) luarocks show --mversion --tree $(ROCKS_PATH) $$ROCK)
+	echo $$VER
+	DIR=$(ROCKS_LIB_PATH)/$$ROCK/$$VER
+	$(RUN) ls -al $$DIR
 	# $(RUN) cp -f $${DIR}/parser/* /etc/xdg/nvim/parser &>/dev/null
 	# $(RUN) cp -fr $${DIR}/queries/* /etc/xdg/nvim/queries &>/dev/null
 	done
