@@ -77,8 +77,6 @@ latest/host-spawn.json:
 	mkdir -p $(dir $@)
 	wget -q https://api.github.com/repos/1player/host-spawn/releases/latest -O $@
 
-
-
 info/host-spawn.md: latest/host-spawn.json
 	echo '##[ $@ ]##'
 	mkdir -p $(dir $@)
@@ -111,9 +109,9 @@ build-tools: info/build-tools.md
 
 info/build-tools.md:
 	echo '##[ $@ ]##'
-	$(RUN) dnf update -y
-	$(INSTALL) $(DEVEL)
-	$(INSTALL) $(BUILDING)
+	$(RUN) dnf update -y &>/dev/null
+	$(INSTALL) $(DEVEL) &>/dev/null
+	$(INSTALL) $(BUILDING) &>/dev/null
 	printf "\n$(HEADING2) %s\n\n" "Selected Build Tooling for Make Installs" | tee $@
 	$(call tr,"Name","Version","Summary",$@)
 	$(call tr,"----","-------","----------------------------",$@)
