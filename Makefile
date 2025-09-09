@@ -260,7 +260,7 @@ parsers_queries:
 	for ROCK in $(ROCKS)
 	do
 	$(RUN) luarocks install $(LR_OPTS) $$ROCK
-	VER=$$(luarocks show --mversion --tree $(ROCKS_PATH) $$ROCK)
+	VER=$$($(RUN) luarocks show --mversion --tree $(ROCKS_PATH) $$ROCK)
 	DIR="$(ROCKS_LIB_PATH)/$$ROCK/$$VER"
 	$(RUN) cp -f $${DIR}/parser/* /etc/xdg/nvim/parser &>/dev/null
 	$(RUN) cp -fr $${DIR}/queries/* /etc/xdg/nvim/queries &>/dev/null
