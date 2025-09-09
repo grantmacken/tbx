@@ -256,7 +256,7 @@ ROCKS_LIB_PATH := $(ROCKS_PATH)/lib/luarocks/rocks-5.1
 LR_OPTS := --tree $(ROCKS_PATH) --server $(ROCKS_BINARIES) --no-doc --force-fast  --deps-mode one
 
 parsers_queries:
-	mkdir -p /etc/xdg/nvim/{parser,queries}
+	$(RUN) mkdir -p /etc/xdg/nvim/{parser,queries}
 	$(RUN) luarocks install $(LR_OPTS) $(ROCKS)
 	$(RUN) tree $(ROCKS_PATH)
 
