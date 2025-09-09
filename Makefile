@@ -33,7 +33,10 @@ tr = printf "| %-14s | %-8s | %-83s |\n" "$(1)" "$(2)" "$(3)" | tee -a $(4)
 bdu = jq -r ".assets[] | select(.browser_download_url | contains(\"$1\")) | .browser_download_url" $2
 tarball = jq -r '.tarball_url' $1
 
-default: nodejs luajit luarocks otp elixir
+OTP := otp rebar3 elixir
+LUA := luajit luarocks
+
+default: nodejs $(LUA) $(OTP)
 	echo '##[ $@ ]##'
 	buildah config \
 	--label summary='a toolbox with cli tools, neovim' \
@@ -162,7 +165,6 @@ cargo:
 	# $(RUN) ln -sf /usr/local/cargo/bin/* /usr/local/bin/
 	# $(RUN) lx --help
 
-
 latest/otp.json: 
 	echo '##[ $@ ]##'
 	mkdir -p $(dir $@)
@@ -226,6 +228,18 @@ info/elixir.md: latest/elixir.json
 	$(RUN) rm -fR /tmp/elixir
 
 
+latest/rebar3.json:
+	# echo '##[ $@ ]##'
+	mkdir -p $(dir $@)
+	$(WGET) https://api.github.com/repos/erlang/rebar3/releases/latest -O $@
+
+
+info/rebar3.md: latest/rebar3.json
+	# echo '##[ $@ ]##'
+	VER=$$(jq -r '.tag_name' $<)
+	SRC=$(shell $(call bdu,rebar3,$<))
+	$(ADD) $${SRC} /usr/local/bin/rebar3 &>/dev/null
+	$(call tr,Rebar3,$${VER},the erlang build tool,$@)
 
 
 pull:
