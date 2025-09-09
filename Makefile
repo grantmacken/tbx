@@ -66,9 +66,9 @@ endif
 init: .env
 	# echo '##[ $@ ]##'
 	# the runtime should have
-	$(RUN) which make
-	$(RUN) which npm
-	$(RUN) which luarocks
+	$(RUN) which make &>dev/null
+	$(RUN) which npm &>dev/null
+	$(RUN) which luarocks &>dev/null
 
 latest/tbx-build-tools.json:
 	# echo '##[ $@ ]##'
@@ -79,7 +79,7 @@ latest/tbx-build-tools.json:
 	# echo '##[ $@ ]##'
 	FROM=$$(cat $< | jq -r '.Name')
 	printf "FROM=%s\n" "$$FROM" | tee $@
-	buildah pull "$$FROM" &> /dev/null
+	buildah pull "$$FROM" &>  /dev/null
 	echo -n "WORKING_CONTAINER=" | tee -a .env
 	buildah from "$$FROM" | tee -a .env
 
@@ -100,11 +100,11 @@ info/neovim.md: files/nvim.tar.gz
 	TARGET=files/$${NAME}/usr/local
 	mkdir -p $${TARGET}
 	$(TAR) $${TARGET} -f $<
-	$(ADD) files/$${NAME} &>/dev/null
-	# CHECK:
-	$(RUN) nvim -v
-	$(RUN) whereis nvim
-	$(RUN) which nvim
+	$(ADD) files/$${NAME} &> /dev/null
+	# CHECKS silent:
+	$(RUN) nvim -v &> /dev/null
+	$(RUN) whereis nvim &> /dev/null
+	$(RUN) which nvim &> /dev/null
 	# Write to file
 	VERSION=$$($(RUN) nvim -v | grep -oP 'NVIM \K.+' | cut -d'-' -f1 )
 	SUM='The text editor with a focus on extensibility and usability'
@@ -113,7 +113,7 @@ info/neovim.md: files/nvim.tar.gz
 nvim_plugins:
 	# echo '##[ $@ ]##'
 	$(ADD) scripts/ /usr/local/bin/
-	$(RUN) /usr/local/bin/nvim_plugins &>dev/null
+	$(RUN) /usr/local/bin/nvim_plugins &> /dev/null
 	$(RUN) ls /usr/local/share/nvim/site/pack/core/opt | tee $@
 	echo '✅ selected nvim plugins installed'
 
@@ -159,8 +159,8 @@ dnf_pkgs: dnf_gh dnf_cli_pkgs dnf_lsp_pkgs
 	echo '✅ Completed DNF installs'
 
 dnf_gh:
-	$(RUN) dnf config-manager addrepo --from-repofile=https://cli.github.com/packages/rpm/gh-cli.repo &>/dev/null
-	$(INSTALL) gh --repo gh-cli &> /dev/null
+	$(RUN) dnf config-manager addrepo --from-repofile=https://cli.github.com/packages/rpm/gh-cli.repo &> /dev/null
+	$(INSTALL) gh --repo gh-cli &>  /dev/null
 	$(RUN) dnf info -q --installed gh
 
 dnf_cli_pkgs: info/cli-tools.md
@@ -169,7 +169,7 @@ dnf_cli_pkgs: info/cli-tools.md
 info/cli-tools.md:
 	# echo '##[ $@ ]##'
 	mkdir -p $(dir $@)
-	$(INSTALL) $(CLI_VIA_DNF) &>/dev/null
+	$(INSTALL) $(CLI_VIA_DNF) &> /dev/null
 	printf "\n$(HEADING2) %s\n\n" "Handpicked CLI tools available in the toolbox" | tee $@
 	$(call tr,"Name","Version","Summary",$@)
 	$(call tr,"----","-------","----------------------------",$@)
@@ -186,7 +186,7 @@ dnf_lsp_pkgs: info/lsp-tooling.md
 info/lsp-tooling.md:
 	# echo '##[ $@ ]##'
 	mkdir -p $(dir $@)
-	$(INSTALL) $(LSP_VIA_DNF) &>/dev/null
+	$(INSTALL) $(LSP_VIA_DNF) &> /dev/null
 	printf "\n$(HEADING2) %s\n\n" "dnf installed LSP tooling available in the toolbox" | tee $@
 	$(call tr,"Name","Version","Summary",$@)
 	$(call tr,"----","-------","----------------------------",$@)
@@ -204,8 +204,8 @@ npm_pkgs: info/npm_pkgs.md
 
 info/npm_pkgs.md:
 	# echo '##[ $@ ]##'
-	$(NPM) $(VIA_NPM) &>/dev/null
-	$(NPM) $(VIA_AT_NPM) &>/dev/null
+	$(NPM) $(VIA_NPM) &> /dev/null
+	$(NPM) $(VIA_AT_NPM) &> /dev/null
 	$(NPM_LIST)
 
 TS_ROCKS := \
@@ -256,13 +256,13 @@ parsers_queries:
 	$(RUN) mkdir -p /etc/xdg/nvim/queries
 	for ROCK in $(ROCKS)
 	do
-	$(RUN) luarocks install $(LR_OPTS) $$ROCK &>/dev/null
+	$(RUN) luarocks install $(LR_OPTS) $$ROCK &> /dev/null
 	VER=$$($(RUN) luarocks show --mversion --tree $(ROCKS_PATH) $$ROCK)
 	DIR=$(ROCKS_LIB_PATH)/$$ROCK/$$VER
 	$(SH) "cp $$DIR/parser/* /etc/xdg/nvim/parser/"
 	$(SH) "cp -r $$DIR/queries/* /etc/xdg/nvim/queries/"
 	done
-	$(RUN) luarocks purge --tree $(ROCKS_PATH) &>/dev/null
+	$(RUN) luarocks purge --tree $(ROCKS_PATH) &> /dev/null
 	# $(RUN) tree /etc/xdg/nvim
 	echo '✅ selected treesitter parsers and queries added'
 
