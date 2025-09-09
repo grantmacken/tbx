@@ -29,7 +29,7 @@ TBX_IMAGE :=  ghcr.io/grantmacken/$(NAME)
 # actions
 RUN     := buildah run $(WORKING_CONTAINER)
 INSTALL := $(RUN) dnf install --allowerasing --skip-unavailable --skip-broken --no-allow-downgrade -y
-$(SH)   := buildah run $(WORKING_CONTAINER) bash -c
+$(SH)   := $(RUN) sh -c
 ADD     := buildah add --chmod 755 $(WORKING_CONTAINER)
 WGET    := wget -q --no-check-certificate --timeout=10 --tries=3
 
