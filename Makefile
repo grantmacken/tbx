@@ -41,17 +41,19 @@ TAR_NO_STRIP := tar xz -C
 NPM      := $(RUN) npm install --global
 NPM_LIST := $(RUN) npm list -g --depth=0
 
+
 #LISTS
 CLI_VIA_DNF := eza fd-find fzf pass ripgrep stow wl-clipboard zoxide
 LSP_VIA_DNF := ShellCheck shfmt
 # https://github.com/artempyanykh/marksman/releases
 VIA_RELEASES := artempyanykh/marksman
-VIA_NPM      := bash-language-server yaml-language-server vscode-langservers-extracted stylelint-lsp opencode-ai@latest
+VIA_NPM      := bash-language-server yaml-language-server vscode-langservers-extracted stylelint-lsp
 VIA_AT_NPM   :=  @github/copilot-language-server @ast-grep/cli
 # @githubnext/copilot-cl
 
 tr = printf "| %-14s | %-8s | %-83s |\n" "$(1)" "$(2)" "$(3)" | tee -a $(4)
 bdu = jq -r ".assets[] | select(.browser_download_url | contains(\"$1\")) | .browser_download_url" $2
+lsp_conf_url  := https://raw.githubusercontent.com/neovim/nvim-lspconfig/refs/heads/master/lsp/$1
 
 default: host-spawn parsers_queries gh_releases dnf_pkgs npm_pkgs nvim_plugins
 	# echo '##[ $@ ]##'
@@ -125,8 +127,7 @@ nvim_plugins:
 	$(RUN) ls /usr/local/share/nvim/site/pack/core/opt | tee $@
 	echo '✅ selected nvim plugins installed'
 
-lua-language-server: info/lua-language-server.md
-	echo '✅ latest $@ installed'
+lua-language-server: /etc/xdg/nvim/after/filetype.lua
 
 latest/lua-language-server.json:
 	# echo '##[ $@ ]##'
@@ -138,19 +139,30 @@ files/lua-language-server.tar.gz: latest/lua-language-server.json
 	mkdir -p $(dir $@)
 	$(WGET) $(shell $(call bdu,linux-x64.tar.gz,$<)) -O $@
 
-info/lua-language-server.md: files/lua-language-server.tar.gz
+/etc/xdg/nvim/lsp/lua_ls.lua: files/lua-language-server.tar.gz
 	mkdir -p $(dir $@)
-	echo '##[ $(basename $(notdir $@)) ]##'
-	NAME=lua-language-server
-	TARGET=files/$${NAME}
+	TARGET=files/lua-language-server
 	mkdir -p $${TARGET}
 	$(TAR_NO_STRIP) $${TARGET} -f $<
-	$(ADD) $${TARGET} /usr/local/$${NAME}
+	$(ADD) $${TARGET} /usr/local/lua-language-server
 	# $(RUN) ls -al /usr/local/
 	$(RUN) ln -sf /usr/local/lua-language-server/bin/lua-language-server /usr/local/bin/lua-language-server
-	$(RUN) which $${NAME}
-	$(RUN) whereis $${NAME}
-	$(RUN) $${NAME} --version
+	# abort if error checks:
+	$(RUN) which lua-language-server &> /dev/null
+	$(RUN) lua-language-server --version &> /dev/null
+	echo '✅ lua-language-server installed'
+	$(ADD) $(call lsp_conf_url,lua_ls) $@
+	echo '✅ lsp config for lua-langauge-server added'
+
+/etc/xdg/nvim/after/filetype.lua: /etc/xdg/nvim/lsp/lua_ls.lua
+	mkdir -p $(dir $@)
+	echo '##[ $(basename $(notdir $@)) ]##'
+	$(RUN) echo '-- enable lua-language-server for filetype' > $@
+	$(RUN) echo 'vim.lsp.enable( $(basename $(notdir $<)) )' >> $@
+	$(RUN) echo '-- start tree-sitter for filetype' > $@
+	$(RUN) echo 'vim.treesitter.start()' >> $@
+	echo '✅ enabled lua-language-server for lua files'
+	echo '✅ enabled treesitter for lua files'
 
 marksman: latest/marksman.json
 latest/marksman.json:
