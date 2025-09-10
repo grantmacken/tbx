@@ -27,7 +27,7 @@ INSTALL := $(RUN) dnf install --allowerasing --skip-unavailable --skip-broken --
 
 WGET := wget -q --no-check-certificate --timeout=10 --tries=3
 
-BUILDING := make jq gh stow gcc gcc-c++ pcre2 autoconf pkgconf
+BUILDING := make jq gh stow pass gcc gcc-c++ pcre2 autoconf pkgconf
 DEVEL := gettext-devel \
  glibc-devel \
  libevent-devel \
@@ -122,5 +122,7 @@ info/build-tools.md:
 	paste  - - -  | sort -u ' | \
 	awk -F'\t' '{printf "| %-14s | %-8s | %-83s |\n", $$1, $$2, $$3}' | \
 	tee -a $@
+	
+
 	
 	
