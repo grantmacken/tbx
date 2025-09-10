@@ -27,7 +27,7 @@ INSTALL := $(RUN) dnf install --allowerasing --skip-unavailable --skip-broken --
 
 WGET := wget -q --no-check-certificate --timeout=10 --tries=3
 
-BUILDING := make jq cgcc gcc-c++ pcre2 autoconf pkgconf
+BUILDING := make jq gh stow gcc gcc-c++ pcre2 autoconf pkgconf
 DEVEL := gettext-devel \
  glibc-devel \
  libevent-devel \
