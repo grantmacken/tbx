@@ -130,7 +130,7 @@ nvim_plugins:
 	$(RUN) ls /usr/local/share/nvim/site/pack/core/opt | tee $@
 	echo '✅ selected nvim plugins installed'
 
-lua-language-server: /etc/xdg/nvim/after/filetype.lua
+lua-language-server: info/lua-language-server.md
 
 latest/lua-language-server.json:
 	# echo '##[ $@ ]##'
