@@ -30,6 +30,8 @@ TBX_IMAGE :=  ghcr.io/grantmacken/$(NAME)
 RUN     := buildah run $(WORKING_CONTAINER)
 INSTALL := $(RUN) dnf install --allowerasing --skip-unavailable --skip-broken --no-allow-downgrade -y
 SH      := $(RUN) sh -c
+LINK    := $(RUN) ln -s $(shell which host-spawn)
+
 ADD     := buildah add --chmod 755 $(WORKING_CONTAINER)
 WGET    := wget -q --no-check-certificate --timeout=10 --tries=3
 
@@ -51,7 +53,7 @@ VIA_AT_NPM   :=  @github/copilot-language-server @ast-grep/cli
 tr = printf "| %-14s | %-8s | %-83s |\n" "$(1)" "$(2)" "$(3)" | tee -a $(4)
 bdu = jq -r ".assets[] | select(.browser_download_url | contains(\"$1\")) | .browser_download_url" $2
 
-default:  parsers_queries gh_releases dnf_pkgs npm_pkgs nvim_plugins
+default: host-spawn parsers_queries gh_releases dnf_pkgs npm_pkgs nvim_plugins
 	# echo '##[ $@ ]##'
 	# echo 'image built'
 ifdef GITHUB_ACTIONS
@@ -82,6 +84,12 @@ latest/tbx-build-tools.json:
 	buildah pull "$$FROM" &>  /dev/null
 	echo -n "WORKING_CONTAINER=" | tee -a .env
 	buildah from "$$FROM" | tee -a .env
+
+link:
+	$(LINK) /usr/local/bin/firefox
+	$(LINK) /usr/local/bin/podman
+	$(LINK) /usr/local/bin/buildah
+	$(LINK) /usr/local/bin/skopeo
 
 gh_releases: nvim lua-language-server marksman harper
 
