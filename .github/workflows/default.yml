@@ -19,10 +19,15 @@ jobs:
       packages: write
       id-token: write
     steps:
+      - uses: docker/login-action@v3
+          with:
+            registry: ghcr.io
+            username: ${{ github.repository_owner }}
+            password: ${{ github.token }}
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
           ref: tbx-build-tools  # Replace with your first branch name
-      - name: Checkout repository
+      - name: Make
         run: make init && make
   # Add more jobs as needed following the same pattern
