@@ -33,7 +33,10 @@ SH      := $(RUN) sh -c
 # LINK    := $(RUN) ln -s $(shell which host-spawn)
 
 ADD     := buildah add --chmod 755 $(WORKING_CONTAINER)
+RW_ADD := buildah add --chmod  644 $(WORKING_CONTAINER)
 WGET    := wget -q --no-check-certificate --timeout=10 --tries=3
+
+FILETYPE := /etc/xdg/nvim/after/filetype
 
 TAR     := tar xz --strip-components=1 -C
 TAR_NO_STRIP := tar xz -C
@@ -151,17 +154,11 @@ info/lua-language-server.md: files/lua-language-server.tar.gz
 	$(RUN) which lua-language-server &> /dev/null
 	$(RUN) lua-language-server --version &> /dev/null
 	echo '✅ lua-language-server installed' | tee $@
-	$(ADD) etc/xdg/nvim/lsp/luals.lua
-	$(RUN) ls -al etc/xdg/nvim/lsp/
+	$(RUN) mkdir -p /etc/xdg/nvim/lsp
+	$(RW_ADD) etc/xdg/nvim/lsp/lua_ls.lua /etc/xdg/nvim/lsp/lua_ls.lua
 	echo '✅ lsp config for lua-langauge-server added'
-
-/etc/xdg/nvim/after/filetype.lua: /etc/xdg/nvim/lsp/lua_ls.lua
-	mkdir -p $(dir $@)
-	echo '##[ $(basename $(notdir $@)) ]##'
-	$(RUN) echo '-- enable lua-language-server for filetype' > $@
-	$(RUN) echo 'vim.lsp.enable( $(basename $(notdir $<)) )' >> $@
-	$(RUN) echo '-- start tree-sitter for filetype' > $@
-	$(RUN) echo 'vim.treesitter.start()' >> $@
+	$(RUN) mkdir -p /etc/xdg/nvim/after/filetype
+	$(RW_ADD) etc/xdg/nvim/after/filetype/lua.lua etc/xdg/nvim/after/filetype/lua.lua
 	echo '✅ enabled lua-language-server for lua files'
 	echo '✅ enabled treesitter for lua files'
 
