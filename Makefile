@@ -36,7 +36,10 @@ ADD     := buildah add --chmod 755 $(WORKING_CONTAINER)
 RW_ADD := buildah add --chmod  644 $(WORKING_CONTAINER)
 WGET    := wget -q --no-check-certificate --timeout=10 --tries=3
 
-FILETYPE := /etc/xdg/nvim/after/filetype
+DIR_FILETYPE := /etc/xdg/nvim/after/filetype
+DIR_LSP      := /etc/xdg/nvim/lsp
+DIR_BIN      := /usr/local/bin
+
 
 TAR     := tar xz --strip-components=1 -C
 TAR_NO_STRIP := tar xz -C
@@ -76,6 +79,9 @@ init: .env
 	$(RUN) which make &> /dev/null
 	$(RUN) which npm &> /dev/null
 	$(RUN) which luarocks &> /dev/null
+	$(RUN) mkdir -p $(DIR_FILETYPE) $(DIR_LSP)
+
+
 
 latest/tbx-build-tools.json:
 	# echo '##[ $@ ]##'
@@ -154,13 +160,13 @@ info/lua-language-server.md: files/lua-language-server.tar.gz
 	$(RUN) which lua-language-server &> /dev/null
 	$(RUN) lua-language-server --version &> /dev/null
 	echo '✅ lua-language-server installed' | tee $@
-	$(RUN) mkdir -p /etc/xdg/nvim/lsp
-	$(RW_ADD) etc/xdg/nvim/lsp/lua_ls.lua /etc/xdg/nvim/lsp/lua_ls.lua
-	echo '✅ lsp config for lua-langauge-server added'
-	$(RUN) mkdir -p /etc/xdg/nvim/after/filetype
-	$(RW_ADD) etc/xdg/nvim/after/filetype/lua.lua etc/xdg/nvim/after/filetype/lua.lua
-	echo '✅ enabled lua-language-server for lua files'
-	echo '✅ enabled treesitter for lua files'
+	$(ADD) $(patsubst /%,%,$(DIR_LSP).luals.lua) $(DIR_LSP)
+	$(RUN) ls -al $(DIR_LSP)
+	# echo '✅ lsp config for lua-langauge-server added'
+	# $(RUN) mkdir -p /etc/xdg/nvim/after/filetype
+	# $(RW_ADD) etc/xdg/nvim/after/filetype/lua.lua etc/xdg/nvim/after/filetype/lua.lua
+	# echo '✅ enabled lua-language-server for lua files'
+	# echo '✅ enabled treesitter for lua files'
 
 marksman: latest/marksman.json
 latest/marksman.json:
