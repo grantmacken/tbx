@@ -12,6 +12,12 @@ jobs:
   # First branch build job
   tbx-build-tools:
     runs-on: ubuntu-latest
+    timeout-minutes: 20
+    continue-on-error: false
+    permissions:
+      contents: write
+      packages: write
+      id-token: write
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
