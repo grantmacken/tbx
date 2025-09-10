@@ -30,7 +30,7 @@ TBX_IMAGE :=  ghcr.io/grantmacken/$(NAME)
 RUN     := buildah run $(WORKING_CONTAINER)
 INSTALL := $(RUN) dnf install --allowerasing --skip-unavailable --skip-broken --no-allow-downgrade -y
 SH      := $(RUN) sh -c
-LINK    := $(RUN) ln -s $(shell which host-spawn)
+# LINK    := $(RUN) ln -s $(shell which host-spawn)
 
 ADD     := buildah add --chmod 755 $(WORKING_CONTAINER)
 WGET    := wget -q --no-check-certificate --timeout=10 --tries=3
@@ -55,7 +55,7 @@ tr = printf "| %-14s | %-8s | %-83s |\n" "$(1)" "$(2)" "$(3)" | tee -a $(4)
 bdu = jq -r ".assets[] | select(.browser_download_url | contains(\"$1\")) | .browser_download_url" $2
 lsp_conf_url  := https://raw.githubusercontent.com/neovim/nvim-lspconfig/refs/heads/master/lsp/$1
 
-default: link parsers_queries gh_releases dnf_pkgs npm_pkgs nvim_plugins
+default: parsers_queries gh_releases dnf_pkgs npm_pkgs nvim_plugins
 	# echo '##[ $@ ]##'
 	# echo 'image built'
 ifdef GITHUB_ACTIONS
@@ -87,11 +87,11 @@ latest/tbx-build-tools.json:
 	echo -n "WORKING_CONTAINER=" | tee -a .env
 	buildah from "$$FROM" | tee -a .env
 
-link:
-	$(LINK) /usr/local/bin/firefox
-	$(LINK) /usr/local/bin/podman
-	$(LINK) /usr/local/bin/buildah
-	$(LINK) /usr/local/bin/skopeo
+# link:
+# 	$(LINK) /usr/local/bin/firefox
+# 	$(LINK) /usr/local/bin/podman
+# 	$(LINK) /usr/local/bin/buildah
+# 	$(LINK) /usr/local/bin/skopeo
 
 gh_releases: nvim lua-language-server marksman harper
 
@@ -139,7 +139,7 @@ files/lua-language-server.tar.gz: latest/lua-language-server.json
 	mkdir -p $(dir $@)
 	$(WGET) $(shell $(call bdu,linux-x64.tar.gz,$<)) -O $@
 
-/etc/xdg/nvim/lsp/lua_ls.lua: files/lua-language-server.tar.gz
+info/lua-language-server.md: files/lua-language-server.tar.gz
 	mkdir -p $(dir $@)
 	TARGET=files/lua-language-server
 	mkdir -p $${TARGET}
@@ -150,8 +150,9 @@ files/lua-language-server.tar.gz: latest/lua-language-server.json
 	# abort if error checks:
 	$(RUN) which lua-language-server &> /dev/null
 	$(RUN) lua-language-server --version &> /dev/null
-	echo '✅ lua-language-server installed'
-	$(ADD) $(call lsp_conf_url,lua_ls) $@
+	echo '✅ lua-language-server installed' | tee $@
+	$(ADD) etc/xdg/nvim/lsp/luals.lua
+	$(RUN) ls -al etc/xdg/nvim/lsp/
 	echo '✅ lsp config for lua-langauge-server added'
 
 /etc/xdg/nvim/after/filetype.lua: /etc/xdg/nvim/lsp/lua_ls.lua
