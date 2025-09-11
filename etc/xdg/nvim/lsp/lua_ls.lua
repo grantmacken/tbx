@@ -1,4 +1,3 @@
-
 local tbl_cmd = { 'lua-language-server' }
 local tbl_settings = {
   Lua = {
