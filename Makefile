@@ -59,7 +59,7 @@ VIA_AT_NPM   :=  @github/copilot-language-server @ast-grep/cli
 
 tr = printf "| %-14s | %-8s | %-83s |\n" "$(1)" "$(2)" "$(3)" | tee -a $(4)
 bdu = jq -r ".assets[] | select(.browser_download_url | contains(\"$1\")) | .browser_download_url" $2
-LSP_CONF_URL := https://raw.githubusercontent.com/neovim/nvim-lspconfig/refs/heads/master/lsp
+lsp_conf_url := https://raw.githubusercontent.com/neovim/nvim-lspconfig/refs/heads/master/lsp
 
 default:  xdg gh_releases # parsers_queries dnf_pkgs npm_pkgs nvim_plugins
 	# echo '##[ $@ ]##'
@@ -138,6 +138,7 @@ nvim_plugins:
 xdg: copilot
 
 copilot:
+	URL=$(LSP_CONF_URL)/$@.lua
 	$(RW_ADD) $$URL $(DIR_LSP)/$@.lua
 	$(RUN) ls -al $(DIR_LSP)
 
