@@ -166,6 +166,8 @@ info/lua-language-server.md: files/lua-language-server.tar.gz
 	# $(RUN) mkdir -p /etc/xdg/nvim/after/filetype
 	$(RW_ADD) etc/xdg/nvim/lsp/lua_ls.lua $(DIR_LSP)/lua_ls.lua
 	$(RUN) ls -al $(DIR_LSP)/lua_ls.lua
+	$(RUN) touch $(DIR_FILETYPE)/$(suffix)
+	$(RUN) echo '' > $(DIR_LSP) 
 	# echo '✅ enabled lua-language-server for lua files'
 	# echo '✅ enabled treesitter for lua files'
 	
@@ -176,7 +178,7 @@ latest/marksman.json:
 
 files/marksman.tar.gz: latest/marksman.json
 	mkdir -p $(dir $@)
-	$(WGET) $(shell $(call bdu,linux-x64.tar.gz,$<)) -O $@
+	$(WGET) $(shell $(call bdu,linux-x64,$<)) -O $@
 
 info/marksman.md: files/marksman.tar.gz
 	echo '##[ $@ ]##'
