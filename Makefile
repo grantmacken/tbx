@@ -25,13 +25,11 @@ FROM_IMAGE := ghcr.io/grantmacken/tbx-runtimes
 NAME := tbx-coding
 WORKING_CONTAINER ?= $(NAME)-working-container
 TBX_IMAGE :=  ghcr.io/grantmacken/$(NAME)
-
 # actions
 RUN     := buildah run $(WORKING_CONTAINER)
 INSTALL := $(RUN) dnf install --allowerasing --skip-unavailable --skip-broken --no-allow-downgrade -y
 SH      := $(RUN) sh -c
 # LINK    := $(RUN) ln -s $(shell which host-spawn)
-
 ADD     := buildah add --chmod 755 $(WORKING_CONTAINER)
 RW_ADD := buildah add --chmod  644 $(WORKING_CONTAINER)
 WGET    := wget -q --no-check-certificate --timeout=10 --tries=3
@@ -47,7 +45,6 @@ TAR_NO_STRIP := tar xz -C
 NPM      := $(RUN) npm install --global
 NPM_LIST := $(RUN) npm list -g --depth=0
 
-
 #LISTS
 CLI_VIA_DNF := eza fd-find fzf pass ripgrep stow wl-clipboard zoxide
 LSP_VIA_DNF := ShellCheck shfmt
@@ -62,8 +59,7 @@ bdu = jq -r ".assets[] | select(.browser_download_url | contains(\"$1\")) | .bro
 lsp_conf_url := https://raw.githubusercontent.com/neovim/nvim-lspconfig/refs/heads/master/lsp
 
 default:  xdg gh_releases # parsers_queries dnf_pkgs npm_pkgs nvim_plugins
-	# echo '##[ $@ ]##'
-	# echo 'image built'
+
 ifdef GITHUB_ACTIONS
 	buildah config \
 	--label summary='a toolbox with cli tools, neovim' \
@@ -134,13 +130,14 @@ nvim_plugins:
 	$(RUN) ls /usr/local/share/nvim/site/pack/core/opt | tee $@
 	echo '✅ selected nvim plugins installed'
 
-
 xdg: copilot
 
 copilot:
 	URL=$(LSP_CONF_URL)/$@.lua
 	$(RW_ADD) $$URL $(DIR_LSP)/$@.lua
 	$(RUN) ls -al $(DIR_LSP)
+
+
 
 lua-language-server: info/lua-language-server.md
 
@@ -168,8 +165,8 @@ info/lua-language-server.md: files/lua-language-server.tar.gz
 	echo '✅ lua-language-server installed' | tee $@
 	# echo '✅ lsp config for lua-langauge-server added'
 	# $(RUN) mkdir -p /etc/xdg/nvim/after/filetype
-	$(ADD) etc/xdg/nvim/lsp/lua_ls.lua
-	$(RUN) ls -al $(RUN) ls -al $(DIR_LSP)
+	$(RW_ADD) etc/xdg/nvim/lsp/lua_ls.lua
+	$(RUN) ls -al $(DIR_LSP)/lua_ls.lua
 	# echo '✅ enabled lua-language-server for lua files'
 	# echo '✅ enabled treesitter for lua files'
 	#
