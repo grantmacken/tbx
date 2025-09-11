@@ -142,6 +142,9 @@ copilot:
 	echo $(DIR_LSP)
 	echo 'to'
 	echo  $(abspath $(DIR_LSP))
+	URL=$(call lsp_conf_url,copilot.lua)
+	echo $$URL
+
 
 
 
