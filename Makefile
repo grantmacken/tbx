@@ -39,7 +39,7 @@ WGET    := wget -q --no-check-certificate --timeout=10 --tries=3
 DIR_FILETYPE := /etc/xdg/nvim/after/filetype
 DIR_LSP      := /etc/xdg/nvim/lsp
 DIR_BIN      := /usr/local/bin
-
+LSP_CONF_URL := https://raw.githubusercontent.com/neovim/nvim-lspconfig/refs/heads/master/lsp/
 
 TAR     := tar xz --strip-components=1 -C
 TAR_NO_STRIP := tar xz -C
@@ -59,7 +59,7 @@ VIA_AT_NPM   :=  @github/copilot-language-server @ast-grep/cli
 
 tr = printf "| %-14s | %-8s | %-83s |\n" "$(1)" "$(2)" "$(3)" | tee -a $(4)
 bdu = jq -r ".assets[] | select(.browser_download_url | contains(\"$1\")) | .browser_download_url" $2
-lsp_conf_url  := https://raw.githubusercontent.com/neovim/nvim-lspconfig/refs/heads/master/lsp/$1
+LSP_CONF_URL := https://raw.githubusercontent.com/neovim/nvim-lspconfig/refs/heads/master/lsp
 
 default:  xdg # parsers_queries gh_releases dnf_pkgs npm_pkgs nvim_plugins
 	# echo '##[ $@ ]##'
@@ -144,11 +144,10 @@ copilot:
 	echo 'to'
 	TO=$(DIR_LSP)
 	echo $$TO
-	URL=$(call lsp_conf_url,$$NAME)
+	URL=$(LSP_CONF_URL)/$$NAME
 	echo $$URL
 	$(ADD) $$URL $(DIR_LSP)/$$NAME
 	$(RUN) ls -al $(DIR_LSP)
-
 
 lua-language-server: info/lua-language-server.md
 
