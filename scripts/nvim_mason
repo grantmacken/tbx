@@ -1,9 +1,11 @@
 #!/usr/bin/env -S nvim -l
 -- https://mason-registry.dev/registry/list
 local bins = {
-  "lua-language-server",
-  "bash-language-server",
-  "copilot-language-serve"
+  'bash-language-server',
+  'copilot-language-server',
+  'harper-ls',
+  'lua-language-server',
+  'marksman',
   }
 -- unset at scripts end
 vim.uv.os_setenv("XDG_DATA_HOME", "/usr/local/share")
