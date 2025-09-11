@@ -129,7 +129,8 @@ mason:
 	$(RUN) mkdir -p /usr/local/share/mason 
 	$(RUN) /usr/local/bin/nvim_mason &>/dev/null
 	$(RUN) ls /usr/local/share/mason/bin || true
-	# $(RUN) ls /usr/local/share/nvim/mason.log || true
+	$(SH) 'ln -s /usr/local/share/mason/bin/* /usr/local/bin/'
+	$(RUN) ls /usr/local/bin
 
 
 
