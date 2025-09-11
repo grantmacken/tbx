@@ -36,8 +36,8 @@ ADD     := buildah add --chmod 755 $(WORKING_CONTAINER)
 RW_ADD := buildah add --chmod  644 $(WORKING_CONTAINER)
 WGET    := wget -q --no-check-certificate --timeout=10 --tries=3
 
-DIR_FILETYPE := etc/xdg/nvim/after/filetype
-DIR_LSP      := etc/xdg/nvim/lsp
+DIR_FILETYPE := /etc/xdg/nvim/after/filetype
+DIR_LSP      := /etc/xdg/nvim/lsp
 DIR_BIN      := /usr/local/bin
 
 
@@ -138,19 +138,17 @@ nvim_plugins:
 xdg: copilot
 
 copilot:
-	echo 'from'
+	NAME=$@.lua
+	echo $$NAME
 	echo $(DIR_LSP)
 	echo 'to'
 	NAME=copilot.lua
-	TO=/$(DIR_LSP)
+	TO=$(DIR_LSP)
 	echo $$TO
-	URL=$(call lsp_conf_url,copilot.lua)
+	URL=$(call lsp_conf_url,$$NAME)
 	echo $$URL
+	$(ADD) $$URL $(DIR_LSP)/$$NAME
 
-
-
-
-# https://raw.githubusercontent.com/neovim/nvim-lspconfig/refs/heads/master/lsp/copilot.lua
 
 lua-language-server: info/lua-language-server.md
 
