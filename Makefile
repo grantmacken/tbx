@@ -59,10 +59,12 @@ tr = printf "| %-14s | %-8s | %-83s |\n" "$(1)" "$(2)" "$(3)" | tee -a $(4)
 bdu = jq -r ".assets[] | select(.browser_download_url | contains(\"$1\")) | .browser_download_url" $2
 lsp_conf_url := https://raw.githubusercontent.com/neovim/nvim-lspconfig/refs/heads/master/lsp
 
-lsp_configs := $(wildcard xdg/nvim/lsp/*.lua)
-lsp_targs := $(patsubst xdg/nvim/lsp/%.lua,info/%.md,$(lsp_configs))
+lsp_confs := $(wildcard xdg/nvim/lsp/*.lua)
+lsp_targs := $(patsubst xdg/nvim/lsp/%.lua,info/%.md,$(lsp_confs))
 
-$(info $(lsp_configs))
+ft_confs  := $(wildcard xdg/nvim/lsp/*.lua)
+lsp_targs := $(patsubst xdg/nvim/lsp/%.lua,info/%.md,$(ft_confs))
+$(info $(lsp_confs))
 $(info $(lsp_targs))
 
 default: $(lsp_targs) #nvim  # mason  # gh_releases parsers_queries dnf_pkgs npm_pkgs nvim_plugins
@@ -160,7 +162,7 @@ info/lsp/%: xdg/nvim/lsp/%
 	$(RW_ADD) $< $(DIR_LSP)/$*
 	echo '✅ lsp: $*' | tee $@
 
-$(RW_ADD) xdg/nvim/after/filetype/lua.lua $(DIR_FILETYPE)/lua.lua
+# $(RW_ADD) xdg/nvim/after/filetype/lua.lua $(DIR_FILETYPE)/lua.lua
 
 # marksman: info/marksman.md
 # latest/marksman.json:
