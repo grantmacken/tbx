@@ -137,8 +137,6 @@ copilot:
 	$(RW_ADD) $$URL $(DIR_LSP)/$@.lua
 	$(RUN) ls -al $(DIR_LSP)
 
-
-
 lua-language-server: info/lua-language-server.md
 latest/lua-language-server.json:
 	# echo '##[ $@ ]##'
@@ -162,14 +160,10 @@ info/lua-language-server.md: files/lua-language-server.tar.gz
 	$(RUN) which lua-language-server &> /dev/null
 	$(RUN) lua-language-server --version &> /dev/null
 	echo '✅ lua-language-server installed' | tee $@
-	# echo '✅ lsp config for lua-langauge-server added'
-	# $(RUN) mkdir -p /etc/xdg/nvim/after/filetype
 	$(RW_ADD) etc/xdg/nvim/lsp/lua_ls.lua $(DIR_LSP)/lua_ls.lua
-	$(RUN) ls -al $(DIR_LSP)/lua_ls.lua
-	$(RUN) echo 'vim.lsp.enable("lua_ls")' > $(DIR_FILETYPE)/lua.lua
-	$(RUN) echo  'vim.treesitter.start()' >> $(DIR_FILETYPE)/lua.lua
-	 echo '✅ enabled lua-language-server for lua files'
-	 echo '✅ enabled treesitter for lua files'
+	$(RW_ADD) etc/xdg/nvim/after/filetype/lua.lua $(DIR_FILETYPE)/lua.lua
+	echo '✅ enabled lua-language-server for lua files'
+	echo '✅ enabled treesitter for lua files'
 
 marksman: info/marksman.md
 latest/marksman.json:
