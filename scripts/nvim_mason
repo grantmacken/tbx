@@ -1,12 +1,15 @@
 #!/usr/bin/env -S nvim -l
--- set XDG_DATA_HOME for vim.pack
+print( '##[[ MASON ]]##' )
 -- unset at scripts end
 vim.uv.os_setenv("XDG_DATA_HOME", "/usr/local/share")
+vim.print(vim.uv.os_getenv("XDG_DATA_HOME"))
 -- use pack.add
 -- /usr/local/share/nvim/site/pack/core/opt/
 vim.pack.add({
  'https://github.com/mason-org/mason.nvim',
   })
+
+
 
 local ok_mason, mason = pcall(require, 'mason')
 if ok_mason then
