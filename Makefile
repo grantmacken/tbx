@@ -62,10 +62,10 @@ lsp_conf_url := https://raw.githubusercontent.com/neovim/nvim-lspconfig/refs/hea
 lsp_configs := $(wildcard xdg/nvim/lsp/*.lua)
 lsp_targs := $(patsubst xdg/nvim/lsp/%.lua,info/%.md,$(lsp_configs))
 
-$(info $(lsp_preconfigured))
-$(info $(lsp_targets))
+$(info $(lsp_configs))
+$(info $(lsp_targs))
 
-default: nvim # mason  # gh_releases parsers_queries dnf_pkgs npm_pkgs nvim_plugins
+default: $(lsp_targs) #nvim  # mason  # gh_releases parsers_queries dnf_pkgs npm_pkgs nvim_plugins
 
 ifdef GITHUB_ACTIONS
 	buildah config \
@@ -146,16 +146,21 @@ nvim_plugins:
 	$(RUN) ls /usr/local/share/nvim/site/pack/core/opt | tee $@
 	echo '✅ selected nvim plugins installed'
 
-xdg: copilot
+# xdg: copilot
+#
+# copilot:
+# 	URL=$(LSP_CONF_URL)/$@.lua
+# 	$(RW_ADD) $$URL $(DIR_LSP)/$@.lua
+# 	$(RUN) ls -al $(DIR_LSP)
+# 	echo '✅ lsp: '
 
-copilot:
-	URL=$(LSP_CONF_URL)/$@.lua
-	$(RW_ADD) $$URL $(DIR_LSP)/$@.lua
-	$(RUN) ls -al $(DIR_LSP)
+# Preconfigure LSP
+info/lsp/%: xdg/nvim/lsp/%
+	mkdir -p $(dir $@)
+	$(RW_ADD) $< $(DIR_LSP)/$*
+	echo '✅ lsp: $*' | tee $@
 
-info/lua-language-server.md:
-	$(RW_ADD) xdg/nvim/lsp/lua_ls.lua $(DIR_LSP)/lua_ls.lua
-	$(RW_ADD) xdg/nvim/after/filetype/lua.lua $(DIR_FILETYPE)/lua.lua
+$(RW_ADD) xdg/nvim/after/filetype/lua.lua $(DIR_FILETYPE)/lua.lua
 
 # marksman: info/marksman.md
 # latest/marksman.json:
