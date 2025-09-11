@@ -61,7 +61,7 @@ tr = printf "| %-14s | %-8s | %-83s |\n" "$(1)" "$(2)" "$(3)" | tee -a $(4)
 bdu = jq -r ".assets[] | select(.browser_download_url | contains(\"$1\")) | .browser_download_url" $2
 LSP_CONF_URL := https://raw.githubusercontent.com/neovim/nvim-lspconfig/refs/heads/master/lsp
 
-default:  xdg # parsers_queries gh_releases dnf_pkgs npm_pkgs nvim_plugins
+default:  xdg gh_releases # parsers_queries dnf_pkgs npm_pkgs nvim_plugins
 	# echo '##[ $@ ]##'
 	# echo 'image built'
 ifdef GITHUB_ACTIONS
@@ -138,15 +138,7 @@ nvim_plugins:
 xdg: copilot
 
 copilot:
-	NAME=$@.lua
-	echo $$NAME
-	echo $(DIR_LSP)
-	echo 'to'
-	TO=$(DIR_LSP)
-	echo $$TO
-	URL=$(LSP_CONF_URL)/$$NAME
-	echo $$URL
-	$(ADD) $$URL $(DIR_LSP)/$$NAME
+	$(RW_ADD) $$URL $(DIR_LSP)/$@.lua
 	$(RUN) ls -al $(DIR_LSP)
 
 lua-language-server: info/lua-language-server.md
@@ -173,10 +165,9 @@ info/lua-language-server.md: files/lua-language-server.tar.gz
 	$(RUN) which lua-language-server &> /dev/null
 	$(RUN) lua-language-server --version &> /dev/null
 	echo '✅ lua-language-server installed' | tee $@
-	echo  $(patsubst \/%,%,$(DIR_LSP))
 	# echo '✅ lsp config for lua-langauge-server added'
 	# $(RUN) mkdir -p /etc/xdg/nvim/after/filetype
-	# $(RW_ADD) etc/xdg/nvim/after/filetype/lua.lua etc/xdg/nvim/after/filetype/lua.lua
+	$(RW_ADD) etc/xdg/nvim/lsp/lua_ls.lua $(DIR_LSP)/lua_ls.lua
 	# echo '✅ enabled lua-language-server for lua files'
 	# echo '✅ enabled treesitter for lua files'
 
