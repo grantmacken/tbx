@@ -128,8 +128,8 @@ mason:
 	$(ADD) scripts/ /usr/local/bin/
 	$(RUN) mkdir -p /usr/local/share/mason
 	$(RUN) /usr/local/bin/nvim_mason
-	$(RUN) tree /usr/local/share/mason
-	$(RUN) ls /usr/local/share/nvim/mason.log || true
+	$(RUN) tree /usr/local/share/mason || true
+	# $(RUN) ls /usr/local/share/nvim/mason.log || true
 
 
 

@@ -1,5 +1,6 @@
 #!/usr/bin/env -S nvim -l
 print( '##[[ MASON ]]##' )
+-- https://mason-registry.dev/registry/list
 -- unset at scripts end
 vim.uv.os_setenv("XDG_DATA_HOME", "/usr/local/share")
 -- vim.cmd.printf( %s\n, vim.uv.os_getenv("XDG_DATA_HOME"))
@@ -16,16 +17,17 @@ if ok_mason then
   print( 'required Mason' )
   mason.setup(
     {
-      install_root_dir = '/usr/local',
+      install_root_dir = '/usr/local/share/mason',
       PATH = 'skip',
     }
   )
 local registry = require("mason-registry")
 registry.update()
-vim.uv.sleep(1000)
+vim.uv.sleep(1000) 
 print( 'mason registry set up' )
-
 vim.cmd([[:MasonInstall lua-language-server ]] )
+vim.uv.sleep(1000) 
+vim.cmd.MasonInstall('bash-language-server')
 else
   print( '- ABORT!!' )
 end
