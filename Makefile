@@ -141,7 +141,7 @@ copilot:
 	echo 'from'
 	echo $(DIR_LSP)
 	echo 'to'
-	echo  $(patsubst "%","/%",$(DIR_LSP)/copilot.lua)
+	echo  $(abspath $(DIR_LSP))
 
 
 
