@@ -96,7 +96,7 @@ latest/tbx-build-tools.json:
 # 	$(LINK) /usr/local/bin/buildah
 # 	$(LINK) /usr/local/bin/skopeo
 
-gh_releases: nvim # lua-language-server # marksman harper
+gh_releases: nvim mason # lua-language-server # marksman harper
 
 nvim: info/neovim.md
 	echo '✅ latest pre-release neovim installed'
@@ -122,6 +122,13 @@ info/neovim.md: files/nvim.tar.gz
 	VERSION=$$($(RUN) nvim -v | grep -oP 'NVIM \K.+' | cut -d'-' -f1 )
 	SUM='The text editor with a focus on extensibility and usability'
 	printf "| %-10s | %-13s | %-83s |\n" "$${NAME}" "$${VERSION}" "$${SUM}" | tee -a $@
+
+mason:
+	# echo '##[ $@ ]##'
+	$(ADD) scripts/ /usr/local/bin/
+	$(RUN) /usr/local/bin/nvim_mason &> /dev/null
+
+
 
 nvim_plugins:
 	# echo '##[ $@ ]##'
