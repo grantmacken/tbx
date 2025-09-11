@@ -171,11 +171,28 @@ info/lua-language-server.md: files/lua-language-server.tar.gz
 	$(RW_ADD) etc/xdg/nvim/lsp/lua_ls.lua $(DIR_LSP)/lua_ls.lua
 	# echo '✅ enabled lua-language-server for lua files'
 	# echo '✅ enabled treesitter for lua files'
-
+	#
+	
 marksman: latest/marksman.json
+
 latest/marksman.json:
 	mkdir -p $(dir $@)
 	$(WGET) https://api.github.com/repos/artempyanykh/marksman/releases/latest -O $@
+
+files/marksman.tar.gz: latest/marksman.json
+	mkdir -p $(dir $@)
+	$(WGET) $(shell $(call bdu,linux-x64.tar.gz,$<)) -O $@
+
+info/marksman.md: files/marksman.tar.gz
+	echo '##[ $@ ]##'
+	mkdir -p $(dir $@)
+	TARGET=files/$(basename $(notdir))
+	mkdir -p $$TARGET
+	echo $$TARGET
+
+
+
+
 
 harper: latest/harper.json
 latest/harper.json:
