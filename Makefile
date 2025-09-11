@@ -158,7 +158,7 @@ info/lua-language-server.md: files/lua-language-server.tar.gz
 	$(RUN) which lua-language-server &> /dev/null
 	$(RUN) lua-language-server --version &> /dev/null
 	echo '✅ lua-language-server installed' | tee $@
-	$(ADD) etc/xdg/nvim/lsp
+	$(ADD) etc/xdg/nvim/lsp  $(DIR_LSP)
 	$(RUN) ls -al $(DIR_LSP)
 	# echo '✅ lsp config for lua-langauge-server added'
 	# $(RUN) mkdir -p /etc/xdg/nvim/after/filetype
