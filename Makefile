@@ -36,8 +36,8 @@ ADD     := buildah add --chmod 755 $(WORKING_CONTAINER)
 RW_ADD := buildah add --chmod  644 $(WORKING_CONTAINER)
 WGET    := wget -q --no-check-certificate --timeout=10 --tries=3
 
-DIR_FILETYPE := /etc/xdg/nvim/after/filetype
-DIR_LSP      := /etc/xdg/nvim/lsp
+DIR_FILETYPE := etc/xdg/nvim/after/filetype
+DIR_LSP      := etc/xdg/nvim/lsp
 DIR_BIN      := /usr/local/bin
 
 
@@ -138,7 +138,10 @@ nvim_plugins:
 xdg: copilot
 
 copilot:
-	echo  $(patsubst "/%","%",$(DIR_LSP)/copilot.lua)
+	echo 'from'
+	echo $(DIR_LSP)
+	echo 'to'
+	echo  $(patsubst "%","/%",$(DIR_LSP)/copilot.lua)
 
 
 
