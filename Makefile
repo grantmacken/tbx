@@ -58,16 +58,20 @@ VIA_AT_NPM   :=  @github/copilot-language-server @ast-grep/cli
 tr = printf "| %-14s | %-8s | %-83s |\n" "$(1)" "$(2)" "$(3)" | tee -a $(4)
 bdu = jq -r ".assets[] | select(.browser_download_url | contains(\"$1\")) | .browser_download_url" $2
 lsp_conf_url := https://raw.githubusercontent.com/neovim/nvim-lspconfig/refs/heads/master/lsp
+lsp_preconfigured := $(wildcard xdg/nvim/lsp/*.lua)
 
-default: nvim mason lua-language-server  # gh_releases parsers_queries dnf_pkgs npm_pkgs nvim_plugins
+$(info $(lsp_preconfigured))
+
+default: nvim # mason  # gh_releases parsers_queries dnf_pkgs npm_pkgs nvim_plugins
 
 ifdef GITHUB_ACTIONS
 	buildah config \
 	--label summary='a toolbox with cli tools, neovim' \
 	--label maintainer='Grant MacKenzie <grantmacken@gmail.com>' \
 	--env lang=C.UTF-8 $(WORKING_CONTAINER)
-	buildah commit $(WORKING_CONTAINER) $(TBX_IMAGE)
-	buildah push $(TBX_IMAGE):latest
+	# REM
+	# buildah commit $(WORKING_CONTAINER) $(TBX_IMAGE)
+	# buildah push $(TBX_IMAGE):latest
 endif
 
 init: .env
