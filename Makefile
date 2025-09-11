@@ -126,8 +126,12 @@ info/neovim.md: files/nvim.tar.gz
 mason:
 	# echo '##[ $@ ]##'
 	$(ADD) scripts/ /usr/local/bin/
+	$(RUN) msdir -p /usr/local/share/mason
 	$(RUN) /usr/local/bin/nvim_mason
-	$(RUN) tree /usr/local	
+	$(RUN) tree /usr/local/share/mason
+	$(RUN) ls /usr/local/share/nvim/mason.log || true
+
+
 
 
 
