@@ -130,7 +130,7 @@ mason:
 	$(RUN) /usr/local/bin/nvim_mason &>/dev/null
 	$(RUN) ls /usr/local/share/mason/bin || true
 	$(SH) 'ln -s /usr/local/share/mason/bin/* /usr/local/bin/'
-	$(RUN) ls /usr/local/bin
+	# $(RUN) ls /usr/local/bin
 
 nvim_plugins:
 	# echo '##[ $@ ]##'

@@ -6,6 +6,8 @@ local bins = {
   'harper-ls',
   'lua-language-server',
   'marksman',
+  'css-lsp',
+  'html-lsp'
   }
 -- unset at scripts end
 vim.uv.os_setenv("XDG_DATA_HOME", "/usr/local/share")
