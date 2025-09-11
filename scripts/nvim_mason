@@ -1,12 +1,13 @@
 #!/usr/bin/env -S nvim -l
-print( '##[[ MASON ]]##' )
 -- https://mason-registry.dev/registry/list
+local bins = {
+  "lua-language-server",
+  "bash-language-server",
+  "copilot-language-serve"
+  }
 -- unset at scripts end
 vim.uv.os_setenv("XDG_DATA_HOME", "/usr/local/share")
--- vim.cmd.printf( %s\n, vim.uv.os_getenv("XDG_DATA_HOME"))
--- log =  $XDG_DATA_HOME/nvim/mason.log
 
--- use pack.add
 -- /usr/local/share/nvim/site/pack/core/opt/
 vim.pack.add({
  'https://github.com/mason-org/mason.nvim',
@@ -24,10 +25,11 @@ if ok_mason then
 local registry = require("mason-registry")
 registry.update()
 vim.uv.sleep(1000) 
-print( 'mason registry set up' )
-vim.cmd([[:MasonInstall lua-language-server ]] )
+for _, bin in ipairs(bins) do
 vim.uv.sleep(1000) 
-vim.cmd.MasonInstall('bash-language-server')
+vim.cmd.MasonInstall(bin)
+vim.uv.sleep(1000) 
+end
 else
   print( '- ABORT!!' )
 end
