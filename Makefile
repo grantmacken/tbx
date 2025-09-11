@@ -58,9 +58,9 @@ VIA_AT_NPM   :=  @github/copilot-language-server @ast-grep/cli
 tr = printf "| %-14s | %-8s | %-83s |\n" "$(1)" "$(2)" "$(3)" | tee -a $(4)
 bdu = jq -r ".assets[] | select(.browser_download_url | contains(\"$1\")) | .browser_download_url" $2
 lsp_conf_url := https://raw.githubusercontent.com/neovim/nvim-lspconfig/refs/heads/master/lsp
-lsp_preconfigured := $(wildcard xdg/nvim/lsp/*.lua)
-lsp_targs := $(patsubst xdg/nvim/lsp/%.lua,info/%.md,$(wildcard xdg/nvim/lsp/*.lua)
-)
+
+lsp_configs := $(wildcard xdg/nvim/lsp/*.lua)
+lsp_targs := $(patsubst xdg/nvim/lsp/%.lua,info/%.md,$(lsp_configs))
 
 $(info $(lsp_preconfigured))
 $(info $(lsp_targets))
