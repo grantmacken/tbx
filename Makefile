@@ -64,8 +64,8 @@ lsp_targs := $(patsubst xdg/nvim/lsp/%.lua,info/%.md,$(lsp_confs))
 
 ft_confs  := $(wildcard xdg/nvim/lsp/*.lua)
 lsp_targs := $(patsubst xdg/nvim/lsp/%.lua,info/lsp/%.md,$(ft_confs))
-$(info $(lsp_confs))
-$(info $(lsp_targs))
+# $(info $(lsp_confs))
+# $(info $(lsp_targs))
 
 default:  #nvim  # mason  # gh_releases parsers_queries dnf_pkgs npm_pkgs nvim_plugins
 
@@ -169,9 +169,13 @@ copilot:
 
 # Preconfigure LSP	
 confs: $(lsp_targs)
+	echo '✅ selected nvim plugins installed'
+	
 info/lsp/%: xdg/nvim/lsp/%
+	echo '##[ lsp: $* ]]##'
 	mkdir -p $(dir $@)
 	$(RW_ADD) $< $(DIR_LSP)/$*
+	$(RUN) -al ls $(DIR_LSP)/$*
 	echo '✅ lsp: $*' | tee $@
 
 # $(RW_ADD) xdg/nvim/after/filetype/lua.lua $(DIR_FILETYPE)/lua.lua
