@@ -165,7 +165,7 @@ info/lua-language-server.md: files/lua-language-server.tar.gz
 	echo '✅ lua-language-server installed' | tee $@
 	# echo '✅ lsp config for lua-langauge-server added'
 	# $(RUN) mkdir -p /etc/xdg/nvim/after/filetype
-	$(RW_ADD) etc/xdg/nvim/lsp/lua_ls.lua
+	$(RW_ADD) etc/xdg/nvim/lsp/lua_ls.lua $(DIR_LSP)/lua_ls.lua
 	$(RUN) ls -al $(DIR_LSP)/lua_ls.lua
 	# echo '✅ enabled lua-language-server for lua files'
 	# echo '✅ enabled treesitter for lua files'
