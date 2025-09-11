@@ -63,11 +63,11 @@ lsp_confs := $(wildcard xdg/nvim/lsp/*.lua)
 lsp_targs := $(patsubst xdg/nvim/lsp/%.lua,info/%.md,$(lsp_confs))
 
 ft_confs  := $(wildcard xdg/nvim/lsp/*.lua)
-lsp_targs := $(patsubst xdg/nvim/lsp/%.lua,info/%.md,$(ft_confs))
+lsp_targs := $(patsubst xdg/nvim/lsp/%.lua,info/lsp/%.md,$(ft_confs))
 $(info $(lsp_confs))
 $(info $(lsp_targs))
 
-default: $(lsp_targs) #nvim  # mason  # gh_releases parsers_queries dnf_pkgs npm_pkgs nvim_plugins
+default:  #nvim  # mason  # gh_releases parsers_queries dnf_pkgs npm_pkgs nvim_plugins
 
 ifdef GITHUB_ACTIONS
 	buildah config \
@@ -155,8 +155,20 @@ nvim_plugins:
 # 	$(RW_ADD) $$URL $(DIR_LSP)/$@.lua
 # 	$(RUN) ls -al $(DIR_LSP)
 # 	echo '✅ lsp: '
+#
+get_confs: copilot
 
-# Preconfigure LSP
+copilot:
+	URL=$(LSP_CONF_URL)/$@.lua
+	$(RW_ADD) $$URL $(DIR_LSP)/$@.lua
+	$(RUN) ls -al $(DIR_LSP)
+	echo '✅ lsp: '
+
+
+
+
+# Preconfigure LSP	
+confs: $(lsp_targs)
 info/lsp/%: xdg/nvim/lsp/%
 	mkdir -p $(dir $@)
 	$(RW_ADD) $< $(DIR_LSP)/$*
