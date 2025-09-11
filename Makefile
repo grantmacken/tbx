@@ -34,8 +34,9 @@ ADD     := buildah add --chmod 755 $(WORKING_CONTAINER)
 RW_ADD := buildah add --chmod  644 $(WORKING_CONTAINER)
 WGET    := wget -q --no-check-certificate --timeout=10 --tries=3
 
-DIR_FILETYPE := /etc/xdg/nvim/after/filetype
-DIR_LSP      := /etc/xdg/nvim/lsp
+# XDG_DATA_DIRS
+DIR_FILETYPE := /usr/local/nvim/after/filetype
+DIR_LSP      := /usr/local/nvim/lsp
 DIR_BIN      := /usr/local/bin
 LSP_CONF_URL := https://raw.githubusercontent.com/neovim/nvim-lspconfig/refs/heads/master/lsp/
 
@@ -58,7 +59,7 @@ tr = printf "| %-14s | %-8s | %-83s |\n" "$(1)" "$(2)" "$(3)" | tee -a $(4)
 bdu = jq -r ".assets[] | select(.browser_download_url | contains(\"$1\")) | .browser_download_url" $2
 lsp_conf_url := https://raw.githubusercontent.com/neovim/nvim-lspconfig/refs/heads/master/lsp
 
-default: nvim mason# gh_releases parsers_queries dnf_pkgs npm_pkgs nvim_plugins
+default: nvim mason lua-language-server  # gh_releases parsers_queries dnf_pkgs npm_pkgs nvim_plugins
 
 ifdef GITHUB_ACTIONS
 	buildah config \
@@ -96,7 +97,6 @@ latest/tbx-build-tools.json:
 # 	$(LINK) /usr/local/bin/buildah
 # 	$(LINK) /usr/local/bin/skopeo
 
-gh_releases: nvim mason # lua-language-server # marksman harper
 
 nvim: info/neovim.md
 	echo '✅ latest pre-release neovim installed'
@@ -132,10 +132,6 @@ mason:
 	$(SH) 'ln -s /usr/local/share/mason/bin/* /usr/local/bin/'
 	$(RUN) ls /usr/local/bin
 
-
-
-
-
 nvim_plugins:
 	# echo '##[ $@ ]##'
 	$(ADD) scripts/ /usr/local/bin/
@@ -150,33 +146,9 @@ copilot:
 	$(RW_ADD) $$URL $(DIR_LSP)/$@.lua
 	$(RUN) ls -al $(DIR_LSP)
 
-lua-language-server: info/lua-language-server.md
-latest/lua-language-server.json:
-	# echo '##[ $@ ]##'
-	mkdir -p $(dir $@)
-	$(WGET) https://api.github.com/repos/luals/lua-language-server/releases/latest -O $@
-
-files/lua-language-server.tar.gz: latest/lua-language-server.json
-	echo '##[ $@ ]##'
-	mkdir -p $(dir $@)
-	$(WGET) $(shell $(call bdu,linux-x64.tar.gz,$<)) -O $@
-
-info/lua-language-server.md: files/lua-language-server.tar.gz
-	mkdir -p $(dir $@)
-	TARGET=files/lua-language-server
-	mkdir -p $${TARGET}
-	$(TAR_NO_STRIP) $${TARGET} -f $<
-	$(ADD) $${TARGET} /usr/local/lua-language-server
-	# $(RUN) ls -al /usr/local/
-	$(RUN) ln -sf /usr/local/lua-language-server/bin/lua-language-server /usr/local/bin/lua-language-server
-	# abort if error checks:
-	$(RUN) which lua-language-server &> /dev/null
-	$(RUN) lua-language-server --version &> /dev/null
-	echo '✅ lua-language-server installed' | tee $@
-	$(RW_ADD) etc/xdg/nvim/lsp/lua_ls.lua $(DIR_LSP)/lua_ls.lua
-	$(RW_ADD) etc/xdg/nvim/after/filetype/lua.lua $(DIR_FILETYPE)/lua.lua
-	echo '✅ enabled lua-language-server for lua files'
-	echo '✅ enabled treesitter for lua files'
+info/lua-language-server.md:
+	$(RW_ADD) xdg/nvim/lsp/lua_ls.lua $(DIR_LSP)/lua_ls.lua
+	$(RW_ADD) xdg/nvim/after/filetype/lua.lua $(DIR_FILETYPE)/lua.lua
 
 # marksman: info/marksman.md
 # latest/marksman.json:
