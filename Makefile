@@ -142,12 +142,12 @@ copilot:
 	echo $$NAME
 	echo $(DIR_LSP)
 	echo 'to'
-	NAME=copilot.lua
 	TO=$(DIR_LSP)
 	echo $$TO
 	URL=$(call lsp_conf_url,$$NAME)
 	echo $$URL
 	$(ADD) $$URL $(DIR_LSP)/$$NAME
+	$(RUN) ls -al $(DIR_LSP)
 
 
 lua-language-server: info/lua-language-server.md
