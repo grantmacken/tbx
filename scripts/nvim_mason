@@ -24,6 +24,8 @@ local registry = require("mason-registry")
 registry.update()
 vim.uv.sleep(1000)
 print( 'mason registry set up' )
+
+vim.cmd([[:MasonInstall lua-language-server ]] )
 else
   print( '- ABORT!!' )
 end
@@ -34,7 +36,6 @@ vim.uv.os_unsetenv("XDG_DATA_HOME")
 -- -- $XDG_DATA_HOME/nvim/mason.log
 
 --
--- vim.cmd([[:MasonInstall lua-language-server ]] )
 
 
 
