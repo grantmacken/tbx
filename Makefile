@@ -81,8 +81,6 @@ init: .env
 	$(RUN) which luarocks &> /dev/null
 	$(RUN) mkdir -p $(DIR_FILETYPE) $(DIR_LSP)
 
-
-
 latest/tbx-build-tools.json:
 	# echo '##[ $@ ]##'
 	mkdir -p $(dir $@)
@@ -160,7 +158,7 @@ info/lua-language-server.md: files/lua-language-server.tar.gz
 	$(RUN) which lua-language-server &> /dev/null
 	$(RUN) lua-language-server --version &> /dev/null
 	echo '✅ lua-language-server installed' | tee $@
-	$(ADD) $(patsubst /%,%,$(DIR_LSP).luals.lua) $(DIR_LSP)
+	$(ADD) etc/xdg/nvim/lsp
 	$(RUN) ls -al $(DIR_LSP)
 	# echo '✅ lsp config for lua-langauge-server added'
 	# $(RUN) mkdir -p /etc/xdg/nvim/after/filetype
