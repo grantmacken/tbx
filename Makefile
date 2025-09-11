@@ -140,7 +140,6 @@ copilot:
 
 
 lua-language-server: info/lua-language-server.md
-
 latest/lua-language-server.json:
 	# echo '##[ $@ ]##'
 	mkdir -p $(dir $@)
@@ -169,10 +168,8 @@ info/lua-language-server.md: files/lua-language-server.tar.gz
 	$(RUN) ls -al $(DIR_LSP)/lua_ls.lua
 	# echo '✅ enabled lua-language-server for lua files'
 	# echo '✅ enabled treesitter for lua files'
-	#
 	
-marksman: latest/marksman.json
-
+marksman: info/marksman.md
 latest/marksman.json:
 	mkdir -p $(dir $@)
 	$(WGET) https://api.github.com/repos/artempyanykh/marksman/releases/latest -O $@
@@ -184,13 +181,11 @@ files/marksman.tar.gz: latest/marksman.json
 info/marksman.md: files/marksman.tar.gz
 	echo '##[ $@ ]##'
 	mkdir -p $(dir $@)
-	TARGET=files/$(basename $(notdir))
+	TARGET=files/$(basename $(notdir $@))
 	mkdir -p $$TARGET
-	echo $$TARGET
-
-
-
-
+	$(TAR) $${TARGET} -f $<
+	$(RUN) ls -al $${TARGET}
+	# $(ADD) $${TARGET} /usr/local/lua-language-server
 
 harper: latest/harper.json
 latest/harper.json:
