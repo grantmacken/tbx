@@ -61,7 +61,7 @@ tr = printf "| %-14s | %-8s | %-83s |\n" "$(1)" "$(2)" "$(3)" | tee -a $(4)
 bdu = jq -r ".assets[] | select(.browser_download_url | contains(\"$1\")) | .browser_download_url" $2
 lsp_conf_url  := https://raw.githubusercontent.com/neovim/nvim-lspconfig/refs/heads/master/lsp/$1
 
-default: parsers_queries gh_releases dnf_pkgs npm_pkgs nvim_plugins
+default:  xdg # parsers_queries gh_releases dnf_pkgs npm_pkgs nvim_plugins
 	# echo '##[ $@ ]##'
 	# echo 'image built'
 ifdef GITHUB_ACTIONS
@@ -133,6 +133,16 @@ nvim_plugins:
 	$(RUN) /usr/local/bin/nvim_plugins &> /dev/null
 	$(RUN) ls /usr/local/share/nvim/site/pack/core/opt | tee $@
 	echo '✅ selected nvim plugins installed'
+
+
+xdg: copilot
+
+copilot:
+	echo  $(patsubst "/%","%",$(DIR_LSP)/copilot.lua)
+
+
+
+# https://raw.githubusercontent.com/neovim/nvim-lspconfig/refs/heads/master/lsp/copilot.lua
 
 lua-language-server: info/lua-language-server.md
 
