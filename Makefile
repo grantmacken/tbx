@@ -127,7 +127,7 @@ mason:
 	# echo '##[ $@ ]##'
 	$(ADD) scripts/ /usr/local/bin/
 	$(RUN) /usr/local/bin/nvim_mason
-	$(RUN) tree /usr/local
+	$(RUN) tree /usr/local	
 
 
 
