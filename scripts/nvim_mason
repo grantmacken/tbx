@@ -2,7 +2,7 @@
 print( '##[[ MASON ]]##' )
 -- unset at scripts end
 vim.uv.os_setenv("XDG_DATA_HOME", "/usr/local/share")
-vim.print(vim.uv.os_getenv("XDG_DATA_HOME"))
+-- vim.cmd.printf( %s\n, vim.uv.os_getenv("XDG_DATA_HOME"))
 -- log =  $XDG_DATA_HOME/nvim/mason.log
 
 -- use pack.add
@@ -20,12 +20,11 @@ if ok_mason then
       PATH = 'skip',
     }
   )
-
 end
 --
 -- -- $XDG_DATA_HOME/nvim/mason.log
 --
--- print( 'mason set up' )
+print( 'mason set up' )
 --
 -- vim.cmd([[:MasonInstall lua-language-server ]] )
 
