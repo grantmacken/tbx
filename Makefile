@@ -166,8 +166,7 @@ info/lua-language-server.md: files/lua-language-server.tar.gz
 	# $(RUN) mkdir -p /etc/xdg/nvim/after/filetype
 	$(RW_ADD) etc/xdg/nvim/lsp/lua_ls.lua $(DIR_LSP)/lua_ls.lua
 	$(RUN) ls -al $(DIR_LSP)/lua_ls.lua
-	$(RUN) touch $(DIR_FILETYPE)/lua.lua
-	$(RUN) echo 'vim.lsp.enable('lua_ls')' > $(DIR_FILETYPE)/lua.lua
+	$(RUN) echo 'vim.lsp.enable("lua_ls")' > $(DIR_FILETYPE)/lua.lua
 	$(RUN) echo  'vim.treesitter.start()' >> $(DIR_FILETYPE)/lua.lua
 	 echo '✅ enabled lua-language-server for lua files'
 	 echo '✅ enabled treesitter for lua files'
@@ -190,10 +189,23 @@ info/marksman.md: files/marksman.tar.gz
 	$(RUN) ls -al $${TARGET}
 	# $(ADD) $${TARGET} /usr/local/lua-language-server
 
-harper: latest/harper.json
+harper:
 latest/harper.json:
 	mkdir -p $(dir $@)
 	$(WGET) https://api.github.com/repos/Automattic/harper/releases/latest -O $@
+
+files/harper.tar.gz: latest/harper.json
+	mkdir -p $(dir $@)
+	$(WGET) $(shell $(call bdu,linux-x64,$<)) -O $@
+
+info/harper.md: files/harper.tar.gz
+	echo '##[ $@ ]##'
+	mkdir -p $(dir $@)
+	TARGET=files/$(basename $(notdir $@))
+	mkdir -p $$TARGET
+	$(TAR) $${TARGET} -f $<
+	$(RUN) ls -al $${TARGET}
+	# $(ADD) $${TARGET} /usr/local/lua-language-server
 
 # DNF
 dnf_pkgs: dnf_gh dnf_cli_pkgs dnf_lsp_pkgs 
