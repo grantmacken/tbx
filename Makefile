@@ -59,8 +59,11 @@ tr = printf "| %-14s | %-8s | %-83s |\n" "$(1)" "$(2)" "$(3)" | tee -a $(4)
 bdu = jq -r ".assets[] | select(.browser_download_url | contains(\"$1\")) | .browser_download_url" $2
 lsp_conf_url := https://raw.githubusercontent.com/neovim/nvim-lspconfig/refs/heads/master/lsp
 lsp_preconfigured := $(wildcard xdg/nvim/lsp/*.lua)
+lsp_targs := $(patsubst xdg/nvim/lsp/%.lua,info/%.md,$(wildcard xdg/nvim/lsp/*.lua)
+)
 
 $(info $(lsp_preconfigured))
+$(info $(lsp_targets))
 
 default: nvim # mason  # gh_releases parsers_queries dnf_pkgs npm_pkgs nvim_plugins
 
