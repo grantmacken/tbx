@@ -1,10 +1,8 @@
 #!/usr/bin/env -S nvim -l
 -- https://mason-registry.dev/registry/list
 --
--- htmx
--- 'gh-actions-language-server', 
+-- 'gh-actions-language-server' 
 -- 'jq-lsp',
--- requires go
 
 local bins = {
   'copilot-language-server',

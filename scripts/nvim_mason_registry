@@ -18,7 +18,7 @@ if ok_mason then
     }
   )
 local registry = require("mason-registry")
-registry.update():wait(100000)
+registry.update()
 else
   print( '- ABORT!!' )
 end
