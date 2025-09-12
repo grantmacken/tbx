@@ -35,8 +35,7 @@ RW_ADD := buildah add --chmod  644 $(WORKING_CONTAINER)
 WGET    := wget -q --no-check-certificate --timeout=10 --tries=3
 
 # XDG_DATA_DIRS
-DIR_FILETYPE := /usr/local/nvim/after/filetype
-DIR_LSP      := /usr/local/nvim/lsp
+DIR_NVIM    := /usr/local/nvim/
 DIR_BIN      := /usr/local/bin
 LSP_CONF_URL := https://raw.githubusercontent.com/neovim/nvim-lspconfig/refs/heads/master/lsp/
 
@@ -50,7 +49,6 @@ NPM_LIST := $(RUN) npm list -g --depth=0
 CLI_VIA_DNF := eza fd-find fzf pass ripgrep stow wl-clipboard zoxide
 LSP_VIA_DNF := ShellCheck shfmt
 # https://github.com/artempyanykh/marksman/releases
-VIA_RELEASES := artempyanykh/marksman
 VIA_NPM      := bash-language-server yaml-language-server vscode-langservers-extracted stylelint-lsp
 VIA_AT_NPM   :=  @github/copilot-language-server @ast-grep/cli
 # @githubnext/copilot-cl
@@ -67,7 +65,7 @@ lsp_targs := $(patsubst xdg/nvim/lsp/%.lua,info/lsp/%.md,$(ft_confs))
 # $(info $(lsp_confs))
 # $(info $(lsp_targs))
 
-default:  #nvim  # mason  # gh_releases parsers_queries dnf_pkgs npm_pkgs nvim_plugins
+default: confs #nvim  # mason  parsers_queries dnf_pkgs npm_pkgs nvim_plugins
 
 ifdef GITHUB_ACTIONS
 	buildah config \
@@ -85,7 +83,7 @@ init: .env
 	$(RUN) which make &> /dev/null
 	$(RUN) which npm &> /dev/null
 	$(RUN) which luarocks &> /dev/null
-	$(RUN) mkdir -p $(DIR_FILETYPE) $(DIR_LSP)
+	$(SH) mkdir -p $(DIR_NVIM)/{after/filetype,queries,parser,lsp} 
 
 latest/tbx-build-tools.json:
 	# echo '##[ $@ ]##'
@@ -156,13 +154,13 @@ nvim_plugins:
 # 	$(RUN) ls -al $(DIR_LSP)
 # 	echo '✅ lsp: '
 #
-get_confs: copilot
-
-copilot:
-	URL=$(LSP_CONF_URL)/$@.lua
-	$(RW_ADD) $$URL $(DIR_LSP)/$@.lua
-	$(RUN) ls -al $(DIR_LSP)
-	echo '✅ lsp: '
+# get_confs: copilot
+#
+# copilot:
+# 	URL=$(LSP_CONF_URL)/$@.lua
+# 	$(RW_ADD) $$URL $(DIR_NVIM)/lsp/$@.lua
+# 	$(RUN) ls -al $(DIR_NVIM)/lsp	
+# 	echo '✅ lsp: '
 
 
 
@@ -170,12 +168,12 @@ copilot:
 # Preconfigure LSP	
 confs: $(lsp_targs)
 	echo '✅ selected nvim plugins installed'
-	
+
 info/lsp/%: xdg/nvim/lsp/%
 	echo '##[ lsp: $* ]]##'
 	mkdir -p $(dir $@)
-	$(RW_ADD) $< $(DIR_LSP)/$*
-	$(RUN) -al ls $(DIR_LSP)/$*
+	$(RW_ADD) $< $(DIR_NVIM)/lsp/$*
+	$(RUN) -al ls $(DIR_NVIM)/lsp/$*
 	echo '✅ lsp: $*' | tee $@
 
 # $(RW_ADD) xdg/nvim/after/filetype/lua.lua $(DIR_FILETYPE)/lua.lua
