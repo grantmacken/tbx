@@ -58,7 +58,7 @@ lsp_targs := $(patsubst xdg/nvim/lsp/%.lua,info/lsp/%.md,$(ft_confs))
 # $(info $(lsp_targs))
 # info/lsp/lua_ls.md
 
-default: init nvim ts # mason # t# lsp_confs# mason  parsers_queries dnf_pkgs npm_pkgs nvim_plugins
+default: init nvim ts mason # t# lsp_confs# mason  parsers_queries dnf_pkgs npm_pkgs nvim_plugins
 ifdef GITHUB_ACTIONS
 	buildah config \
 	--label summary='a toolbox with cli tools, neovim' \
@@ -121,7 +121,7 @@ mason:
 	# run the script that install mason packages 
 	$(RUN) /usr/local/bin/nvim_mason &>/dev/null
 	# take a look at what is installed
-	$(RUN) ls /usr/local/share/mason/bin || tru
+	$(RUN) ls /usr/local/share/mason/bin || true
 	# link installed packages to $(DIR_BIN)
 	# use SH to allow for globbing
 	$(SH) 'ln -s /usr/local/share/mason/bin/* $(DIR_BIN)/'
@@ -132,25 +132,21 @@ mason:
 ts:
 	echo '##[ $@ ]##'
 	# install the dep
-	$(NPM) tree-sitter-cli
+	$(NPM) tree-sitter-cli &>/dev/null
 	# check if there
-	$(NPM_LIST)
+	# $(NPM_LIST)
 	# create the dir where ts parser as queries will be installed
 	$(RUN) mkdir -p /usr/local/share/nvim/site
 	# run the script that install treesitter parsers and queries
-	$(RUN) nvim_treesitter || true
-	$(RUN) ls /usr/local/share/nvim/site/parser
+	$(RUN) nvim_treesitter &>/dev/null
+	# $(RUN) ls /usr/local/share/nvim/site/parser
 	echo '✅ selected treesitter parsers and queries added'
 
 plugins:
 	# echo '##[ $@ ]##'
-	$(ADD) scripts/ /usr/local/bin/
-	$(RUN) /usr/local/bin/nvim_plugins &> /dev/null
-	$(RUN) ls /usr/local/share/nvim/site/pack/core/opt | tee $@
+	$(RUN) nvim_plugins &> /dev/null
+	# $(RUN) ls /usr/local/share/nvim/site/pack/core/opt | tee $@
 	echo '✅ selected nvim plugins installed'
-
-
-
 
 # Preconfigure LSP
 lsp_confs: $(lsp_targs)

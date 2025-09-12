@@ -1,22 +1,21 @@
 #!/usr/bin/env -S nvim -l
 -- https://mason-registry.dev/registry/list
 local bins = {
-  'tree-sitter-cli',
-  -- 'ast-grep',
-  -- 'bash-language-server',
-  -- 'copilot-language-server',
-  -- 'css-lsp',
-  -- 'harper-ls',
-  -- 'html-lsp',
-  -- 'lua-language-server',
-  -- 'marksman',
-  -- 'shellcheck',
-  -- 'shfmt',
-  -- 'stylelint-lsp',
-  -- 'yaml-language-server',
-  -- 'json-lsp',
-  -- 'typescript-language-server',
-  -- 'tombi',
+  'ast-grep',
+  'bash-language-server',
+  'copilot-language-server',
+  'css-lsp',
+  'harper-ls',
+  'html-lsp',
+  'json-lsp',
+  'lua-language-server',
+  'marksman',
+  'shellcheck',
+  'shfmt',
+  'stylelint-lsp',
+  'tombi',
+  'typescript-language-server',
+  'yaml-language-server',
   }
 -- unset at scripts end
 vim.uv.os_setenv("XDG_DATA_HOME", "/usr/local/share")
