@@ -131,7 +131,9 @@ treesitter:
 	# echo '##[ $@ ]##'
 	$(ADD) scripts/ /usr/local/bin/
 	$(RUN) /usr/local/bin/nvim_treesitter &> /dev/null
-	## treesitter-cli installed
+	$(RUN) ls /usr/local/share/mason/bin || true
+	$(SH) 'ln -s /usr/local/share/mason/bin/* $(DIR_BIN)/'
+	## treesitter-cli installed and linkd to PATH bin dir
 	$(RUN) ls /usr/local/share/nvim/site/pack/core/opt | tee $@
 	$(RUN) ls /usr/local/share/nvim/ | tee $@
 	echo '✅ selected nvim todo'
