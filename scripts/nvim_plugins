@@ -6,17 +6,18 @@ vim.print(vim.fn.stdpath('data'))
 -- use pack.add
 -- /usr/local/share/nvim/site/pack/core/opt/
 
-vim.pack.add({ -- COLORSCHEMES
+-- COLORSCHEMES
+vim.pack.add({ 
  'https://github.com/catppuccin/nvim',
  'https://github.com/neanias/everforest-nvim',
  'https://github.com/rebelot/kanagawa.nvim',
  'https://github.com/vague2k/vague.nvim'
  })
 
-# vim.pack.add({ -- DEPS  other plugins may depend on these being available
-# 'https://github.com/folke/snacks.nvim',
-#  'https://github.com/nvim-lua/plenary.nvim',
-# })
+-- # vim.pack.add({ -- DEPS  other plugins may depend on these being available
+-- # 'https://github.com/folke/snacks.nvim',
+-- #  'https://github.com/nvim-lua/plenary.nvim',
+-- # })
 
 vim.pack.add({
  'https://github.com/MagicDuck/grug-far.nvim',
