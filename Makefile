@@ -84,7 +84,7 @@ init: .env
 	$(RUN) which make &> /dev/null
 	$(RUN) which npm &> /dev/null
 	$(RUN) which luarocks &> /dev/null
-	$(SH) "mkdir -p $(DIR_NVIM)/{after/filetype,queries,parser,lsp}" 
+	$(RUN) mkdir -p $(DIR_NVIM)/after/filetype $(DIR_NVIM)/lsp  $(DIR_NVIM)/parser $(DIR_NVIM)/queries
 
 latest/tbx-build-tools.json:
 	# echo '##[ $@ ]##'
