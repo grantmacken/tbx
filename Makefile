@@ -119,7 +119,7 @@ mason:
 	echo '✅ selected mason lsp servers, linters and formaters installed'
 	# $(RUN) ls /usr/local/bin
 
-nvim_plugins:
+plugins:
 	# echo '##[ $@ ]##'
 	$(ADD) scripts/ /usr/local/bin/
 	$(RUN) /usr/local/bin/nvim_plugins &> /dev/null
@@ -131,24 +131,11 @@ treesitter:
 	# echo '##[ $@ ]##'
 	$(ADD) scripts/ /usr/local/bin/
 	$(RUN) /usr/local/bin/nvim_treesitter &> /dev/null
+	## treesitter-cli installed
+	$(RUN) ls /usr/local/share/nvim/site/pack/core/opt | tee $@
 	$(RUN) ls /usr/local/share/nvim/ | tee $@
 	echo '✅ selected nvim todo'
 
-# xdg: copilot
-#
-# copilot:
-# 	URL=$(LSP_CONF_URL)/$@.lua
-# 	$(RW_ADD) $$URL $(DIR_LSP)/$@.lua
-# 	$(RUN) ls -al $(DIR_LSP)
-# 	echo '✅ lsp: '
-#
-# get_confs: copilot
-#
-# copilot:
-# 	URL=$(LSP_CONF_URL)/$@.lua
-# 	$(RW_ADD) $$URL $(DIR_NVIM)/lsp/$@.lua
-# 	$(RUN) ls -al $(DIR_NVIM)/lsp
-# 	echo '✅ lsp: '
 
 # Preconfigure LSP
 lsp_confs: $(lsp_targs)
