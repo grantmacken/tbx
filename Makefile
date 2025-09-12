@@ -19,12 +19,10 @@ HEADING1 := \#
 HEADING2 := $(HEADING1)$(HEADING1)
 HEADING3 := $(HEADING2)$(HEADING1)
 
-include .env
+FROM_IMAGE := 
+WORKING_CONTAINER := tbx-runtimes-working-container
 
-FROM_IMAGE := ghcr.io/grantmacken/tbx-runtimes
-NAME := tbx-coding
-WORKING_CONTAINER ?= $(NAME)-working-container
-TBX_IMAGE :=  ghcr.io/grantmacken/$(NAME)
+TBX_IMAGE :=  ghcr.io/grantmacken/tbx-coding
 # actions
 RUN     := buildah run $(WORKING_CONTAINER)
 INSTALL := $(RUN) dnf install --allowerasing --skip-unavailable --skip-broken --no-allow-downgrade -y
@@ -36,8 +34,9 @@ RW_ADD := buildah add --chmod  644 $(WORKING_CONTAINER)
 WGET    := wget -q --no-check-certificate --timeout=10 --tries=3
 
 # XDG_DATA_DIRS
-DIR_NVIM    := /usr/local/share/nvim/
+DIR_NVIM    := /usr/local/share/nvim
 DIR_BIN      := /usr/local/bin
+
 LSP_CONF_URL := https://raw.githubusercontent.com/neovim/nvim-lspconfig/refs/heads/master/lsp/
 
 TAR     := tar xz --strip-components=1 -C
@@ -64,11 +63,10 @@ lsp_targs := $(patsubst xdg/nvim/lsp/%.lua,info/lsp/%.md,$(lsp_confs))
 ft_confs  := $(wildcard xdg/nvim/lsp/*.lua)
 lsp_targs := $(patsubst xdg/nvim/lsp/%.lua,info/lsp/%.md,$(ft_confs))
 # $(info $(lsp_confs))
-$(info $(lsp_targs))
+# $(info $(lsp_targs))
 # info/lsp/lua_ls.md
 
-default: confs #nvim  # mason  parsers_queries dnf_pkgs npm_pkgs nvim_plugins
-
+default: init # confs #nvim  # mason  parsers_queries dnf_pkgs npm_pkgs nvim_plugins
 ifdef GITHUB_ACTIONS
 	buildah config \
 	--label summary='a toolbox with cli tools, neovim' \
@@ -79,25 +77,14 @@ ifdef GITHUB_ACTIONS
 	# buildah push $(TBX_IMAGE):latest
 endif
 
-init: .env
+init:
 	# echo '##[ $@ ]##'
+	buildah pull ghcr.io/grantmacken/tbx-runtimes &>  /dev/null
+	buildah from ghcr.io/grantmacken/tbx-runtimes
 	# the runtime should have
 	$(RUN) which make &> /dev/null
 	$(RUN) which npm &> /dev/null
 	$(RUN) which luarocks &> /dev/null
-
-latest/tbx-build-tools.json:
-	# echo '##[ $@ ]##'
-	mkdir -p $(dir $@)
-	skopeo inspect docker://${FROM_IMAGE}:latest | jq '.' > $@
-
-.env: latest/tbx-build-tools.json
-	# echo '##[ $@ ]##'
-	FROM=$$(cat $< | jq -r '.Name')
-	printf "FROM=%s\n" "$$FROM" | tee $@
-	buildah pull "$$FROM" &>  /dev/null
-	echo -n "WORKING_CONTAINER=" | tee -a .env
-	buildah from "$$FROM" | tee -a .env
 
 # link:
 # 	$(SPAWN) $(DIR_BIN)/firefox
