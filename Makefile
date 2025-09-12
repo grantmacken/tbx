@@ -53,9 +53,6 @@ ft_confs  := $(wildcard xdg/nvim/after/filetype/*.lua)
 ft_targs := $(patsubst xdg/nvim/after/filetype/*.lua, info/filetype/%.md,$(ft_confs))
 
 # CLI   := bat direnv eza fd-find fzf imagemagick just lynx ripgrep texlive-scheme-basic wl-clipboard yq zoxide
-# $(info $(lsp_confs))
-# $(info $(lsp_targs))
-# info/lsp/lua_ls.md
 
 default: init nvim mason treesitter plugins lsp_confs filetype_confs 
 ifdef GITHUB_ACTIONS
@@ -114,7 +111,7 @@ info/neovim.md: files/nvim.tar.gz
 mason_registry:
 	# create the dir mason uses to store packages
 	$(RUN) mkdir -p /usr/local/share/mason
-	$(RUN) nvim_mason_registry || true
+	$(RUN) nvim_mason_registry &>/dev/null
 	$(RUN) ls /usr/local/share/mason
 	echo '✅ mason registry added'
 
@@ -122,7 +119,7 @@ mason: mason_registry
 	# run the script that install mason packages
 	$(RUN) nvim_mason 2>&1 >/dev/null
 	# take a look at what is installed
-	$(RUN) ls /usr/local/share/mason/bin || true
+	$(RUN) ls /usr/local/share/mason/bin
 	# link installed packages to $(DIR_BIN)
 	# use SH to allow for globbing
 	$(SH) 'ln -s /usr/local/share/mason/bin/* $(DIR_BIN)/'
