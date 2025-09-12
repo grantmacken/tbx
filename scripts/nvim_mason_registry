@@ -1,0 +1,27 @@
+#!/usr/bin/env -S nvim -l
+-- https://mason-registry.dev/registry/list
+vim.uv.os_setenv("XDG_DATA_HOME", "/usr/local/share")
+local dir_mason = vim.uv.os_getenv("XDG_DATA_HOME") .. 'mason'
+-- unset at scripts end
+-- /usr/local/share/nvim/site/pack/core/opt/
+vim.pack.add({
+ 'https://github.com/mason-org/mason.nvim',
+  })
+vim.uv.sleep(1000) 
+local ok_mason, mason = pcall(require, 'mason')
+if ok_mason then
+  print( 'required Mason' )
+  mason.setup(
+    {
+      install_root_dir = dir_mason,
+      PATH = 'skip',
+    }
+  )
+local registry = require("mason-registry")
+registry.update():wait(100000)
+else
+  print( '- ABORT!!' )
+end
+
+vim.uv.os_unsetenv("XDG_DATA_HOME")
+

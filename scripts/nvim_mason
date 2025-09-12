@@ -45,7 +45,7 @@ if ok_mason then
       PATH = 'skip',
     }
   )
--- local registry = require("mason-registry")
+local registry = require("mason-registry")
 -- registry.update()
 vim.uv.sleep(1000) 
 for _, bin in ipairs(bins) do
