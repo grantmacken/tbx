@@ -116,8 +116,8 @@ mason:
 	# add the nvim-treesitter dep
 	# create the dir mason uses to store packages
 	$(RUN) mkdir -p /usr/local/share/mason
-	# run the script that install mason packages 
-	$(RUN) nvim_mason || true
+	# run the script that install mason packages
+	$(RUN) nvim_mason 2>&1 >/dev/null
 	# take a look at what is installed
 	$(RUN) ls /usr/local/share/mason/bin || true
 	# link installed packages to $(DIR_BIN)
@@ -146,10 +146,10 @@ treesitter: npm
 	$(RUN) nvim_treesitter &>/dev/null
 	# $(RUN) ls /usr/local/share/nvim/site/parser
 	echo '✅ selected treesitter parsers and queries added'
-
+	
 plugins:
 	# echo '##[ $@ ]##'
-	$(RUN) nvim_plugins &> /dev/null
+	$(RUN) nvim_plugins || true
 	# $(RUN) ls /usr/local/share/nvim/site/pack/core/opt | tee $@
 	echo '✅ selected nvim plugins installed'
 
