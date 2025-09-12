@@ -42,9 +42,10 @@ TAR_NO_STRIP := tar xz -C
 NPM      := $(RUN) npm install --global
 NPM_LIST := $(RUN) npm list -g --depth=0
 
+LSP_CONF_URL := https://raw.githubusercontent.com/neovim/nvim-lspconfig/refs/heads/master/lsp
+
 tr = printf "| %-14s | %-8s | %-83s |\n" "$(1)" "$(2)" "$(3)" | tee -a $(4)
 bdu = jq -r ".assets[] | select(.browser_download_url | contains(\"$1\")) | .browser_download_url" $2
-lsp_conf_url := https://raw.githubusercontent.com/neovim/nvim-lspconfig/refs/heads/master/lsp
 
 lsp_confs := $(wildcard xdg/nvim/lsp/*.lua)
 lsp_targs := $(patsubst xdg/nvim/lsp/%.lua,info/lsp/%.md,$(lsp_confs))
@@ -152,16 +153,29 @@ plugins:
 	echo '✅ selected nvim plugins installed'
 
 # Preconfigure LSP
-lsp_confs: $(lsp_targs)
-	echo '✅ ls confs installed'
+lsp_confs: lsp_local lsp_urls
+	$(RUN) ls -al $(DIR_NVIM)/lsp
+	echo '✅ Installed all lsp confs'
+
+lsp_local: $(lsp_targs)
+	echo '✅ preconfigured local lsp configs installed'
+
+LSPCONFIGS := copilot.lua 
+
+lsp_urls:
+	for conf in $(LSPCONFIGS)
+	do
+	$(RW_ADD) $(LSP_CONF_URL)/$$conf  $(DIR_NVIM)/lsp/$$conf
+	done
+ 
+# https://github.com/neovim/nvim-lspconfig/tree/master/lsp
 
 info/lsp/%.md: xdg/nvim/lsp/%.lua
 	echo '##[ lsp: $* ]]##'
 	mkdir -p $(dir $@)
 	$(RUN) mkdir -p $(DIR_NVIM)/lsp
 	$(RW_ADD) $< $(DIR_NVIM)/lsp/$*
-	$(RUN) ls -al $(DIR_NVIM)/lsp/$*
-	echo '✅ Installed preconfigured lsp confs'
+
 
 ftreesitter parsers and queries addediletype_confs: $(ft_targs)
 	echo '✅ Installed preconfigured filetype confs'
