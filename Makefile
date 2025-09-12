@@ -136,10 +136,6 @@ npm:
 
 treesitter: npm
 	echo '##[ $@ ]##'
-	# install the dep
-	$(NPM) tree-sitter-cli &>/dev/null
-	# check if there
-	# $(NPM_LIST)
 	# create the dir where ts parser as queries will be installed
 	$(RUN) mkdir -p /usr/local/share/nvim/site
 	# run the script that install treesitter parsers and queries
@@ -149,7 +145,7 @@ treesitter: npm
 
 plugins:
 	# echo '##[ $@ ]##'
-	$(RUN) nvim_plugins || true
+	$(RUN) nvim_plugins &> /dev/null
 	# $(RUN) ls /usr/local/share/nvim/site/pack/core/opt | tee $@
 	echo '✅ selected nvim plugins installed'
 
