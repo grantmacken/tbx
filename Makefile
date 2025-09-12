@@ -63,9 +63,11 @@ lsp_targs := $(patsubst xdg/nvim/lsp/%.lua,info/%.md,$(lsp_confs))
 ft_confs  := $(wildcard xdg/nvim/lsp/*.lua)
 lsp_targs := $(patsubst xdg/nvim/lsp/%.lua,info/lsp/%.md,$(ft_confs))
 # $(info $(lsp_confs))
-# $(info $(lsp_targs))
+:w
+$(info $(lsp_targs))
+# info/lsp/lua_ls.md
 
-default: confs parsers_queries #nvim  # mason  parsers_queries dnf_pkgs npm_pkgs nvim_plugins
+default: parsers_queries confs  #nvim  # mason  parsers_queries dnf_pkgs npm_pkgs nvim_plugins
 
 ifdef GITHUB_ACTIONS
 	buildah config \
