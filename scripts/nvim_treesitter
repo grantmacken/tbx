@@ -3,7 +3,40 @@
 -- unset at scripts end
 vim.uv.os_setenv("XDG_DATA_HOME", "/usr/local/share")
 local treesitters = {
- 'bash'
+'awk',
+'bash',
+'comment',
+'css',
+'csv',
+'diff',
+'djot',
+'dtd',
+'ebnf',
+'elixir',
+'erlang',
+'git_config',
+'gitignore',
+'gleam',
+'gnuplot',
+'html',
+'http',
+'javascript',
+'jq',
+'json',
+'just',
+'latex',
+'ledger',
+'make',
+'markdown_inline',
+'mermaid',
+'nginx',
+'printf',
+'readline',
+'regex',
+'ssh_config',
+'toml',
+'xml',
+'yaml'
 }
 
 vim.pack.add({
@@ -21,7 +54,6 @@ if ok_ts then
       install_root_dir = '/usr/local/share/nvim/site',
     }
   )
-
 ts.install(treesitters):wait(300000)
 end
 

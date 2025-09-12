@@ -139,9 +139,8 @@ ts:
 	$(RUN) mkdir -p /usr/local/share/nvim/site
 	# run the script that install treesitter parsers and queries
 	$(RUN) nvim_treesitter || true
-	$(RUN) ls /usr/local/share/nvim/site
-	echo '✅ selected nvim todo'
-	#
+	$(RUN) ls /usr/local/share/nvim/site/parser
+	echo '✅ selected treesitter parsers and queries added'
 
 plugins:
 	# echo '##[ $@ ]##'
@@ -266,7 +265,6 @@ xssssss::
 	done
 	$(RUN) luarocks purge --tree $(ROCKS_PATH) &> /dev/null
 	# $(RUN) tree /etc/xdg/nvim
-	echo '✅ selected treesitter parsers and queries added'
 
 pull:
 	echo '##[ $@ ]##'
