@@ -49,7 +49,7 @@ NPM_LIST := $(RUN) npm list -g --depth=0
 CLI_VIA_DNF := eza fd-find fzf pass ripgrep stow wl-clipboard zoxide
 LSP_VIA_DNF := ShellCheck shfmt
 # https://github.com/artempyanykh/marksman/releases
-VIA_NPM      := bash-language-server yaml-language-server vscode-langservers-extracted stylelint-lsp
+VIA_NPM      :=  bash-language-server yaml-language-server vscode-langservers-extracted stylelint-lsp
 VIA_AT_NPM   :=  @github/copilot-language-server @ast-grep/cli
 # @githubnext/copilot-cl
 
@@ -164,44 +164,8 @@ info/lsp/%.md: xdg/nvim/lsp/%.lua
 
 # $(RW_ADD) xdg/nvim/after/filetype/lua.lua $(DIR_FILETYPE)/lua.lua
 
-# marksman: info/marksman.md
-# latest/marksman.json:
-# 	mkdir -p $(dir $@)
-# 	$(WGET) https://api.github.com/repos/artempyanykh/marksman/releases/latest -O $@
-#
-# files/marksman.tar.gz: latest/marksman.json
-# 	mkdir -p $(dir $@)
-# 	$(WGET) $(shell $(call bdu,linux-x64,$<)) -O $@
-#
-# info/marksman.md: files/marksman.tar.gz
-# 	echo '##[ $@ ]##'
-# 	mkdir -p $(dir $@)
-# 	TARGET=files/$(basename $(notdir $@))
-# 	mkdir -p $$TARGET
-# 	$(TAR) $${TARGET} -f $<
-# 	$(RUN) ls -al $${TARGET}
-# 	# $(ADD) $${TARGET} /usr/local/lua-language-server
-
-harper:
-latest/harper.json:
-	mkdir -p $(dir $@)
-	$(WGET) https://api.github.com/repos/Automattic/harper/releases/latest -O $@
-
-files/harper.tar.gz: latest/harper.json
-	mkdir -p $(dir $@)
-	$(WGET) $(shell $(call bdu,linux-x64,$<)) -O $@
-
-info/harper.md: files/harper.tar.gz
-	echo '##[ $@ ]##'
-	mkdir -p $(dir $@)
-	TARGET=files/$(basename $(notdir $@))
-	mkdir -p $$TARGET
-	$(TAR) $${TARGET} -f $<
-	$(RUN) ls -al $${TARGET}
-	# $(ADD) $${TARGET} /usr/local/lua-language-server
-
 # DNF
-dnf_pkgs: dnf_gh dnf_cli_pkgs dnf_lsp_pkgs 
+dnf_pkgs:  dnf_cli_pkgs dnf_lsp_pkgs 
 	echo '✅ Completed DNF installs'
 
 dnf_gh:
