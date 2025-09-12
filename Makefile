@@ -160,15 +160,12 @@ nvim_plugins:
 # copilot:
 # 	URL=$(LSP_CONF_URL)/$@.lua
 # 	$(RW_ADD) $$URL $(DIR_NVIM)/lsp/$@.lua
-# 	$(RUN) ls -al $(DIR_NVIM)/lsp	
+# 	$(RUN) ls -al $(DIR_NVIM)/lsp
 # 	echo '✅ lsp: '
 
-
-
-
-# Preconfigure LSP	
+# Preconfigure LSP
 confs: $(lsp_targs)
-	echo '✅ selected nvim plugins installed'
+	echo '✅ ls confs installed'
 
 info/lsp/%: xdg/nvim/lsp/%
 	echo '##[ lsp: $* ]]##'
