@@ -49,15 +49,15 @@ lsp_conf_url := https://raw.githubusercontent.com/neovim/nvim-lspconfig/refs/hea
 lsp_confs := $(wildcard xdg/nvim/lsp/*.lua)
 lsp_targs := $(patsubst xdg/nvim/lsp/%.lua,info/lsp/%.md,$(lsp_confs))
 
-ft_confs  := $(wildcard xdg/nvim/lsp/*.lua)
-lsp_targs := $(patsubst xdg/nvim/lsp/%.lua,info/lsp/%.md,$(ft_confs))
+ft_confs  := $(wildcard xdg/nvim/after/filetype/*.lua)
+ft_targs := $(patsubst xdg/nvim/after/filetype/*.lua, info/filetype/%.md,$(ft_confs))
 
 # CLI   := bat direnv eza fd-find fzf imagemagick just lynx ripgrep texlive-scheme-basic wl-clipboard yq zoxide
 # $(info $(lsp_confs))
 # $(info $(lsp_targs))
 # info/lsp/lua_ls.md
 
-default: init nvim mason # treesitter plugins lsp_confs # mason  parsers_queries dnf_pkgs npm_pkgs nvim_plugins
+default: init nvim mason treesitter plugins lsp_confs filetype_confs 
 ifdef GITHUB_ACTIONS
 	buildah config \
 	--label summary='a toolbox with cli tools, neovim' \
@@ -149,7 +149,7 @@ treesitter: npm
 	$(RUN) nvim_treesitter &>/dev/null
 	# $(RUN) ls /usr/local/share/nvim/site/parser
 	echo '✅ selected treesitter parsers and queries added'
-	
+
 plugins:
 	# echo '##[ $@ ]##'
 	$(RUN) nvim_plugins || true
@@ -166,7 +166,20 @@ info/lsp/%.md: xdg/nvim/lsp/%.lua
 	$(RUN) mkdir -p $(DIR_NVIM)/lsp
 	$(RW_ADD) $< $(DIR_NVIM)/lsp/$*
 	$(RUN) ls -al $(DIR_NVIM)/lsp/$*
+	echo '✅ Installed preconfigured lsp confs'
+
+filetype_confs: $(ft_targs)
+	echo '✅ Installed preconfigured filetype confs'
+
+info/filetype/%.md: xdg/nvim/after/filetype/%.lua
+	echo '##[ lsp: $* ]]##'
+	mkdir -p $(dir $@)
+	$(RUN) mkdir -p $(DIR_NVIM)/lsp
+	$(RW_ADD) $< $(DIR_NVIM)/lsp/$*
+	$(RUN) ls -al $(DIR_NVIM)/lsp/$*
 	echo '✅ lsp: $*' | tee $@
+
+
 
 # $(RW_ADD) xdg/nvim/after/filetype/lua.lua $(DIR_FILETYPE)/lua.lua
 
