@@ -2,8 +2,8 @@
 -- https://mason-registry.dev/registry/list
 --
 -- htmx
+-- 'gh-actions-language-server', requires go
 local bins = {
-  'gh-actions-language-server',
   'jq-lsp',
   'ast-grep',
   'bash-language-server',
