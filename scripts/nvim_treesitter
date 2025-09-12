@@ -2,7 +2,7 @@
 -- set XDG_DATA_HOME for vim.pack
 -- unset at scripts end
 vim.uv.os_setenv("XDG_DATA_HOME", "/usr/local/share")
-ts_rocks = {
+local items = {
  'bash'
 }
 
@@ -10,23 +10,23 @@ vim.pack.add({
     {
     src = 'https://github.com/nvim-treesitter/nvim-treesitter',
     version = 'main'
-    },
-    {
-    src = 'https://github.com/mason-org/mason.nvim'
-    },
-    })
+    }})
 
-local ok_mason, mason = pcall(require, 'mason')
-if ok_mason then
-  print( 'required Mason' )
-  mason.setup(
+local ok_ts, ts = pcall(require, 'nvim-treesitter')
+if ok_ts then
+  print( 'required treesitter' )
+  ts.setup(
     {
-      install_root_dir = '/usr/local/share/mason',
-      PATH = 'skip',
+      install_root_dir = '/usr/local/share/nvim/site',
     }
   )
 end
 
-vim.cmd.MasonInstall('tree-sitter-cli')
+for _, item in ipairs(items) do
+vim.uv.sleep(1000) 
+vim.cmd.MasonInstall(item)
+vim.uv.sleep(1000) 
+end
+
 vim.uv.os_unsetenv("XDG_DATA_HOME")
 

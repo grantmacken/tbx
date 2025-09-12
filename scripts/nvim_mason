@@ -1,32 +1,30 @@
 #!/usr/bin/env -S nvim -l
 -- https://mason-registry.dev/registry/list
-local bins = {'tree-sitter-cli'}
-local xbins = {
-  'ast-grep',
-  'bash-language-server',
-  'copilot-language-server',
-  'css-lsp',
-  'harper-ls',
-  'html-lsp',
-  'lua-language-server',
-  'marksman',
-  'shellcheck',
-  'shfmt',
-  'stylelint-lsp',
-  'yaml-language-server',
-  'json-lsp',
-  'typescript-language-server',
-  'tombi',
-  
+local bins = {
+  'tree-sitter-cli',
+  -- 'ast-grep',
+  -- 'bash-language-server',
+  -- 'copilot-language-server',
+  -- 'css-lsp',
+  -- 'harper-ls',
+  -- 'html-lsp',
+  -- 'lua-language-server',
+  -- 'marksman',
+  -- 'shellcheck',
+  -- 'shfmt',
+  -- 'stylelint-lsp',
+  -- 'yaml-language-server',
+  -- 'json-lsp',
+  -- 'typescript-language-server',
+  -- 'tombi',
   }
 -- unset at scripts end
 vim.uv.os_setenv("XDG_DATA_HOME", "/usr/local/share")
-
 -- /usr/local/share/nvim/site/pack/core/opt/
 vim.pack.add({
  'https://github.com/mason-org/mason.nvim',
   })
-
+vim.uv.sleep(1000) 
 local ok_mason, mason = pcall(require, 'mason')
 if ok_mason then
   print( 'required Mason' )
