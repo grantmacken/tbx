@@ -41,9 +41,8 @@ DEVEL := gettext-devel \
 tr = printf "| %-14s | %-8s | %-83s |\n" "$(1)" "$(2)" "$(3)" | tee -a $(4)
 bdu = jq -r ".assets[] | select(.browser_download_url | contains(\"$1\")) | .browser_download_url" $2
 
-default: build-tools
+default: info/build-tools.md
 	echo '##[ $@ ]##'
-	$(RUN) which wget
 	buildah config \
 	--label summary='a toolbox with cli tools, neovim' \
 	--label maintainer='Grant MacKenzie <grantmacken@gmail.com>' \
@@ -70,6 +69,39 @@ latest/fedora-toolbox.json:
 	echo '##[ $@ ]##'
 	mkdir -p $(dir $@)
 	skopeo inspect docker://${FED_IMAGE}:latest | jq '.' > $@
+
+info/build-tools.md:
+	echo '##[ $@ ]##'
+	mkdir -p $(dir $@)
+	$(RUN) dnf config-manager addrepo --from-repofile=https://cli.github.com/packages/rpm/gh-cli.repo &> /dev/null
+	$(INSTALL) gh --repo gh-cli &>  /dev/null
+	$(INSTALL) $(TOOLS) &>/dev/null
+	$(INSTALL) $(DEVEL) &>/dev/null
+	$(INSTALL) $(BUILDING) &>/dev/null
+	printf "\n$(HEADING2) %s\n\n" "Selected CLI Tools" | tee $@
+	$(call tr,"Name","Version","Summary",$@)
+	$(call tr,"----","-------","----------------------------",$@)
+	$(RUN) sh -c  'dnf info -q --installed $(TOOLS) | \
+	grep -oP "(Name.+:\s\K.+)|(Ver.+:\s\K.+)|(Sum.+:\s\K.+)" | \
+	paste  - - -  | sort -u ' | \
+	awk -F'\t' '{printf "| %-14s | %-8s | %-83s |\n", $$1, $$2, $$3}' | \
+	tee -a $@
+	printf "\n$(HEADING2) %s\n\n" "Selected Build Tooling for Make Installs" | tee $@
+	$(call tr,"Name","Version","Summary",$@)
+	$(call tr,"----","-------","----------------------------",$@)
+	$(RUN) sh -c  'dnf info -q --installed $(BUILDING) | \
+	grep -oP "(Name.+:\s\K.+)|(Ver.+:\s\K.+)|(Sum.+:\s\K.+)" | \
+	paste  - - -  | sort -u ' | \
+	awk -F'\t' '{printf "| %-14s | %-8s | %-83s |\n", $$1, $$2, $$3}' | \
+	tee -a $@
+	printf "\n$(HEADING2) %s\n\n" "Selected Development files for building" | tee $@
+	$(call tr,"Name","Version","Summary",$@)
+	$(call tr,"----","-------","----------------------------",$@)
+	$(RUN) sh -c  'dnf info -q --installed $(DEVEL) | \
+	grep -oP "(Name.+:\s\K.+)|(Ver.+:\s\K.+)|(Sum.+:\s\K.+)" | \
+	paste  - - -  | sort -u ' | \
+	awk -F'\t' '{printf "| %-14s | %-8s | %-83s |\n", $$1, $$2, $$3}' | \
+	tee -a $@
 
 ## HOST-SPAWN
 # host-spawn: info/host-spawn.md
@@ -100,39 +132,4 @@ latest/fedora-toolbox.json:
 # 	EOF
 # 	printf "Checkout the %s for more information.\n\n" "[host-spawn repo](https://github.com/1player/host-spawn)" | tee -a $@
 
-build-tools: info/build-tools.md
-info/build-tools.md:
-	echo '##[ $@ ]##'
-	$(RUN) dnf config-manager addrepo --from-repofile=https://cli.github.com/packages/rpm/gh-cli.repo &> /dev/null
-	$(INSTALL) gh --repo gh-cli &>  /dev/null
-	$(INSTALL) $(TOOLS) &>/dev/null
-	$(INSTALL) $(DEVEL) &>/dev/null
-	$(INSTALL) $(BUILDING) &>/dev/null
-	printf "\n$(HEADING2) %s\n\n" "Selected CLI Tools" | tee $@
-	$(call tr,"Name","Version","Summary",$@)
-	$(call tr,"----","-------","----------------------------",$@)
-	$(RUN) sh -c  'dnf info -q --installed $(TOOLS) | \
-	grep -oP "(Name.+:\s\K.+)|(Ver.+:\s\K.+)|(Sum.+:\s\K.+)" | \
-	paste  - - -  | sort -u ' | \
-	awk -F'\t' '{printf "| %-14s | %-8s | %-83s |\n", $$1, $$2, $$3}' | \
-	tee -a $@
-	printf "\n$(HEADING2) %s\n\n" "Selected Build Tooling for Make Installs" | tee $@
-	$(call tr,"Name","Version","Summary",$@)
-	$(call tr,"----","-------","----------------------------",$@)
-	$(RUN) sh -c  'dnf info -q --installed $(BUILDING) | \
-	grep -oP "(Name.+:\s\K.+)|(Ver.+:\s\K.+)|(Sum.+:\s\K.+)" | \
-	paste  - - -  | sort -u ' | \
-	awk -F'\t' '{printf "| %-14s | %-8s | %-83s |\n", $$1, $$2, $$3}' | \
-	tee -a $@
-	printf "\n$(HEADING2) %s\n\n" "Selected Development files for building" | tee $@
-	$(call tr,"Name","Version","Summary",$@)
-	$(call tr,"----","-------","----------------------------",$@)
-	$(RUN) sh -c  'dnf info -q --installed $(DEVEL) | \
-	grep -oP "(Name.+:\s\K.+)|(Ver.+:\s\K.+)|(Sum.+:\s\K.+)" | \
-	paste  - - -  | sort -u ' | \
-	awk -F'\t' '{printf "| %-14s | %-8s | %-83s |\n", $$1, $$2, $$3}' | \
-	tee -a $@
-	
 
-	
-	
