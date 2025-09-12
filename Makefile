@@ -58,7 +58,7 @@ lsp_targs := $(patsubst xdg/nvim/lsp/%.lua,info/lsp/%.md,$(ft_confs))
 # $(info $(lsp_targs))
 # info/lsp/lua_ls.md
 
-default: init nvim treesitter #  mason lsp_confs# mason  parsers_queries dnf_pkgs npm_pkgs nvim_plugins
+default: init nvim mason # ts # lsp_confs# mason  parsers_queries dnf_pkgs npm_pkgs nvim_plugins
 ifdef GITHUB_ACTIONS
 	buildah config \
 	--label summary='a toolbox with cli tools, neovim' \
@@ -108,16 +108,37 @@ info/neovim.md: files/nvim.tar.gz
 	VERSION=$$($(RUN) nvim -v | grep -oP 'NVIM \K.+' | cut -d'-' -f1 )
 	SUM='The text editor with a focus on extensibility and usability'
 	printf "| %-10s | %-13s | %-83s |\n" "$${NAME}" "$${VERSION}" "$${SUM}" | tee -a $@
+	# add the nvim scripts
+	$(ADD) scripts/ $(DIR_BIN)/
+	$(RUN) ls -al $(DIR_BIN)
+
 
 mason:
 	# echo '##[ $@ ]##'
-	$(ADD) scripts/ /usr/local/bin/
-	$(RUN) mkdir -p /usr/local/share/mason 
+	# create the dir mason uses to store packages
+	$(RUN) mkdir -p /usr/local/share/mason
+	# run the script that install mason packages 
 	$(RUN) /usr/local/bin/nvim_mason &>/dev/null
+	# take a look at what is installed
+	$(RUN) ls /usr/local/share/mason/bin || true
+	# link installed packages to $(DIR_BIN)
+	# use SH to allow for globbing
+	$(SH) 'ln -s /usr/local/share/mason/bin/* $(DIR_BIN)/'
+	# check bin dir
+	$(RUN) ls -l /usr/local/bin
+	echo '✅ selected mason lsp	 servers, linters and formaters installed'
+	
+ts:
+	echo '##[ $@ ]##'
+	# $(ADD) scripts/ /usr/local/bin/
+	$(RUN) /usr/local/bin/nvim_treesitter || true
 	$(RUN) ls /usr/local/share/mason/bin || true
 	$(SH) 'ln -s /usr/local/share/mason/bin/* $(DIR_BIN)/'
-	echo '✅ selected mason lsp servers, linters and formaters installed'
-	# $(RUN) ls /usr/local/bin
+	## treesitter-cli installed and linkd to PATH bin dir
+	$(RUN) ls /usr/local/share/nvim/site/pack/core/opt | tee $@
+	$(RUN) ls /usr/local/share/nvim/ | tee $@
+	echo '✅ selected nvim todo'
+	#
 
 plugins:
 	# echo '##[ $@ ]##'
@@ -127,16 +148,6 @@ plugins:
 	echo '✅ selected nvim plugins installed'
 
 
-treesitter:
-	# echo '##[ $@ ]##'
-	$(ADD) scripts/ /usr/local/bin/
-	$(RUN) /usr/local/bin/nvim_treesitter &> /dev/null
-	$(RUN) ls /usr/local/share/mason/bin || true
-	$(SH) 'ln -s /usr/local/share/mason/bin/* $(DIR_BIN)/'
-	## treesitter-cli installed and linkd to PATH bin dir
-	$(RUN) ls /usr/local/share/nvim/site/pack/core/opt | tee $@
-	$(RUN) ls /usr/local/share/nvim/ | tee $@
-	echo '✅ selected nvim todo'
 
 
 # Preconfigure LSP
