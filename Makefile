@@ -109,6 +109,7 @@ info/neovim.md: files/nvim.tar.gz
 	# $(RUN) ls -al $(DIR_BIN)
 
 mason_registry:
+	echo '##[ $@ ]##'
 	# create the dir mason uses to store packages
 	$(RUN) mkdir -p /usr/local/share/mason
 	$(RUN) nvim_mason_registry &>/dev/null
@@ -116,8 +117,9 @@ mason_registry:
 	echo '✅ mason registry added'
 
 mason: mason_registry
+	echo '##[ $@ ]##'
 	# run the script that install mason packages
-	$(RUN) nvim_mason 2>&1 >/dev/null
+	$(RUN) nvim_mason &>/dev/null #  2>&1 >/dev/null
 	# take a look at what is installed
 	$(RUN) ls /usr/local/share/mason/bin
 	# link installed packages to $(DIR_BIN)
@@ -145,7 +147,7 @@ treesitter: npm
 
 plugins:
 	# echo '##[ $@ ]##'
-	$(RUN) nvim_plugins &> /dev/null
+	$(RUN) nvim_plugins  /dev/null
 	# $(RUN) ls /usr/local/share/nvim/site/pack/core/opt | tee $@
 	echo '✅ selected nvim plugins installed'
 
@@ -172,11 +174,7 @@ info/filetype/%.md: xdg/nvim/after/filetype/%.lua
 	$(RUN) ls -al $(DIR_NVIM)/lsp/$*
 	echo '✅ lsp: $*' | tee $@
 
-
-
 # $(RW_ADD) xdg/nvim/after/filetype/lua.lua $(DIR_FILETYPE)/lua.lua
-
-
 
 info/cli-tools.md:
 	# echo '##[ $@ ]##'
