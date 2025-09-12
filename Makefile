@@ -66,7 +66,7 @@ lsp_targs := $(patsubst xdg/nvim/lsp/%.lua,info/lsp/%.md,$(ft_confs))
 # $(info $(lsp_targs))
 # info/lsp/lua_ls.md
 
-default: init lsp_confs #  # mason  parsers_queries dnf_pkgs npm_pkgs nvim_plugins
+default: init nvim mason lsp_confs #  # mason  parsers_queries dnf_pkgs npm_pkgs nvim_plugins
 ifdef GITHUB_ACTIONS
 	buildah config \
 	--label summary='a toolbox with cli tools, neovim' \
@@ -123,7 +123,8 @@ mason:
 	$(RUN) mkdir -p /usr/local/share/mason 
 	$(RUN) /usr/local/bin/nvim_mason &>/dev/null
 	$(RUN) ls /usr/local/share/mason/bin || true
-	$(SH) 'ln -s /usr/local/share/mason/bin/* /usr/local/bin/'
+	$(SH) 'ln -s /usr/local/share/mason/bin/* $(DIR_BIN)/'
+	echo '✅ selected mason lsp servers, linters and formaters installed'
 	# $(RUN) ls /usr/local/bin
 
 nvim_plugins:
