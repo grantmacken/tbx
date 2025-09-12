@@ -58,7 +58,7 @@ lsp_targs := $(patsubst xdg/nvim/lsp/%.lua,info/lsp/%.md,$(ft_confs))
 # $(info $(lsp_targs))
 # info/lsp/lua_ls.md
 
-default: init nvim ts mason # t# lsp_confs# mason  parsers_queries dnf_pkgs npm_pkgs nvim_plugins
+default: init nvim ts mason plugins # t# lsp_confs# mason  parsers_queries dnf_pkgs npm_pkgs nvim_plugins
 ifdef GITHUB_ACTIONS
 	buildah config \
 	--label summary='a toolbox with cli tools, neovim' \
@@ -112,14 +112,13 @@ info/neovim.md: files/nvim.tar.gz
 	$(ADD) scripts/ $(DIR_BIN)/
 	$(RUN) ls -al $(DIR_BIN)
 
-
 mason:
 	# echo '##[ $@ ]##'
 	# add the nvim-treesitter dep
 	# create the dir mason uses to store packages
 	$(RUN) mkdir -p /usr/local/share/mason
 	# run the script that install mason packages 
-	$(RUN) /usr/local/bin/nvim_mason &>/dev/null
+	$(RUN) nvim_mason || true
 	# take a look at what is installed
 	$(RUN) ls /usr/local/share/mason/bin || true
 	# link installed packages to $(DIR_BIN)
