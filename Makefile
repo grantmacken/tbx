@@ -54,7 +54,7 @@ ft_targs := $(patsubst xdg/nvim/after/filetype/*.lua, info/filetype/%.md,$(ft_co
 
 # CLI   := bat direnv eza fd-find fzf imagemagick just lynx ripgrep texlive-scheme-basic wl-clipboard yq zoxide
 
-default: init nvim mason # treesitter # plugins lsp_confs filetype_confs 
+default: init nvim mason treesitter # plugins lsp_confs filetype_confs 
 ifdef GITHUB_ACTIONS
 	buildah config \
 	--label summary='a toolbox with cli tools, neovim' \
@@ -130,11 +130,12 @@ mason: mason_registry
 	echo '✅ selected mason lsp	 servers, linters and formaters installed'
 
 npm:
+	echo '##[ $@ ]##'
 	# dependency for treesitter
 	$(NPM) tree-sitter-cli &>/dev/null
 	# also install lsp server not on mason registry
-	# http rest
 	$(NPM) @mistweaverco/kulala-ls &>/dev/null
+	echo '✅ selected npm packages installed'
 
 treesitter: npm
 	echo '##[ $@ ]##'
@@ -163,7 +164,7 @@ info/lsp/%.md: xdg/nvim/lsp/%.lua
 	$(RUN) ls -al $(DIR_NVIM)/lsp/$*
 	echo '✅ Installed preconfigured lsp confs'
 
-filetype_confs: $(ft_targs)
+ftreesitter parsers and queries addediletype_confs: $(ft_targs)
 	echo '✅ Installed preconfigured filetype confs'
 
 info/filetype/%.md: xdg/nvim/after/filetype/%.lua
