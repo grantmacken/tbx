@@ -42,9 +42,6 @@ TAR_NO_STRIP := tar xz -C
 NPM      := $(RUN) npm install --global
 NPM_LIST := $(RUN) npm list -g --depth=0
 
-#LISTS
-LSP_VIA_DNF := ShellCheck shfmt
-
 tr = printf "| %-14s | %-8s | %-83s |\n" "$(1)" "$(2)" "$(3)" | tee -a $(4)
 bdu = jq -r ".assets[] | select(.browser_download_url | contains(\"$1\")) | .browser_download_url" $2
 lsp_conf_url := https://raw.githubusercontent.com/neovim/nvim-lspconfig/refs/heads/master/lsp
@@ -54,11 +51,13 @@ lsp_targs := $(patsubst xdg/nvim/lsp/%.lua,info/lsp/%.md,$(lsp_confs))
 
 ft_confs  := $(wildcard xdg/nvim/lsp/*.lua)
 lsp_targs := $(patsubst xdg/nvim/lsp/%.lua,info/lsp/%.md,$(ft_confs))
+
+CLI   := bat direnv eza fd-find fzf gh imagemagick jq just lynx ripgrep stow texlive-scheme-basic wl-clipboard yq zoxide
 # $(info $(lsp_confs))
 # $(info $(lsp_targs))
 # info/lsp/lua_ls.md
 
-default: init nvim ts mason plugins # t# lsp_confs# mason  parsers_queries dnf_pkgs npm_pkgs nvim_plugins
+default: init nvim treesitter mason plugins lsp_confs # mason  parsers_queries dnf_pkgs npm_pkgs nvim_plugins
 ifdef GITHUB_ACTIONS
 	buildah config \
 	--label summary='a toolbox with cli tools, neovim' \
@@ -128,7 +127,7 @@ mason:
 	# $(RUN) ls -l /usr/local/bin
 	echo '✅ selected mason lsp	 servers, linters and formaters installed'
 
-ts:
+treesitter:
 	echo '##[ $@ ]##'
 	# install the dep
 	$(NPM) tree-sitter-cli &>/dev/null
@@ -161,17 +160,11 @@ info/lsp/%.md: xdg/nvim/lsp/%.lua
 
 # $(RW_ADD) xdg/nvim/after/filetype/lua.lua $(DIR_FILETYPE)/lua.lua
 
-# DNF
-dnf_pkgs:  dnf_cli_pkgs dnf_lsp_pkgs 
-	echo '✅ Completed DNF installs'
 
 dnf_gh:
 	$(RUN) dnf config-manager addrepo --from-repofile=https://cli.github.com/packages/rpm/gh-cli.repo &> /dev/null
 	$(INSTALL) gh --repo gh-cli &>  /dev/null
 	$(RUN) dnf info -q --installed gh
-
-dnf_cli_pkgs: info/cli-tools.md
-	echo '✅ CLI tools added'
 
 info/cli-tools.md:
 	# echo '##[ $@ ]##'
@@ -201,65 +194,6 @@ info/lsp-tooling.md:
 	   grep -oP "(Name.+:\s\K.+)|(Ver.+:\s\K.+)|(Sum.+:\s\K.+)" | \
 	   paste  - - -  | sort -u ' | \
 	   awk -F'\t' '{printf "| %-14s | %-8s | %-83s |\n", $$1, $$2, $$3}' | tee -a $@
-
-TS_ROCKS := \
-awk \
-bash \
-comment \
-css \
-csv \
-diff \
-djot \
-dtd \
-ebnf \
-elixir \
-erlang \
-git_config \
-gitignore \
-gleam \
-gnuplot \
-html \
-http \
-javascript \
-jq \
-json \
-just \
-latex \
-ledger \
-make \
-markdown_inline \
-mermaid \
-nginx \
-printf \
-readline \
-regex \
-ssh_config \
-toml \
-xml \
-yaml
-
-ROCKS  := $(patsubst %,tree-sitter-%,$(TS_ROCKS))
-ROCKS_BINARIES := https://nvim-neorocks.github.io/rocks-binaries
-ROCKS_PATH := /usr/local/rocks
-ROCKS_LIB_PATH := $(ROCKS_PATH)/lib/luarocks/rocks-5.1
-LR_OPTS := --tree $(ROCKS_PATH) --server $(ROCKS_BINARIES) --no-doc  --deps-mode one
-SHOW_OPTS := --tree $(ROCKS_PATH)
-
-xssssss::
-	echo " ##[[ $@ ]]##"
-	$(RUN) mkdir -p $(ROCKS_PATH)
-	$(RUN) mkdir -p $(DIR_NVIM)/queries 
-	$(RUN) mkdir -p $(DIR_NVIM)/parser
-	for ROCK in $(ROCKS)
-	do
-	$(RUN) luarocks install $(LR_OPTS) $$ROCK &> /dev/null
-	VER=$$($(RUN) luarocks show --mversion --tree $(ROCKS_PATH) $$ROCK)
-	DIR=$(ROCKS_LIB_PATH)/$$ROCK/$$VER
-	$(SH) "cp $$DIR/parser/* $(DIR_NVIM)/parser/"
-	$(SH) "cp -r $$DIR/queries/* $(DIR_NVIM)/queries/"
-	done
-	$(RUN) luarocks purge --tree $(ROCKS_PATH) &> /dev/null
-	# $(RUN) tree /etc/xdg/nvim
 
 pull:
 	echo '##[ $@ ]##'
