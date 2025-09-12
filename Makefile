@@ -3,9 +3,6 @@ SHELL=/usr/bin/bash
 # -e Exit immediately if a pipeline fails
 # -u Error if there are unset variables and parameters
 # -o option-name Set the option corresponding to option-name
-#
-# https://mason-registry.dev/registry/list
-#
 .ONESHELL:
 .DELETE_ON_ERROR:
 .SECONDARY:
@@ -46,11 +43,7 @@ NPM      := $(RUN) npm install --global
 NPM_LIST := $(RUN) npm list -g --depth=0
 
 #LISTS
-CLI_VIA_DNF := eza fd-find fzf pass ripgrep stow wl-clipboard zoxide
 LSP_VIA_DNF := ShellCheck shfmt
-# https://github.com/artempyanykh/marksman/releases
-VIA_NPM      :=  bash-language-server yaml-language-server vscode-langservers-extracted stylelint-lsp
-# @githubnext/copilot-cl
 
 tr = printf "| %-14s | %-8s | %-83s |\n" "$(1)" "$(2)" "$(3)" | tee -a $(4)
 bdu = jq -r ".assets[] | select(.browser_download_url | contains(\"$1\")) | .browser_download_url" $2
@@ -65,7 +58,7 @@ lsp_targs := $(patsubst xdg/nvim/lsp/%.lua,info/lsp/%.md,$(ft_confs))
 # $(info $(lsp_targs))
 # info/lsp/lua_ls.md
 
-default: init nvim mason lsp_confs #  # mason  parsers_queries dnf_pkgs npm_pkgs nvim_plugins
+default: init nvim  treesitter #  mason lsp_confs# mason  parsers_queries dnf_pkgs npm_pkgs nvim_plugins
 ifdef GITHUB_ACTIONS
 	buildah config \
 	--label summary='a toolbox with cli tools, neovim' \
@@ -132,6 +125,14 @@ nvim_plugins:
 	$(RUN) /usr/local/bin/nvim_plugins &> /dev/null
 	$(RUN) ls /usr/local/share/nvim/site/pack/core/opt | tee $@
 	echo '✅ selected nvim plugins installed'
+
+
+nvim_treesitter:
+	# echo '##[ $@ ]##'
+	$(ADD) scripts/ /usr/local/bin/
+	$(RUN) /usr/local/bin/nvim_treesitter &> /dev/null
+	$(RUN) ls /usr/local/share/nvim/ | tee $@
+	echo '✅ selected nvim todo'
 
 # xdg: copilot
 #
@@ -204,19 +205,6 @@ info/lsp-tooling.md:
 	   paste  - - -  | sort -u ' | \
 	   awk -F'\t' '{printf "| %-14s | %-8s | %-83s |\n", $$1, $$2, $$3}' | tee -a $@
 
-###############
-##    NPM    ##
-###############
-
-npm_pkgs: info/npm_pkgs.md
-	echo '✅ NPM packages installed'
-
-info/npm_pkgs.md:
-	# echo '##[ $@ ]##'
-	$(NPM) $(VIA_NPM) &> /dev/null
-	$(NPM) $(VIA_AT_NPM) &> /dev/null
-	$(NPM_LIST)
-
 TS_ROCKS := \
 awk \
 bash \
@@ -260,7 +248,7 @@ ROCKS_LIB_PATH := $(ROCKS_PATH)/lib/luarocks/rocks-5.1
 LR_OPTS := --tree $(ROCKS_PATH) --server $(ROCKS_BINARIES) --no-doc  --deps-mode one
 SHOW_OPTS := --tree $(ROCKS_PATH)
 
-parsers_queries:
+xssssss::
 	echo " ##[[ $@ ]]##"
 	$(RUN) mkdir -p $(ROCKS_PATH)
 	$(RUN) mkdir -p $(DIR_NVIM)/queries 

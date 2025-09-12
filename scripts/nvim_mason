@@ -12,9 +12,10 @@ local bins = {
   'shellcheck',
   'shfmt',
   'stylelint-lsp',
-   'yaml-language-server',
-   'json-lsp',
-   'tombi', --toml
+  'yaml-language-server',
+  'json-lsp',
+  'typescript-language-server',
+  'tombi', --toml
   }
 -- unset at scripts end
 vim.uv.os_setenv("XDG_DATA_HOME", "/usr/local/share")
