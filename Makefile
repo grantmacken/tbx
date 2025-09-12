@@ -85,7 +85,6 @@ init: .env
 	$(RUN) which make &> /dev/null
 	$(RUN) which npm &> /dev/null
 	$(RUN) which luarocks &> /dev/null
-	$(RUN) mkdir -p $(DIR_NVIM)/after/filetype $(DIR_NVIM)/lsp  $(DIR_NVIM)/parser $(DIR_NVIM)/queries
 
 latest/tbx-build-tools.json:
 	# echo '##[ $@ ]##'
@@ -167,9 +166,10 @@ nvim_plugins:
 confs: $(lsp_targs)
 	echo '✅ ls confs installed'
 
-info/lsp/%: xdg/nvim/lsp/%
+info/lsp/%.md: xdg/nvim/lsp/%.lua
 	echo '##[ lsp: $* ]]##'
 	mkdir -p $(dir $@)
+	$(RUN) mkdir -p $(DIR_NVIM)/lsp
 	$(RW_ADD) $< $(DIR_NVIM)/lsp/$*
 	$(RUN) -al ls $(DIR_NVIM)/lsp/$*
 	echo '✅ lsp: $*' | tee $@
