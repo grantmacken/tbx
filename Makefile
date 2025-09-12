@@ -31,7 +31,8 @@ RW_ADD := buildah add --chmod  644 $(WORKING_CONTAINER)
 WGET    := wget -q --no-check-certificate --timeout=10 --tries=3
 
 # XDG_DATA_DIRS
-DIR_NVIM    := /usr/local/share/nvim
+# everything is site dir
+DIR_NVIM    := /usr/local/share/nvim/site
 DIR_BIN      := /usr/local/bin
 
 LSP_CONF_URL := https://raw.githubusercontent.com/neovim/nvim-lspconfig/refs/heads/master/lsp/
@@ -53,7 +54,7 @@ lsp_targs := $(patsubst xdg/nvim/lsp/%.lua,info/lsp/%.md,$(lsp_confs))
 ft_confs  := $(wildcard xdg/nvim/after/filetype/*.lua)
 ft_targs := $(patsubst xdg/nvim/after/filetype/*.lua, info/filetype/%.md,$(ft_confs))
 
-default: init nvim mason treesitter plugins lsp_confs filetype_confs
+default: init nvim treesitter # mason  plugins lsp_confs filetype_confs
 
 ifdef GITHUB_ACTIONS
 	buildah config \
@@ -140,10 +141,10 @@ npm:
 treesitter: npm
 	echo '##[ $@ ]##'
 	# create the dir where ts parser as queries will be installed
-	$(RUN) mkdir -p /usr/local/share/nvim/site
+	$(RUN) mkdir -p $(DIR_NVIM)
 	# run the script that install treesitter parsers and queries
 	$(RUN) nvim_treesitter &>/dev/null
-	# $(RUN) ls /usr/local/share/nvim/site/parser
+	$(RUN) ls $(DIR_NVIM) | grep -oP '\w+'
 	echo '✅ selected treesitter parsers and queries added'
 
 plugins:
@@ -152,7 +153,7 @@ plugins:
 	# $(RUN) ls /usr/local/share/nvim/site/pack/core/opt | tee $@
 	echo '✅ selected nvim plugins installed'
 
-# Preconfigure LSP
+# files in $(DIR_NVIM)/lsp
 lsp_confs: lsp_local lsp_urls
 	$(RUN) ls -al $(DIR_NVIM)/lsp
 	echo '✅ Installed all lsp confs'
@@ -161,7 +162,6 @@ lsp_local: $(lsp_targs)
 	echo '✅ preconfigured local lsp configs installed'
 
 LSPCONFIGS := copilot.lua 
-
 lsp_urls:
 	for conf in $(LSPCONFIGS)
 	do
@@ -177,7 +177,7 @@ info/lsp/%.md: xdg/nvim/lsp/%.lua
 	$(RW_ADD) $< $(DIR_NVIM)/lsp/$*
 
 
-ftreesitter parsers and queries addediletype_confs: $(ft_targs)
+filetype_confs: $(ft_targs)
 	echo '✅ Installed preconfigured filetype confs'
 
 info/filetype/%.md: xdg/nvim/after/filetype/%.lua
