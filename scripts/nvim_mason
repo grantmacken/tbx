@@ -5,7 +5,13 @@
 -- 'gh-actions-language-server', 
 -- 'jq-lsp',
 -- requires go
+
 local bins = {
+  'copilot-language-server',
+  'lua-language-server',
+  }
+
+local todo_bins = {
   'ast-grep',
   'bash-language-server',
   'copilot-language-server',
