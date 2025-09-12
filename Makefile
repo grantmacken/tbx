@@ -36,7 +36,7 @@ RW_ADD := buildah add --chmod  644 $(WORKING_CONTAINER)
 WGET    := wget -q --no-check-certificate --timeout=10 --tries=3
 
 # XDG_DATA_DIRS
-DIR_NVIM    := /usr/local/nvim/
+DIR_NVIM    := /usr/local/share/nvim/
 DIR_BIN      := /usr/local/bin
 LSP_CONF_URL := https://raw.githubusercontent.com/neovim/nvim-lspconfig/refs/heads/master/lsp/
 
@@ -67,7 +67,7 @@ lsp_targs := $(patsubst xdg/nvim/lsp/%.lua,info/lsp/%.md,$(ft_confs))
 $(info $(lsp_targs))
 # info/lsp/lua_ls.md
 
-default: parsers_queries confs # #nvim  # mason  parsers_queries dnf_pkgs npm_pkgs nvim_plugins
+default: confs #nvim  # mason  parsers_queries dnf_pkgs npm_pkgs nvim_plugins
 
 ifdef GITHUB_ACTIONS
 	buildah config \
@@ -313,6 +313,7 @@ LR_OPTS := --tree $(ROCKS_PATH) --server $(ROCKS_BINARIES) --no-doc  --deps-mode
 SHOW_OPTS := --tree $(ROCKS_PATH)
 
 parsers_queries:
+	echo " ##[[ $@ ]]##"
 	$(RUN) mkdir -p $(ROCKS_PATH)
 	$(RUN) mkdir -p $(DIR_NVIM)/queries 
 	$(RUN) mkdir -p $(DIR_NVIM)/parser
