@@ -1,6 +1,10 @@
 #!/usr/bin/env -S nvim -l
 -- https://mason-registry.dev/registry/list
+--
+-- htmx
 local bins = {
+  'gh-actions-language-server',
+  'jq-lsp',
   'ast-grep',
   'bash-language-server',
   'copilot-language-server',
@@ -8,6 +12,7 @@ local bins = {
   'harper-ls',
   'html-lsp',
   'json-lsp',
+  'kulala-fmt',
   'lua-language-server',
   'marksman',
   'shellcheck',

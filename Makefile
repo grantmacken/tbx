@@ -52,7 +52,7 @@ lsp_targs := $(patsubst xdg/nvim/lsp/%.lua,info/lsp/%.md,$(lsp_confs))
 ft_confs  := $(wildcard xdg/nvim/lsp/*.lua)
 lsp_targs := $(patsubst xdg/nvim/lsp/%.lua,info/lsp/%.md,$(ft_confs))
 
-CLI   := bat direnv eza fd-find fzf gh imagemagick jq just lynx ripgrep stow texlive-scheme-basic wl-clipboard yq zoxide
+# CLI   := bat direnv eza fd-find fzf imagemagick just lynx ripgrep texlive-scheme-basic wl-clipboard yq zoxide
 # $(info $(lsp_confs))
 # $(info $(lsp_targs))
 # info/lsp/lua_ls.md
@@ -127,7 +127,14 @@ mason:
 	# $(RUN) ls -l /usr/local/bin
 	echo '✅ selected mason lsp	 servers, linters and formaters installed'
 
-treesitter:
+npm:
+	# dependency for treesitter
+	$(NPM) tree-sitter-cli &>/dev/null
+	# also install lsp server not on mason registry
+	# http rest
+	$(NPM) @mistweaverco/kulala-ls &>/dev/null
+
+treesitter: npm
 	echo '##[ $@ ]##'
 	# install the dep
 	$(NPM) tree-sitter-cli &>/dev/null
@@ -161,10 +168,6 @@ info/lsp/%.md: xdg/nvim/lsp/%.lua
 # $(RW_ADD) xdg/nvim/after/filetype/lua.lua $(DIR_FILETYPE)/lua.lua
 
 
-dnf_gh:
-	$(RUN) dnf config-manager addrepo --from-repofile=https://cli.github.com/packages/rpm/gh-cli.repo &> /dev/null
-	$(INSTALL) gh --repo gh-cli &>  /dev/null
-	$(RUN) dnf info -q --installed gh
 
 info/cli-tools.md:
 	# echo '##[ $@ ]##'
