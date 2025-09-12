@@ -2,9 +2,10 @@
 -- https://mason-registry.dev/registry/list
 --
 -- htmx
--- 'gh-actions-language-server', requires go
+-- 'gh-actions-language-server', 
+-- 'jq-lsp',
+-- requires go
 local bins = {
-  'jq-lsp',
   'ast-grep',
   'bash-language-server',
   'copilot-language-server',
