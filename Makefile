@@ -54,7 +54,7 @@ ft_targs := $(patsubst xdg/nvim/after/filetype/*.lua, info/filetype/%.md,$(ft_co
 
 # CLI   := bat direnv eza fd-find fzf imagemagick just lynx ripgrep texlive-scheme-basic wl-clipboard yq zoxide
 
-default: init nvim mason treesitter plugins lsp_confs filetype_confs 
+default: init nvim mason # treesitter # plugins lsp_confs filetype_confs 
 ifdef GITHUB_ACTIONS
 	buildah config \
 	--label summary='a toolbox with cli tools, neovim' \
