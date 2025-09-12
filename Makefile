@@ -150,7 +150,7 @@ nvim_plugins:
 # 	echo '✅ lsp: '
 
 # Preconfigure LSP
-confs: $(lsp_targs)
+lsp_confs: $(lsp_targs)
 	echo '✅ ls confs installed'
 
 info/lsp/%.md: xdg/nvim/lsp/%.lua
@@ -158,7 +158,7 @@ info/lsp/%.md: xdg/nvim/lsp/%.lua
 	mkdir -p $(dir $@)
 	$(RUN) mkdir -p $(DIR_NVIM)/lsp
 	$(RW_ADD) $< $(DIR_NVIM)/lsp/$*
-	$(RUN) -al ls $(DIR_NVIM)/lsp/$*
+	$(RUN) ls -al $(DIR_NVIM)/lsp/$*
 	echo '✅ lsp: $*' | tee $@
 
 # $(RW_ADD) xdg/nvim/after/filetype/lua.lua $(DIR_FILETYPE)/lua.lua
