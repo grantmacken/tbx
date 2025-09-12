@@ -65,7 +65,7 @@ lsp_targs := $(patsubst xdg/nvim/lsp/%.lua,info/lsp/%.md,$(ft_confs))
 # $(info $(lsp_confs))
 # $(info $(lsp_targs))
 
-default: confs #nvim  # mason  parsers_queries dnf_pkgs npm_pkgs nvim_plugins
+default: confs parsers_queries #nvim  # mason  parsers_queries dnf_pkgs npm_pkgs nvim_plugins
 
 ifdef GITHUB_ACTIONS
 	buildah config \
@@ -83,7 +83,7 @@ init: .env
 	$(RUN) which make &> /dev/null
 	$(RUN) which npm &> /dev/null
 	$(RUN) which luarocks &> /dev/null
-	$(SH) mkdir -p $(DIR_NVIM)/{after/filetype,queries,parser,lsp} 
+	$(SH) "mkdir -p $(DIR_NVIM)/{after/filetype,queries,parser,lsp}" 
 
 latest/tbx-build-tools.json:
 	# echo '##[ $@ ]##'
@@ -312,15 +312,13 @@ LR_OPTS := --tree $(ROCKS_PATH) --server $(ROCKS_BINARIES) --no-doc  --deps-mode
 SHOW_OPTS := --tree $(ROCKS_PATH)
 
 parsers_queries:
-	$(RUN) mkdir -p /etc/xdg/nvim/parser
-	$(RUN) mkdir -p /etc/xdg/nvim/queries
 	for ROCK in $(ROCKS)
 	do
 	$(RUN) luarocks install $(LR_OPTS) $$ROCK &> /dev/null
 	VER=$$($(RUN) luarocks show --mversion --tree $(ROCKS_PATH) $$ROCK)
 	DIR=$(ROCKS_LIB_PATH)/$$ROCK/$$VER
-	$(SH) "cp $$DIR/parser/* /etc/xdg/nvim/parser/"
-	$(SH) "cp -r $$DIR/queries/* /etc/xdg/nvim/queries/"
+	$(SH) "cp $$DIR/parser/* $(DIR_NVIM)/parser/"
+	$(SH) "cp -r $$DIR/queries/* $(DIR_NVIM)/queries/"
 	done
 	$(RUN) luarocks purge --tree $(ROCKS_PATH) &> /dev/null
 	# $(RUN) tree /etc/xdg/nvim
