@@ -41,7 +41,7 @@ DEVEL := gettext-devel \
 tr = printf "| %-14s | %-8s | %-83s |\n" "$(1)" "$(2)" "$(3)" | tee -a $(4)
 bdu = jq -r ".assets[] | select(.browser_download_url | contains(\"$1\")) | .browser_download_url" $2
 
-default: host-spawn build-tools
+default: build-tools
 	echo '##[ $@ ]##'
 	$(RUN) which wget
 	buildah config \
@@ -101,7 +101,6 @@ latest/fedora-toolbox.json:
 # 	printf "Checkout the %s for more information.\n\n" "[host-spawn repo](https://github.com/1player/host-spawn)" | tee -a $@
 
 build-tools: info/build-tools.md
-
 info/build-tools.md:
 	echo '##[ $@ ]##'
 	$(RUN) dnf config-manager addrepo --from-repofile=https://cli.github.com/packages/rpm/gh-cli.repo &> /dev/null
