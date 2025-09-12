@@ -30,6 +30,7 @@ RUN     := buildah run $(WORKING_CONTAINER)
 INSTALL := $(RUN) dnf install --allowerasing --skip-unavailable --skip-broken --no-allow-downgrade -y
 SH      := $(RUN) sh -c
 # LINK    := $(RUN) ln -s $(shell which host-spawn)
+# SPAWN    := 
 ADD     := buildah add --chmod 755 $(WORKING_CONTAINER)
 RW_ADD := buildah add --chmod  644 $(WORKING_CONTAINER)
 WGET    := wget -q --no-check-certificate --timeout=10 --tries=3
@@ -100,11 +101,10 @@ latest/tbx-build-tools.json:
 	buildah from "$$FROM" | tee -a .env
 
 # link:
-# 	$(LINK) /usr/local/bin/firefox
-# 	$(LINK) /usr/local/bin/podman
-# 	$(LINK) /usr/local/bin/buildah
-# 	$(LINK) /usr/local/bin/skopeo
-
+# 	$(SPAWN) $(DIR_BIN)/firefox
+# 	$(SPAWN) $(DIR_BIN)/bin/podman
+# 	$(SPAWN) $(DIR_BIN)/buildah
+# 	$(SPAWN) $(DIR_BIN/skopeo
 
 nvim: info/neovim.md
 	echo '✅ latest pre-release neovim installed'
@@ -313,6 +313,9 @@ LR_OPTS := --tree $(ROCKS_PATH) --server $(ROCKS_BINARIES) --no-doc  --deps-mode
 SHOW_OPTS := --tree $(ROCKS_PATH)
 
 parsers_queries:
+	$(RUN) mkdir -p $(ROCKS_PATH)
+	$(RUN) mkdir -p $(DIR_NVIM)/queries 
+	$(RUN) mkdir -p $(DIR_NVIM)/parser
 	for ROCK in $(ROCKS)
 	do
 	$(RUN) luarocks install $(LR_OPTS) $$ROCK &> /dev/null
