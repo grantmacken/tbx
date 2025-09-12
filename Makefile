@@ -127,7 +127,7 @@ nvim_plugins:
 	echo '✅ selected nvim plugins installed'
 
 
-nvim_treesitter:
+treesitter:
 	# echo '##[ $@ ]##'
 	$(ADD) scripts/ /usr/local/bin/
 	$(RUN) /usr/local/bin/nvim_treesitter &> /dev/null
