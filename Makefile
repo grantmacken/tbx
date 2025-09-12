@@ -115,6 +115,7 @@ mason_registry:
 	# create the dir mason uses to store packages
 	$(RUN) mkdir -p /usr/local/share/mason
 	$(RUN) nvim_mason_registry || true
+	$(RUN) ls /usr/local/share/mason
 	echo '✅ mason registry added'
 
 mason: mason_registry
