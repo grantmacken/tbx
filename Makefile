@@ -58,16 +58,15 @@ bdu = jq -r ".assets[] | select(.browser_download_url | contains(\"$1\")) | .bro
 lsp_conf_url := https://raw.githubusercontent.com/neovim/nvim-lspconfig/refs/heads/master/lsp
 
 lsp_confs := $(wildcard xdg/nvim/lsp/*.lua)
-lsp_targs := $(patsubst xdg/nvim/lsp/%.lua,info/%.md,$(lsp_confs))
+lsp_targs := $(patsubst xdg/nvim/lsp/%.lua,info/lsp/%.md,$(lsp_confs))
 
 ft_confs  := $(wildcard xdg/nvim/lsp/*.lua)
 lsp_targs := $(patsubst xdg/nvim/lsp/%.lua,info/lsp/%.md,$(ft_confs))
 # $(info $(lsp_confs))
-:w
 $(info $(lsp_targs))
 # info/lsp/lua_ls.md
 
-default: parsers_queries confs  #nvim  # mason  parsers_queries dnf_pkgs npm_pkgs nvim_plugins
+default: parsers_queries confs # #nvim  # mason  parsers_queries dnf_pkgs npm_pkgs nvim_plugins
 
 ifdef GITHUB_ACTIONS
 	buildah config \
