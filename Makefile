@@ -29,17 +29,13 @@ DIR_SITE   := /usr/local/share/nvim/site
 DIR_BIN    := /usr/local/bin
 DIR_MASON  := /usr/local/share/mason
 
-DIR_NVIM    := /usr/local/share/nvim/site
+URL_LSPCONFIG := https://raw.githubusercontent.com/neovim/nvim-lspconfig/refs/heads/master/lsp/
 
-LSP_CONF_URL := https://raw.githubusercontent.com/neovim/nvim-lspconfig/refs/heads/master/lsp/
-
-TAR     := tar xz --strip-components=1 -C
+TAR          := tar xz --strip-components=1 -C
 TAR_NO_STRIP := tar xz -C
 
 NPM      := $(RUN) npm install --global
 NPM_LIST := $(RUN) npm list -g --depth=0
-
-LSP_CONF_URL := https://raw.githubusercontent.com/neovim/nvim-lspconfig/refs/heads/master/lsp
 
 tr = printf "| %-14s | %-8s | %-83s |\n" "$(1)" "$(2)" "$(3)" | tee -a $(4)
 bdu = jq -r ".assets[] | select(.browser_download_url | contains(\"$1\")) | .browser_download_url" $2
@@ -54,7 +50,7 @@ HEADING1 := \#
 HEADING2 := $(HEADING1)$(HEADING1)
 HEADING3 := $(HEADING2)$(HEADING1)
 
-default: init nvim treesitter #  mason # plugins lsp_confs filetype_confs
+default: init nvim treesitter mason plugins lsp_confs filetype_confs
 
 ifdef GITHUB_ACTIONS
 	buildah config \
@@ -152,9 +148,9 @@ plugins:
 	# $(RUN) ls /usr/local/share/nvim/site/pack/core/opt | tee $@
 	echo '✅ selected nvim plugins installed'
 
-# files in $(DIR_NVIM)/lsp
+# files in $(DIR_SITE)/lsp
 lsp_confs: lsp_local lsp_urls
-	$(RUN) ls -al $(DIR_NVIM)/lsp
+	$(RUN) ls -al $(DIR_SITE)/lsp
 	echo '✅ Installed all lsp confs'
 
 lsp_local: $(lsp_targs)
@@ -164,7 +160,7 @@ LSPCONFIGS := copilot.lua
 lsp_urls:
 	for conf in $(LSPCONFIGS)
 	do
-	$(RW_ADD) $(LSP_CONF_URL)/$$conf  $(DIR_NVIM)/lsp/$$conf
+	$(RW_ADD) $(URL_LSPCONFIG)/$$conf  $(DIR_SITE)/lsp/$$conf
 	done
  
 # https://github.com/neovim/nvim-lspconfig/tree/master/lsp
@@ -172,9 +168,8 @@ lsp_urls:
 info/lsp/%.md: xdg/nvim/lsp/%.lua
 	echo '##[ lsp: $* ]]##'
 	mkdir -p $(dir $@)
-	$(RUN) mkdir -p $(DIR_NVIM)/lsp
-	$(RW_ADD) $< $(DIR_NVIM)/lsp/$*
-
+	$(RUN) mkdir -p $(DIR_SITE)/lsp
+	$(RW_ADD) $< $(DIR_SITE)/lsp/$*
 
 filetype_confs: $(ft_targs)
 	echo '✅ Installed preconfigured filetype confs'
@@ -182,9 +177,9 @@ filetype_confs: $(ft_targs)
 info/filetype/%.md: xdg/nvim/after/filetype/%.lua
 	echo '##[ lsp: $* ]]##'
 	mkdir -p $(dir $@)
-	$(RUN) mkdir -p $(DIR_NVIM)/lsp
-	$(RW_ADD) $< $(DIR_NVIM)/lsp/$*
-	$(RUN) ls -al $(DIR_NVIM)/lsp/$*
+	$(RUN) mkdir -p $(DIR_SITE)/lsp
+	$(RW_ADD) $< $(DIR_SITE)/lsp/$*
+	$(RUN) ls -al $(DIR_SITE)/lsp/$*
 	echo '✅ lsp: $*' | tee $@
 
 # $(RW_ADD) xdg/nvim/after/filetype/lua.lua $(DIR_FILETYPE)/lua.lua
