@@ -4,6 +4,7 @@
 
 local dir_site = vim.uv.os_getenv("DIR_SITE")
 print(dir_site)
+return
 local treesitters = {
 'awk',
 'bash',
