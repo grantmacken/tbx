@@ -1,10 +1,9 @@
 #!/usr/bin/env -S nvim -l
 -- set XDG_DATA_HOME for vim.pack
 -- unset at scripts end
-
 local dir_site = vim.uv.os_getenv("DIR_SITE")
 print(dir_site)
-return
+print()
 local treesitters = {
 'awk',
 'bash',
