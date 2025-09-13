@@ -143,7 +143,7 @@ treesitter: npm
 	# create the dir where ts parser as queries will be installed
 	$(RUN) mkdir -p $(DIR_NVIM)
 	# run the script that install treesitter parsers and queries
-	$(RUN) nvim_treesitter &>/dev/null
+	$(RUN) nvim_treesitter || true
 	$(RUN) ls $(DIR_NVIM)/parser | grep -oP '\w+'
 	echo '✅ selected treesitter parsers and queries added'
 
