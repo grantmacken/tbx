@@ -21,7 +21,13 @@ Installed in the toolbox is
 `/usr/local/share/nvim/site` is the location for
 the selected neovim plugins, parsers, queries, and preconfigured lsp and ftplugins
 
-The scripts in the scripts folder are used to install
+Binaries installed by mason are in `/usr/local/bin`
+
+The scripts in the scripts folder use neovim to install the above.
+
+
+
+
 
 <!-- 
 TODO
