@@ -11,6 +11,7 @@ MAKEFLAGS += --warn-undefined-variables
 MAKEFLAGS += --no-builtin-rules
 MAKEFLAGS += --silent
 unexport MAKEFLAGS
+
 WORKING_CONTAINER := tbx-runtimes-working-container
 TBX_IMAGE :=  ghcr.io/grantmacken/tbx-coding
 # actions
@@ -18,7 +19,7 @@ RUN     := buildah run $(WORKING_CONTAINER)
 INSTALL := $(RUN) dnf install --allowerasing --skip-unavailable --skip-broken --no-allow-downgrade -y
 SH      := $(RUN) sh -c
 # LINK    := $(RUN) ln -s $(shell which host-spawn)
-# SPAWN    := 
+# SPAWN    :=
 ADD     := buildah add --chmod 755 $(WORKING_CONTAINER)
 RW_ADD := buildah add --chmod  644 $(WORKING_CONTAINER)
 WGET    := wget -q --no-check-certificate --timeout=10 --tries=3
@@ -58,8 +59,8 @@ ifdef GITHUB_ACTIONS
 	--label maintainer='Grant MacKenzie <grantmacken@gmail.com>' \
 	--env lang=C.UTF-8 $(WORKING_CONTAINER)
 	# REM
-	# buildah commit $(WORKING_CONTAINER) $(TBX_IMAGE)
-	# buildah push $(TBX_IMAGE):latest
+	buildah commit $(WORKING_CONTAINER) $(TBX_IMAGE)
+	buildah push $(TBX_IMAGE):latest
 endif
 
 init:
