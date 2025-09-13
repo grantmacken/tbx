@@ -19,21 +19,18 @@ RUN     := buildah run $(WORKING_CONTAINER)
 INSTALL := $(RUN) dnf install --allowerasing --skip-unavailable --skip-broken --no-allow-downgrade -y
 SH      := $(RUN) sh -c
 # LINK    := $(RUN) ln -s $(shell which host-spawn)
-# SPAWN    :=
 ADD     := buildah add --chmod 755 $(WORKING_CONTAINER)
 RW_ADD := buildah add --chmod  644 $(WORKING_CONTAINER)
 WGET    := wget -q --no-check-certificate --timeout=10 --tries=3
 
-# XDG_DATA_DIRS
 # everything is site dir
 DIR_SITE   := /usr/local/share/nvim/site
 DIR_BIN    := /usr/local/bin
 DIR_MASON  := /usr/local/share/mason
 
 URL_LSPCONFIG := https://raw.githubusercontent.com/neovim/nvim-lspconfig/refs/heads/master/lsp/
-
 TAR          := tar xz --strip-components=1 -C
-TAR_NO_STRIP := tar xz -C
+# TAR_NO_STRIP := tar xz -C
 
 NPM      := $(RUN) npm install --global
 NPM_LIST := $(RUN) npm list -g --depth=0
@@ -65,7 +62,7 @@ endif
 
 init:
 	# echo '##[ $@ ]##'
-	buildah pull ghcr.io/grantmacken/tbx-runtimes &>  /dev/null
+	buildah pull ghcr.io/grantmacken/tbx-runtimes &>/dev/null
 	buildah from ghcr.io/grantmacken/tbx-runtimes
 	# the runtime should have
 	$(RUN) which make &> /dev/null
@@ -73,12 +70,6 @@ init:
 	$(RUN) which luarocks &> /dev/null
 	$(RUN) mkdir -p $(DIR_SITE)
 	$(ADD) scripts/ $(DIR_BIN)/
-
-# link:
-# 	$(SPAWN) $(DIR_BIN)/firefox
-# 	$(SPAWN) $(DIR_BIN)/bin/podman
-# 	$(SPAWN) $(DIR_BIN)/buildah
-# 	$(SPAWN) $(DIR_BIN/skopeo
 
 nvim: info/neovim.md
 	echo '✅ latest pre-release neovim installed'
@@ -104,8 +95,6 @@ info/neovim.md: files/nvim.tar.gz
 	VERSION=$$($(RUN) nvim -v | grep -oP 'NVIM \K.+' | cut -d'-' -f1 )
 	SUM='The text editor with a focus on extensibility and usability'
 	printf "| %-10s | %-13s | %-83s |\n" "$${NAME}" "$${VERSION}" "$${SUM}" | tee -a $@
-	# add the nvim scripts
-	# $(RUN) ls -al $(DIR_BIN)
 
 mason_registry:
 	echo '##[ $@ ]##'
@@ -181,35 +170,6 @@ info/site/ftplugin/%.md: site/after/ftplugin/%.lua
 	$(RW_ADD) $< $(DIR_SITE)/after/ftplugin/$*
 	$(RUN) ls -al $(DIR_SITE)/ftplugin/$*
 	echo '✅ lsp: $*' | tee $@
-
-info/cli-tools.md:
-	# echo '##[ $@ ]##'
-	mkdir -p $(dir $@)
-	$(INSTALL) $(CLI_VIA_DNF) &> /dev/null
-	printf "\n$(HEADING2) %s\n\n" "Handpicked CLI tools available in the toolbox" | tee $@
-	$(call tr,"Name","Version","Summary",$@)
-	$(call tr,"----","-------","----------------------------",$@)
-	$(SH) 'dnf info -q --installed $(CLI_VIA_DNF) | \
-	   grep -oP "(Name.+:\s\K.+)|(Ver.+:\s\K.+)|(Sum.+:\s\K.+)" | \
-	   paste  - - -  | sort -u ' | \
-	   awk -F'\t' '{printf "| %-14s | %-8s | %-83s |\n", $$1, $$2, $$3}' | tee -a $@
-
-dnf_lsp_pkgs: info/lsp-tooling.md
-	echo '##[ $@ ]##'
-	echo '✅ LSP servers added'
-	echo '✅ Additional formaters and linters added'
-
-info/lsp-tooling.md:
-	# echo '##[ $@ ]##'
-	mkdir -p $(dir $@)
-	$(INSTALL) $(LSP_VIA_DNF) &> /dev/null
-	printf "\n$(HEADING2) %s\n\n" "dnf installed LSP tooling available in the toolbox" | tee $@
-	$(call tr,"Name","Version","Summary",$@)
-	$(call tr,"----","-------","----------------------------",$@)
-	buildah run $(WORKING_CONTAINER) sh -c  'dnf info -q --installed $(LSP_VIA_DNF) | \
-	   grep -oP "(Name.+:\s\K.+)|(Ver.+:\s\K.+)|(Sum.+:\s\K.+)" | \
-	   paste  - - -  | sort -u ' | \
-	   awk -F'\t' '{printf "| %-14s | %-8s | %-83s |\n", $$1, $$2, $$3}' | tee -a $@
 
 pull:
 	echo '##[ $@ ]##'

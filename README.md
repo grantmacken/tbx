@@ -25,6 +25,8 @@ Binaries installed by mason are in `/usr/local/bin`
 
 The scripts in the scripts folder use neovim to install the above.
 
+What gets 
+
 
 
 
