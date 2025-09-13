@@ -16,6 +16,17 @@ Installed in the toolbox is
  - selected treesitter parsers and queries
  - some preconfigured lsp and filetype config files
 
+## Locations
+
+I use /usr/local/share/nvim/site as the location for
+the selected neovim plugins, parsers, queries, and preconfigured lsp and ftplugins
+
+<-- 
+TODO
+## Mason
+
+mason is a neovim packea
+
 
 This toolbox is built **from** 2 other containers.
 These containers are built in sequence.
@@ -23,7 +34,7 @@ These containers are built in sequence.
 ```
  tbx-build-tools --> tbx-runtimes -- tbx-coding
 ```
-This means that all the tools in tbx-build-tools and tbx-runtimes are available in the 
+This means that all the tools in tbx-build-tools and tbx-runtimes are available in the
 tbx-coding toolbox container.
 
 
@@ -50,7 +61,7 @@ The tbx-build-toolbox container provides three tooling categories
  - devel headers
 
 
-
+-->
 
 
 

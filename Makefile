@@ -71,7 +71,6 @@ init:
 	$(RUN) which make &> /dev/null
 	$(RUN) which npm &> /dev/null
 	$(RUN) which luarocks &> /dev/null
-	buildah config --env DIR_SITE=$(DIR_SITE) $(WORKING_CONTAINER)
 	$(RUN) mkdir -p $(DIR_SITE)
 	$(ADD) scripts/ $(DIR_BIN)/
 
@@ -182,8 +181,6 @@ info/site/ftplugin/%.md: site/after/ftplugin/%.lua
 	$(RW_ADD) $< $(DIR_SITE)/after/ftplugin/$*
 	$(RUN) ls -al $(DIR_SITE)/ftplugin/$*
 	echo '✅ lsp: $*' | tee $@
-
-# $(RW_ADD) xdg/nvim/after/filetype/lua.lua $(DIR_FILETYPE)/lua.lua
 
 info/cli-tools.md:
 	# echo '##[ $@ ]##'
