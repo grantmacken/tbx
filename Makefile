@@ -31,7 +31,7 @@ LUA := luajit luarocks
 HEADING1 := \#
 HEADING2 := $(HEADING1)$(HEADING1)
 
-default: init golang nodejs rust $(LUA) $(OTP)
+default: init golang nodejs $(LUA) $(OTP)
 	echo '##[ $@ ]##'
 	buildah config \
 	--label summary='a toolbox with programming language runtimes' \
@@ -147,15 +147,17 @@ info/luarocks.md: latest/luarocks.json
 	$(call tr,$${NAME},$${VER},$${SUM},$@)
 	$(RUN) rm -fR tmp/luarocks
 
-rust:
-	echo '##[ $@ ]##'
-	$(RUN) dnf copr enable @rust-sig/rust-nightly
-	$(INSTALL) rust
-	$(RUN) mkdir -p /usr/local/cargo
-	$(RUN) cargo install cargo-binstall --root /usr/local/cargo
-	$(RUN) ls /usr/local/cargo/bin/
-	$(RUN) ln -sf /usr/local/cargo/bin/cargo-binstall /usr/local/bin/cargo-binstall
-	$(RUN) cargo-binstall --help
+# rust:
+# 	echo '##[ $@ ]##'
+# 	curl https://sh.rustup.rs -sSf | sh -s -- -y
+# 	export PATH="$HOME/.cargo/bin:$PATH"
+# 	$(RUN) dnf copr enable @rust-sig/rust-nightly
+# 	$(INSTALL) rust
+# 	$(RUN) mkdir -p /usr/local/cargo
+# 	$(RUN) cargo install cargo-binstall --root /usr/local/cargo
+# 	$(RUN) ls /usr/local/cargo/bin/
+# 	$(RUN) ln -sf /usr/local/cargo/bin/cargo-binstall /usr/local/bin/cargo-binstall
+# 	$(RUN) cargo-binstall --help
 	# $(RUN) cargo-binstall --no-confirm --no-symlinks --root /usr/local/cargo lux-cli
 	# $(RUN) ls /usr/local/cargo/bin/
 	# $(RUN) ln -sf /usr/local/cargo/bin/* /usr/local/bin/
