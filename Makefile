@@ -143,7 +143,7 @@ treesitter: npm
 	# create the dir where ts parser as queries will be installed
 	# run the script that install treesitter parsers and queries
 	$(RUN) nvim_treesitter || true
-	$(RUN) tree $(DIR_SITE)
+	$(RUN) fd -g gleam.so /usr
 	echo '✅ selected treesitter parsers and queries added'
 
 plugins:
