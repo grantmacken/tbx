@@ -25,6 +25,10 @@ WGET    := wget -q --no-check-certificate --timeout=10 --tries=3
 
 # XDG_DATA_DIRS
 # everything is site dir
+DIR_SITE   := /usr/local/share/nvim/site
+DIR_BIN    := /usr/local/bin
+DIR_MASON  := /usr/local/share/nvim/site
+
 DIR_NVIM    := /usr/local/share/nvim/site
 DIR_BIN     := /usr/local/bin
 
