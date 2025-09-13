@@ -74,6 +74,7 @@ init:
 	$(RUN) which make &> /dev/null
 	$(RUN) which npm &> /dev/null
 	$(RUN) which luarocks &> /dev/null
+	$(RUN) mkdir -p $(DIR_NVIM)
 
 # link:
 # 	$(SPAWN) $(DIR_BIN)/firefox
@@ -141,10 +142,9 @@ npm:
 treesitter: npm
 	echo '##[ $@ ]##'
 	# create the dir where ts parser as queries will be installed
-	$(RUN) mkdir -p $(DIR_NVIM)
 	# run the script that install treesitter parsers and queries
 	$(RUN) nvim_treesitter || true
-	$(RUN) ls $(DIR_NVIM)/parser | grep -oP '\w+'
+	$(RUN) ls $(DIR_NVIM) | grep -oP '\w+'
 	echo '✅ selected treesitter parsers and queries added'
 
 plugins:
