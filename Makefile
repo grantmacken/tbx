@@ -111,16 +111,17 @@ mason_registry:
 	echo '##[ $@ ]##'
 	# create the dir mason uses to store packages
 	$(RUN) mkdir -p $(DIR_MASON)
-	$(RUN) nvim_mason_registry &>/dev/null
+	$(RUN) nvim_mason_registry &>/dev/null'
+	echo '✅ mason registry loaded'
 
-	echo '✅ masonstry
+mason: mason_registry
 	echo '##[ $@ ]##'
 	# run the script that install mason packages
 	$(RUN) nvim_mason &>/dev/null #  2>&1 >/dev/null
 	# take a look at what is installed
 	$(RUN) ls $(DIR_MASON)/bin
 	# link installed packages to $(DIR_BIN)
-	# use SH to allow for globbing
+	# use SH here to allow for globbing
 	$(SH) 'ln -s $(DIR_MASON)/bin/* $(DIR_BIN)/'
 	# check bin dir
 	# $(RUN) ls -l /usr/local/bin
