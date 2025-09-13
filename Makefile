@@ -69,7 +69,7 @@ golang: info/golang.md
 info/golang.md:
 	echo '##[ $@ ]##'
 	$(RUN) dnf copr enable -y @go-sig/golang-rawhide
-	$(RUN) info golang
+	$(RUN) dnf info golang
 	$(INSTALL) golang
 	$(RUN) go version
 	# $(RUN) whereis go
