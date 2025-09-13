@@ -146,7 +146,7 @@ treesitter: npm
 plugins:
 	# echo '##[ $@ ]##'
 	$(RUN) nvim_plugins  /dev/null
-	# $(RUN) ls /usr/local/share/nvim/site/pack/core/opt | tee $@
+	$(RUN) ls /usr/local/share/nvim/site/pack/core/opt | tee $@
 	echo '✅ selected nvim plugins installed'
 
 # files in $(DIR_SITE)/lsp
