@@ -58,7 +58,7 @@ vim.pack.add({
 
 local ok_ts, ts = pcall(require, 'nvim-treesitter')
 
--- if ok_ts then
+if ok_ts then
 --   print( 'required treesitter' )
 --   ts.setup(
 --     {
