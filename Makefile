@@ -36,10 +36,10 @@ LUA := luajit luarocks
 HEADING1 := \#
 HEADING2 := $(HEADING1)$(HEADING1)
 
-default: init nodejs # $(LUA) $(OTP)
+default: init golang nodejs # $(LUA) $(OTP)
 	echo '##[ $@ ]##'
 	buildah config \
-	--label summary='a toolbox with cli tools, neovim' \
+	--label summary='a toolbox with programming language runtimes' \
 	--label maintainer='Grant MacKenzie <grantmacken@gmail.com>' \
 	--env lang=C.UTF-8 $(WORKING_CONTAINER)
 	buildah commit $(WORKING_CONTAINER) $(TBX_IMAGE)
@@ -71,6 +71,14 @@ info/runtimes.md: nodejs $(LUA) $(OTP)
 	# cat info/gleam.md  | tee -a $@
 	# cat info/nodejs.md | tee -a $@
 
+golang: info/golang.md
+info/golang.md:
+	echo '##[ $@ ]##'
+	$(RUN) dnf copr enable @go-sig/golang-rawhide
+	$(RUN) dnf update golang
+	$(RUN) go --version
+	$(RUN) whereis go
+
 ##[[ NODEJS ]]##
 nodejs: info/nodejs.md
 	echo '✅ latest nodejs added'
@@ -84,8 +92,10 @@ info/nodejs.md: latest/nodejs.json
 	echo '##[ $@ ]##'
 	mkdir -p $(dir $@)
 	VER=$$(jq -r '.tag_name' $< )
+	echo $${VER}
 	mkdir -p files/nodejs/usr/local
-	$(WGET) https://nodejs.org/download/release/$${VER}/node-$${VER}-linux-x64.tar.gz -O- | 
+	#$(WGET) https://nodejs.org/download/release/$${VER}/node-$${VER}-linux-x64.tar.gz -O- | 
+	$(WGET) https://nodejs.org/dist/$${VER}/node-$${VER}-linux-x64.tar.gz -O- |
 	$(TAR) files/nodejs/usr/local
 	$(ADD) files/nodejs &>/dev/null
 	echo -n 'checking node version...'
