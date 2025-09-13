@@ -11,14 +11,7 @@ MAKEFLAGS += --warn-undefined-variables
 MAKEFLAGS += --no-builtin-rules
 MAKEFLAGS += --silent
 unexport MAKEFLAGS
-
-HEADING1 := \#
-HEADING2 := $(HEADING1)$(HEADING1)
-HEADING3 := $(HEADING2)$(HEADING1)
-
-FROM_IMAGE := 
 WORKING_CONTAINER := tbx-runtimes-working-container
-
 TBX_IMAGE :=  ghcr.io/grantmacken/tbx-coding
 # actions
 RUN     := buildah run $(WORKING_CONTAINER)
@@ -33,7 +26,7 @@ WGET    := wget -q --no-check-certificate --timeout=10 --tries=3
 # XDG_DATA_DIRS
 # everything is site dir
 DIR_NVIM    := /usr/local/share/nvim/site
-DIR_BIN      := /usr/local/bin
+DIR_BIN     := /usr/local/bin
 
 LSP_CONF_URL := https://raw.githubusercontent.com/neovim/nvim-lspconfig/refs/heads/master/lsp/
 
@@ -53,6 +46,10 @@ lsp_targs := $(patsubst xdg/nvim/lsp/%.lua,info/lsp/%.md,$(lsp_confs))
 
 ft_confs  := $(wildcard xdg/nvim/after/filetype/*.lua)
 ft_targs := $(patsubst xdg/nvim/after/filetype/*.lua, info/filetype/%.md,$(ft_confs))
+
+HEADING1 := \#
+HEADING2 := $(HEADING1)$(HEADING1)
+HEADING3 := $(HEADING2)$(HEADING1)
 
 default: init nvim treesitter  mason # plugins lsp_confs filetype_confs
 
@@ -144,7 +141,7 @@ treesitter: npm
 	# create the dir where ts parser as queries will be installed
 	# run the script that install treesitter parsers and queries
 	$(RUN) nvim_treesitter || true
-	$(RUN) ls $(DIR_NVIM) | grep -oP '\w+'
+	$(RUN) tree /usr/local/share/nvim
 	echo '✅ selected treesitter parsers and queries added'
 
 plugins:
