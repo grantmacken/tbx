@@ -4,7 +4,12 @@
 local dir_site = vim.uv.os_getenv("DIR_SITE")
 print(dir_site)
 print()
+
 local treesitters = {
+'gleam',
+}
+
+local xtreesitters = {
 'awk',
 'bash',
 'comment',
