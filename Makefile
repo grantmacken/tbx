@@ -25,12 +25,11 @@ WGET    := wget -q --no-check-certificate --timeout=10 --tries=3
 
 # XDG_DATA_DIRS
 # everything is site dir
-DIR_SITE   := /usr/local/share/nvim/site
+DIR_SITE   := /usr/share/nvim/site
 DIR_BIN    := /usr/local/bin
-DIR_MASON  := /usr/local/share/nvim/site
+DIR_MASON  := /usr/local/share/mason
 
 DIR_NVIM    := /usr/local/share/nvim/site
-DIR_BIN     := /usr/local/bin
 
 LSP_CONF_URL := https://raw.githubusercontent.com/neovim/nvim-lspconfig/refs/heads/master/lsp/
 
@@ -55,7 +54,7 @@ HEADING1 := \#
 HEADING2 := $(HEADING1)$(HEADING1)
 HEADING3 := $(HEADING2)$(HEADING1)
 
-default: init nvim treesitter  mason # plugins lsp_confs filetype_confs
+default: init nvim treesitter #  mason # plugins lsp_confs filetype_confs
 
 ifdef GITHUB_ACTIONS
 	buildah config \
@@ -75,7 +74,9 @@ init:
 	$(RUN) which make &> /dev/null
 	$(RUN) which npm &> /dev/null
 	$(RUN) which luarocks &> /dev/null
-	$(RUN) mkdir -p $(DIR_NVIM)
+	buildah config --env DIR_SITE=$(DIR_SITE) $(WORKING_CONTAINER)
+	$(RUN) mkdir -p $(DIR_SITE)
+	$(ADD) scripts/ $(DIR_BIN)/
 
 # link:
 # 	$(SPAWN) $(DIR_BIN)/firefox
@@ -108,26 +109,23 @@ info/neovim.md: files/nvim.tar.gz
 	SUM='The text editor with a focus on extensibility and usability'
 	printf "| %-10s | %-13s | %-83s |\n" "$${NAME}" "$${VERSION}" "$${SUM}" | tee -a $@
 	# add the nvim scripts
-	$(ADD) scripts/ $(DIR_BIN)/
 	# $(RUN) ls -al $(DIR_BIN)
 
 mason_registry:
 	echo '##[ $@ ]##'
 	# create the dir mason uses to store packages
-	$(RUN) mkdir -p /usr/local/share/mason
+	$(RUN) mkdir -p $(DIR_MASON)
 	$(RUN) nvim_mason_registry &>/dev/null
-	$(RUN) ls /usr/local/share/mason
-	echo '✅ mason registry added'
 
-mason: mason_registry
+	echo '✅ masonstry
 	echo '##[ $@ ]##'
 	# run the script that install mason packages
 	$(RUN) nvim_mason &>/dev/null #  2>&1 >/dev/null
 	# take a look at what is installed
-	$(RUN) ls /usr/local/share/mason/bin
+	$(RUN) ls $(DIR_MASON)/bin
 	# link installed packages to $(DIR_BIN)
 	# use SH to allow for globbing
-	$(SH) 'ln -s /usr/local/share/mason/bin/* $(DIR_BIN)/'
+	$(SH) 'ln -s $(DIR_MASON)/bin/* $(DIR_BIN)/'
 	# check bin dir
 	# $(RUN) ls -l /usr/local/bin
 	echo '✅ selected mason lsp	 servers, linters and formaters installed'
