@@ -27,16 +27,9 @@ INSTALL := $(RUN) dnf install --allowerasing --skip-unavailable --skip-broken --
 
 WGET := wget -q --no-check-certificate --timeout=10 --tries=3
 
-TOOLS    :=	host-spawn bat direnv jq eza fd-find fzf ripgrep wl-clipboard zoxide stow
-BUILDING := make gcc gcc-c++ pcre2 autoconf pkgconf
-DEVEL := gettext-devel \
- glibc-devel \
- libevent-devel \
- ncurses-devel \
- openssl-devel \
- perl-devel \
- readline-devel \
- zlib-devel
+TOOLS    :=	atuin bat direnv eza fd-find fzf host-spawn jq ripgrep wl-clipboard zoxide stow
+BUILD := make gcc gcc-c++ pcre2 autoconf pkgconf
+DEVEL    := gettext-devel glibc-devel libevent-devel ncurses-devel openssl-devel perl-devel readline-devel zlib-devel
 
 tr = printf "| %-14s | %-8s | %-83s |\n" "$(1)" "$(2)" "$(3)" | tee -a $(4)
 bdu = jq -r ".assets[] | select(.browser_download_url | contains(\"$1\")) | .browser_download_url" $2
@@ -49,7 +42,7 @@ default: info/build-tools.md
 	--env lang=C.UTF-8 $(WORKING_CONTAINER)
 	buildah commit $(WORKING_CONTAINER) $(TBX_IMAGE)
 	buildah push $(TBX_IMAGE):latest
-	
+
 init: .env
 	echo '##[ $@ ]##'
 
@@ -77,7 +70,7 @@ info/build-tools.md:
 	$(INSTALL) gh --repo gh-cli &>  /dev/null
 	$(INSTALL) $(TOOLS) &>/dev/null
 	$(INSTALL) $(DEVEL) &>/dev/null
-	$(INSTALL) $(BUILDING) &>/dev/null
+	$(INSTALL) $(BUILD) &>/dev/null
 	printf "\n$(HEADING2) %s\n\n" "Selected CLI Tools" | tee $@
 	$(call tr,"Name","Version","Summary",$@)
 	$(call tr,"----","-------","----------------------------",$@)
@@ -89,12 +82,12 @@ info/build-tools.md:
 	printf "\n$(HEADING2) %s\n\n" "Selected Build Tooling for Make Installs" | tee $@
 	$(call tr,"Name","Version","Summary",$@)
 	$(call tr,"----","-------","----------------------------",$@)
-	$(RUN) sh -c  'dnf info -q --installed $(BUILDING) | \
+	$(RUN) sh -c  'dnf info -q --installed $(BUILD) | \
 	grep -oP "(Name.+:\s\K.+)|(Ver.+:\s\K.+)|(Sum.+:\s\K.+)" | \
 	paste  - - -  | sort -u ' | \
 	awk -F'\t' '{printf "| %-14s | %-8s | %-83s |\n", $$1, $$2, $$3}' | \
 	tee -a $@
-	printf "\n$(HEADING2) %s\n\n" "Selected Development files for building" | tee $@
+	printf "\n$(HEADING2) %s\n\n" "Selected Development files for BUILD" | tee $@
 	$(call tr,"Name","Version","Summary",$@)
 	$(call tr,"----","-------","----------------------------",$@)
 	$(RUN) sh -c  'dnf info -q --installed $(DEVEL) | \
