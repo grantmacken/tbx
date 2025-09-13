@@ -165,8 +165,7 @@ lsp_urls:
 	done
 
 ## @see https://github.com/neovim/nvim-lspconfig/tree/master/lsp
-
-info/lsp/%.md: xdg/nvim/lsp/%.lua
+info/site/lsp/%.md: site/lsp/%.lua
 	echo '##[ lsp: $* ]]##'
 	mkdir -p $(dir $@)
 	$(RUN) mkdir -p $(DIR_SITE)/lsp
