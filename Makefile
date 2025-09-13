@@ -11,12 +11,8 @@ MAKEFLAGS += --warn-undefined-variables
 MAKEFLAGS += --no-builtin-rules
 MAKEFLAGS += --silent
 unexport MAKEFLAGS
-
-
-FROM_IMAGE := ghcr.io/grantmacken/tbx-build-tools
-NAME := tbx-runtimes
-WORKING_CONTAINER ?= $(NAME)-working-container
-TBX_IMAGE :=  ghcr.io/grantmacken/$(NAME)
+WORKING_CONTAINER ?= tbx-build-tools-working-container
+TBX_IMAGE :=  
 
 RUN := buildah run $(WORKING_CONTAINER)
 ADD := buildah add --chmod 755 $(WORKING_CONTAINER)
@@ -36,18 +32,18 @@ LUA := luajit luarocks
 HEADING1 := \#
 HEADING2 := $(HEADING1)$(HEADING1)
 
-default: init # golang nodejs # $(LUA) $(OTP)
+default: init golang nodejs # $(LUA) $(OTP)
 	echo '##[ $@ ]##'
 	buildah config \
 	--label summary='a toolbox with programming language runtimes' \
 	--label maintainer='Grant MacKenzie <grantmacken@gmail.com>' \
 	--env lang=C.UTF-8 $(WORKING_CONTAINER)
-	buildah commit $(WORKING_CONTAINER) $(TBX_IMAGE)
-	buildah push $(TBX_IMAGE):latest
+	buildah commit $(WORKING_CONTAINER) ghcr.io/grantmacken/tbx-runtimes
+	buildah push ghcr.io/grantmacken/tbx-runtimes:latest
 
 init:
-	buildah pull $(FROM_IMAGE)  &> /dev/null
-	buildah from $(FROM_IMAGE)
+	buildah pull ghcr.io/grantmacken/tbx-build-tools &>/dev/null
+	buildah from ghcr.io/grantmacken/tbx-build-tools
 
 ##[[ RUNTIMES ]]##
 runtimes: info/runtimes.md
