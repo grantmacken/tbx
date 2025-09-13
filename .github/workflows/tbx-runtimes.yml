@@ -1,7 +1,5 @@
 name: tbx runtimes toolbox
 on:
-  #schedule:
-  # - cron: '0 1 * * 1'  #  1am every monday
   push:
     branches:
     - tbx-runtimes
@@ -24,7 +22,5 @@ jobs:
             username: ${{ github.repository_owner }}
             password: ${{ github.token }}
         - uses: actions/checkout@v4
-        - name: Toolbox Build
-          run: |
-            make init
-            make
+        - name: Make runtimes toolbox image
+          run: make

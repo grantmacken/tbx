@@ -36,7 +36,7 @@ tarball = jq -r '.tarball_url' $1
 OTP := otp rebar3 elixir
 LUA := luajit luarocks
 
-default: nodejs $(LUA) $(OTP)
+default: init runtimes
 	echo '##[ $@ ]##'
 	buildah config \
 	--label summary='a toolbox with cli tools, neovim' \
@@ -45,25 +45,14 @@ default: nodejs $(LUA) $(OTP)
 	buildah commit $(WORKING_CONTAINER) $(TBX_IMAGE)
 	buildah push $(TBX_IMAGE):latest
 
-init: .env
-	echo '##[ $@ ]##'
+init:
+	buildah pull $(FROM_IMAGE)  &> /dev/null
+	buildah from $(FROM_IMAGE) &> /dev/null
 
-latest/tbx-build-tools.json:
-	echo '##[ $@ ]##'
-	mkdir -p $(dir $@)
-	skopeo inspect docker://${FROM_IMAGE}:latest | jq '.' > $@
-
-.env: latest/tbx-build-tools.json
-	echo '##[ $@ ]##'
-	FROM=$$(cat $< | jq -r '.Name')
-	printf "FROM=%s\n" "$$FROM" | tee $@
-	buildah pull "$$FROM" &> /dev/null
-	echo -n "WORKING_CONTAINER=" | tee -a .env
-	buildah from "$$FROM" | tee -a .env
 
 ##[[ RUNTIMES ]]##
 runtimes: info/runtimes.md
-info/runtimes.md: otp # rebar3 elixir gleam
+info/runtimes.md: nodejs $(LUA) $(OTP)
 	mkdir -p $(dir $@)
 	printf "\n$(HEADING2) %s\n\n" "Runtimes and associated languages" | tee $@
 	# cat << EOF | tee -a $@
@@ -210,6 +199,7 @@ latest/elixir.json:
 elixir: info/elixir.md
 info/elixir.md: latest/elixir.json
 	echo '##[ $@ ]##'
+	mkdir -p $(dir $@)
 	TAGNAME=$$(jq -r '.tag_name' $<)
 	SRC=https://github.com/elixir-lang/elixir/archive/$${TAGNAME}.tar.gz
 	mkdir -p files/elixir && $(WGET) $${SRC} -O- |
@@ -227,7 +217,6 @@ info/elixir.md: latest/elixir.json
 	$(call tr,Mix,$${VER},Elixir build tool, $@)
 	$(RUN) rm -fR /tmp/elixir
 
-
 ##[[ rebar3 ]]##
 rebar3: info/rebar3.md
 
@@ -236,14 +225,12 @@ latest/rebar3.json:
 	mkdir -p $(dir $@)
 	$(WGET) https://api.github.com/repos/erlang/rebar3/releases/latest -O $@
 
-
 info/rebar3.md: latest/rebar3.json
 	# echo '##[ $@ ]##'
 	VER=$$(jq -r '.tag_name' $<)
 	SRC=$(shell $(call bdu,rebar3,$<))
 	$(ADD) $${SRC} /usr/local/bin/rebar3 &>/dev/null
 	$(call tr,Rebar3,$${VER},the erlang build tool,$@)
-
 
 ##[[ GLEAM ]]##
 gleam: info/gleam.md
@@ -267,6 +254,7 @@ info/gleam.md: files/gleam.tar
 	$(RUN) gleam --version
 	VER=$$(buildah run $(WORKING_CONTAINER) gleam --version | cut -d' ' -f2)
 	$(call tr,Gleam,$${VER},Gleam programming language,$@)
+
 pull:
 	echo '##[ $@ ]##'
 	podman pull ghcr.io/grantmacken/tbx-runtimes:latest
