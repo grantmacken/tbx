@@ -1,8 +1,12 @@
 #!/usr/bin/env -S nvim -l
 -- set XDG_DATA_HOME for vim.pack
+vim.uv.os_setenv("XDG_DATA_HOME", "/usr/local/share")
 -- unset at scripts end
 local dir_site = vim.uv.os_getenv("DIR_SITE")
 print(dir_site)
+print()
+vim.print(vim.fn.stdpath('data') .. '/site')
+
 print()
 
 local treesitters = {
@@ -54,13 +58,16 @@ vim.pack.add({
 
 local ok_ts, ts = pcall(require, 'nvim-treesitter')
 
-if ok_ts then
-  print( 'required treesitter' )
-  ts.setup(
-    {
-      install_root_dir = dir_site,
-    }
-  )
+-- if ok_ts then
+--   print( 'required treesitter' )
+--   ts.setup(
+--     {
+--       install_root_dir = dir_site,
+--     }
+--   )
 ts.install(treesitters):wait(300000)
 end
+
+vim.uv.os_unsetenv("XDG_DATA_HOME")
+
 

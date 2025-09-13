@@ -25,7 +25,7 @@ WGET    := wget -q --no-check-certificate --timeout=10 --tries=3
 
 # XDG_DATA_DIRS
 # everything is site dir
-DIR_SITE   := /usr/share/nvim/site
+DIR_SITE   := /usr/local/share/nvim/site
 DIR_BIN    := /usr/local/bin
 DIR_MASON  := /usr/local/share/mason
 
@@ -142,8 +142,9 @@ treesitter: npm
 	echo '##[ $@ ]##'
 	# create the dir where ts parser as queries will be installed
 	# run the script that install treesitter parsers and queries
-	$(RUN) nvim_treesitter || true
+	$(RUN)  nvim_treesitter || true
 	$(RUN) fd -g gleam.so /usr
+	$$(RUN) ls  $(DIR_SITE)
 	echo '✅ selected treesitter parsers and queries added'
 
 plugins:
