@@ -12,10 +12,7 @@ MAKEFLAGS += --no-builtin-rules
 MAKEFLAGS += --silent
 unexport MAKEFLAGS
 
-HEADING1 := \#
-HEADING2 := $(HEADING1)$(HEADING1)
 
-include .env
 FROM_IMAGE := ghcr.io/grantmacken/tbx-build-tools
 NAME := tbx-runtimes
 WORKING_CONTAINER ?= $(NAME)-working-container
@@ -36,6 +33,9 @@ tarball = jq -r '.tarball_url' $1
 OTP := otp rebar3 elixir
 LUA := luajit luarocks
 
+HEADING1 := \#
+HEADING2 := $(HEADING1)$(HEADING1)
+
 default: init runtimes
 	echo '##[ $@ ]##'
 	buildah config \
@@ -48,7 +48,6 @@ default: init runtimes
 init:
 	buildah pull $(FROM_IMAGE)  &> /dev/null
 	buildah from $(FROM_IMAGE) &> /dev/null
-
 
 ##[[ RUNTIMES ]]##
 runtimes: info/runtimes.md
