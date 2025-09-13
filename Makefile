@@ -11,13 +11,11 @@ MAKEFLAGS += --warn-undefined-variables
 MAKEFLAGS += --no-builtin-rules
 MAKEFLAGS += --silent
 unexport MAKEFLAGS
-WORKING_CONTAINER ?= tbx-build-tools-working-container
-TBX_IMAGE :=  
-
+## hardcoded working container
+WORKING_CONTAINER := tbx-build-tools-working-container
 RUN := buildah run $(WORKING_CONTAINER)
 ADD := buildah add --chmod 755 $(WORKING_CONTAINER)
 INSTALL := $(RUN) dnf install --allowerasing --skip-unavailable --skip-broken --no-allow-downgrade -y
-
 WGET := wget -q --no-check-certificate --timeout=10 --tries=3
 TAR  := tar xz --strip-components=1 -C
 TAR_NO_STRIP := tar xz -C
@@ -32,7 +30,7 @@ LUA := luajit luarocks
 HEADING1 := \#
 HEADING2 := $(HEADING1)$(HEADING1)
 
-default: init golang nodejs # $(LUA) $(OTP)
+default: init golang nodejs $(LUA) $(OTP)
 	echo '##[ $@ ]##'
 	buildah config \
 	--label summary='a toolbox with programming language runtimes' \
@@ -71,7 +69,7 @@ golang: info/golang.md
 info/golang.md:
 	echo '##[ $@ ]##'
 	$(RUN) dnf copr enable @go-sig/golang-rawhide
-	$(RUN) dnf update golang
+	$(RUN) dnf update golang -y
 	$(RUN) go --version
 	$(RUN) whereis go
 
