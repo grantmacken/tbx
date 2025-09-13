@@ -36,7 +36,7 @@ LUA := luajit luarocks
 HEADING1 := \#
 HEADING2 := $(HEADING1)$(HEADING1)
 
-default: init runtimes
+default: init nodejs # $(LUA) $(OTP)
 	echo '##[ $@ ]##'
 	buildah config \
 	--label summary='a toolbox with cli tools, neovim' \
@@ -47,7 +47,7 @@ default: init runtimes
 
 init:
 	buildah pull $(FROM_IMAGE)  &> /dev/null
-	buildah from $(FROM_IMAGE) &> /dev/null
+	buildah from $(FROM_IMAGE)
 
 ##[[ RUNTIMES ]]##
 runtimes: info/runtimes.md
