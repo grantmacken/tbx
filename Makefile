@@ -11,6 +11,7 @@ MAKEFLAGS += --warn-undefined-variables
 MAKEFLAGS += --no-builtin-rules
 MAKEFLAGS += --silent
 unexport MAKEFLAGS
+
 ## hardcoded working container
 WORKING_CONTAINER := tbx-build-tools-working-container
 RUN := buildah run $(WORKING_CONTAINER)
@@ -30,7 +31,7 @@ LUA := luajit luarocks
 HEADING1 := \#
 HEADING2 := $(HEADING1)$(HEADING1)
 
-default: init golang nodejs $(LUA) $(OTP)
+default: init golang nodejs rust $(LUA) $(OTP)
 	echo '##[ $@ ]##'
 	buildah config \
 	--label summary='a toolbox with programming language runtimes' \
@@ -146,8 +147,10 @@ info/luarocks.md: latest/luarocks.json
 	$(call tr,$${NAME},$${VER},$${SUM},$@)
 	$(RUN) rm -fR tmp/luarocks
 
-cargo:
+rust:
 	echo '##[ $@ ]##'
+	$(RUN) dnf copr enable @rust-sig/rust-nightly
+	$(INSTALL) rust
 	$(RUN) mkdir -p /usr/local/cargo
 	$(RUN) cargo install cargo-binstall --root /usr/local/cargo
 	$(RUN) ls /usr/local/cargo/bin/
