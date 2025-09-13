@@ -40,17 +40,17 @@ NPM_LIST := $(RUN) npm list -g --depth=0
 tr = printf "| %-14s | %-8s | %-83s |\n" "$(1)" "$(2)" "$(3)" | tee -a $(4)
 bdu = jq -r ".assets[] | select(.browser_download_url | contains(\"$1\")) | .browser_download_url" $2
 
-lsp_confs := $(wildcard xdg/nvim/lsp/*.lua)
-lsp_targs := $(patsubst xdg/nvim/lsp/%.lua,info/lsp/%.md,$(lsp_confs))
+lsp_confs := $(wildcard site/lsp/*.lua)
+lsp_targs := $(patsubst site/lsp/%.lua,info/site/lsp/%.md,$(lsp_confs))
 
-ft_confs  := $(wildcard xdg/nvim/after/filetype/*.lua)
-ft_targs := $(patsubst xdg/nvim/after/filetype/*.lua, info/filetype/%.md,$(ft_confs))
+ft_confs  := $(wildcard site/after/filetype/*.lua)
+ft_targs := $(patsubst  site/after/ftplugin/*.lua, info/after/ftplugin/%.md,$(ft_confs))
 
 HEADING1 := \#
 HEADING2 := $(HEADING1)$(HEADING1)
 HEADING3 := $(HEADING2)$(HEADING1)
 
-default: init nvim treesitter mason plugins lsp_confs filetype_confs
+default: init nvim treesitter mason plugins lsp_confs ft_confs
 
 ifdef GITHUB_ACTIONS
 	buildah config \
@@ -157,14 +157,14 @@ lsp_confs: lsp_local lsp_urls
 lsp_local: $(lsp_targs)
 	echo '✅ preconfigured local lsp configs installed'
 
-LSPCONFIGS := copilot.lua 
+LSPCONFIGS := copilot.lua
 lsp_urls:
 	for conf in $(LSPCONFIGS)
 	do
 	$(RW_ADD) $(URL_LSPCONFIG)/$$conf  $(DIR_SITE)/lsp/$$conf
 	done
- 
-# https://github.com/neovim/nvim-lspconfig/tree/master/lsp
+
+## @see https://github.com/neovim/nvim-lspconfig/tree/master/lsp
 
 info/lsp/%.md: xdg/nvim/lsp/%.lua
 	echo '##[ lsp: $* ]]##'
@@ -172,15 +172,15 @@ info/lsp/%.md: xdg/nvim/lsp/%.lua
 	$(RUN) mkdir -p $(DIR_SITE)/lsp
 	$(RW_ADD) $< $(DIR_SITE)/lsp/$*
 
-filetype_confs: $(ft_targs)
+ft_confs: $(ft_targs)
 	echo '✅ Installed preconfigured filetype confs'
 
-info/filetype/%.md: xdg/nvim/after/filetype/%.lua
+info/site/ftplugin/%.md: site/after/ftplugin/%.lua
 	echo '##[ lsp: $* ]]##'
 	mkdir -p $(dir $@)
-	$(RUN) mkdir -p $(DIR_SITE)/lsp
-	$(RW_ADD) $< $(DIR_SITE)/lsp/$*
-	$(RUN) ls -al $(DIR_SITE)/lsp/$*
+	$(RUN) mkdir -p $(DIR_SITE)/after/ftplugin
+	$(RW_ADD) $< $(DIR_SITE)/after/ftplugin/$*
+	$(RUN) ls -al $(DIR_SITE)/ftplugin/$*
 	echo '✅ lsp: $*' | tee $@
 
 # $(RW_ADD) xdg/nvim/after/filetype/lua.lua $(DIR_FILETYPE)/lua.lua
