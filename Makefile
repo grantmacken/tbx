@@ -68,10 +68,11 @@ info/runtimes.md: nodejs $(LUA) $(OTP)
 golang: info/golang.md
 info/golang.md:
 	echo '##[ $@ ]##'
-	$(RUN) dnf copr enable @go-sig/golang-rawhide
+	$(RUN) dnf copr enable -y @go-sig/golang-rawhide
+	$(RUN) info golang
 	$(INSTALL) golang
-	$(RUN) go --version
-	$(RUN) whereis go
+	$(RUN) go version
+	# $(RUN) whereis go
 
 ##[[ NODEJS ]]##
 nodejs: info/nodejs.md
