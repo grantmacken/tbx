@@ -54,7 +54,7 @@ lsp_targs := $(patsubst xdg/nvim/lsp/%.lua,info/lsp/%.md,$(lsp_confs))
 ft_confs  := $(wildcard xdg/nvim/after/filetype/*.lua)
 ft_targs := $(patsubst xdg/nvim/after/filetype/*.lua, info/filetype/%.md,$(ft_confs))
 
-default: init nvim treesitter # mason  plugins lsp_confs filetype_confs
+default: init nvim treesitter  mason # plugins lsp_confs filetype_confs
 
 ifdef GITHUB_ACTIONS
 	buildah config \
@@ -144,7 +144,7 @@ treesitter: npm
 	$(RUN) mkdir -p $(DIR_NVIM)
 	# run the script that install treesitter parsers and queries
 	$(RUN) nvim_treesitter &>/dev/null
-	$(RUN) ls $(DIR_NVIM) | grep -oP '\w+'
+	$(RUN) ls $(DIR_NVIM)/parser | grep -oP '\w+'
 	echo '✅ selected treesitter parsers and queries added'
 
 plugins:
