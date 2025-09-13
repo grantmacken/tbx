@@ -111,7 +111,7 @@ mason_registry:
 	echo '##[ $@ ]##'
 	# create the dir mason uses to store packages
 	$(RUN) mkdir -p $(DIR_MASON)
-	$(RUN) nvim_mason_registry &>/dev/null'
+	$(RUN) nvim_mason_registry &>/dev/null
 	echo '✅ mason registry loaded'
 
 mason: mason_registry
@@ -145,7 +145,7 @@ treesitter: npm
 
 plugins:
 	# echo '##[ $@ ]##'
-	$(RUN) nvim_plugins  /dev/null
+	$(RUN) nvim_plugins &> /dev/null
 	$(RUN) ls $(DIR_SITE)/pack/core/opt
 	echo '✅ selected nvim plugins installed'
 
