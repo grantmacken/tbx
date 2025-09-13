@@ -18,10 +18,12 @@ Installed in the toolbox is
 
 ## Locations
 
-I use /usr/local/share/nvim/site as the location for
+`/usr/local/share/nvim/site` is the location for
 the selected neovim plugins, parsers, queries, and preconfigured lsp and ftplugins
 
-<-- 
+The scripts in the scripts folder are used to install
+
+<!-- 
 TODO
 ## Mason
 
