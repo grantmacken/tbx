@@ -139,19 +139,19 @@ treesitter: npm
 	echo '##[ $@ ]##'
 	# create the dir where ts parser as queries will be installed
 	# run the script that install treesitter parsers and queries
-	$(RUN)  nvim_treesitter || true
-	$(RUN) ls  $(DIR_SITE)/parser | grep -oP '\w+'
+	$(RUN)  nvim_treesitter &>/dev/null
+	$(RUN) ls  $(DIR_SITE)/parser | grep -oP '^\w+'
 	echo '✅ selected treesitter parsers and queries added'
 
 plugins:
 	# echo '##[ $@ ]##'
 	$(RUN) nvim_plugins  /dev/null
-	$(RUN) ls /usr/local/share/nvim/site/pack/core/opt | tee $@
+	$(RUN) ls $(DIR_SITE)/pack/core/opt
 	echo '✅ selected nvim plugins installed'
 
 # files in $(DIR_SITE)/lsp
 lsp_confs: lsp_local lsp_urls
-	$(RUN) ls -al $(DIR_SITE)/lsp
+	$(RUN) ls $(DIR_SITE)/lsp
 	echo '✅ Installed all lsp confs'
 
 lsp_local: $(lsp_targs)
