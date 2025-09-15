@@ -1,10 +1,17 @@
 #!/usr/bin/env -S nvim -l
 -- set XDG_DATA_HOME for vim.pack
+--[[
+nvim/site subdirectories for each directory in $XDG_DATA_DIRS
+This is for plugins which were installed by system administrator,
+but are not part of the Nvim distribution. XDG_DATA_DIRS defaults
+to /usr/local/share/:/usr/share/, so system administrators are
+expected to install site plugins to /usr/share/nvim/site.
 -- unset at scripts end
-vim.uv.os_setenv("XDG_DATA_HOME", "/usr/local/share")
 vim.print(vim.fn.stdpath('data'))
+]]--
 -- use pack.add
--- /usr/local/share/nvim/site/pack/core/opt/
+-- /usr/share/nvim/site/pack/core/opt/
+vim.uv.os_setenv("XDG_DATA_HOME", "/usr/share")
 
 -- COLORSCHEMES
 vim.pack.add({ 

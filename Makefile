@@ -24,7 +24,7 @@ RW_ADD := buildah add --chmod  644 $(WORKING_CONTAINER)
 WGET    := wget -q --no-check-certificate --timeout=10 --tries=3
 
 # everything is site dir
-DIR_SITE   := /usr/local/share/nvim/site
+DIR_SITE   := /usr/share/nvim/site
 DIR_BIN    := /usr/local/bin
 DIR_MASON  := /usr/local/share/mason
 
@@ -48,7 +48,7 @@ HEADING1 := \#
 HEADING2 := $(HEADING1)$(HEADING1)
 HEADING3 := $(HEADING2)$(HEADING1)
 
-default: init nvim treesitter mason plugins lsp_confs ft_confs
+default: init nvim mason npm # treesitter plugins lsp_confs ft_confs
 
 ifdef GITHUB_ACTIONS
 	buildah config \
