@@ -48,7 +48,7 @@ if not registry.is_installed(bin) then
     print(bin .. " is installed!")
     -- Your code here (e.g., configure lsp, etc.)
   end)
-else:w
+else
   print(bin .. " is already installed!")
 end
 end
