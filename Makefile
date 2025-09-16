@@ -106,7 +106,7 @@ mason_registry:
 mason: mason_registry
 	echo '##[ $@ ]##'
 	# run the script that install mason packages
-	$(RUN) nvim_mason &>/dev/null #  2>&1 >/dev/null
+	$(RUN) nvim_mason #  &>/dev/null #  2>&1 >/dev/null
 	# take a look at what is installed
 	$(RUN) ls $(DIR_MASON)/bin
 	# link installed packages to $(DIR_BIN)
