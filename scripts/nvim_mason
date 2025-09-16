@@ -39,29 +39,15 @@ if ok_mason then
     }
   )
   
-local registry = require("mason-registry")
-registry.update()
-  -- Install and wait for completion event
- for _, bin in ipairs(bins) do
-if not registry.is_installed(bin) then
-  registry.get_package(bin):install()
-   registry.get_package(bin):on("install:success", function()
-    print(bin .. " is installed!")
-    -- Your code here (e.g., configure lsp, etc.)
-  end)
-else
-  print(bin .. " is already installed!")
-end
-end
 
---local registry = require("mason-registry")
+local registry = require("mason-registry")
 -- registry.update()
---vim.uv.sleep(1000) 
---for _, bin in ipairs(bins) do
---vim.uv.sleep(1000) 
---vim.cmd.MasonInstall(bin)
---vim.uv.sleep(1000) 
---end
+vim.uv.sleep(1000) 
+for _, bin in ipairs(bins) do
+vim.uv.sleep(1000) 
+vim.cmd.MasonInstall(bin)
+vim.uv.sleep(1000) 
+end
 else
   print( '- ABORT!!' )
 end
