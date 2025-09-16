@@ -48,11 +48,11 @@ HEADING1 := \#
 HEADING2 := $(HEADING1)$(HEADING1)
 HEADING3 := $(HEADING2)$(HEADING1)
 
-default: init nvim mason npm # treesitter plugins lsp_confs ft_confs
+default: init nvim mason npm # plugins treesitter plugins lsp_confs ft_confs
 
 ifdef GITHUB_ACTIONS
 	buildah config \
-	--label summary='a toolbox with cli tools, neovim' \
+	--label summary='a toolbox with cli tools, neovim' \:
 	--label maintainer='Grant MacKenzie <grantmacken@gmail.com>' \
 	--env lang=C.UTF-8 $(WORKING_CONTAINER)
 	# REM
