@@ -17,7 +17,7 @@ local bins = {
   'marksman',
   'shellcheck',
   'shfmt',
-  'stylelint-lsp',
+  -- 'stylelint-lsp',
   'tombi',
   'typescript-language-server',
   'yaml-language-server',
@@ -41,7 +41,7 @@ if ok_mason then
   
 
 local registry = require("mason-registry")
--- registry.update()
+-- registry.update()-
 vim.uv.sleep(1000) 
 for _, bin in ipairs(bins) do
 vim.uv.sleep(1000) 
