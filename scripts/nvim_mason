@@ -3,9 +3,9 @@
 --
 -- 'gh-actions-language-server' 
 -- 'jq-lsp',
+--'ast-grep'
 
 local bins = {
-  'ast-grep',
   'bash-language-server',
   'copilot-language-server',
   'css-lsp',
@@ -40,6 +40,7 @@ if ok_mason then
   )
   
 local registry = require("mason-registry")
+registry.update()
   -- Install and wait for completion event
  for _, bin in ipairs(bins) do
 if not registry.is_installed(bin) then
