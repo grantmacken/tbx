@@ -27,9 +27,9 @@ INSTALL := $(RUN) dnf install --allowerasing --skip-unavailable --skip-broken --
 
 WGET := wget -q --no-check-certificate --timeout=10 --tries=3
 
-TOOLS    :=	atuin bat direnv eza fd-find fzf host-spawn jq ripgrep wl-clipboard zoxide stow
+TOOLS := atuin bat direnv eza fd-find fzf host-spawn jq ripgrep wl-clipboard zoxide stow
 BUILD := make gcc gcc-c++ pcre2 autoconf pkgconf
-DEVEL    := gettext-devel glibc-devel libevent-devel ncurses-devel openssl-devel perl-devel readline-devel zlib-devel
+DEVEL := libicu gettext-devel glibc-devel libevent-devel ncurses-devel openssl-devel perl-devel readline-devel zlib-devel
 
 tr = printf "| %-14s | %-8s | %-83s |\n" "$(1)" "$(2)" "$(3)" | tee -a $(4)
 bdu = jq -r ".assets[] | select(.browser_download_url | contains(\"$1\")) | .browser_download_url" $2
