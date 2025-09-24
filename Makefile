@@ -122,7 +122,7 @@ npm:
 	$(NPM) tree-sitter-cli &>/dev/null
 	# also install lsp server not on mason registry
 	$(NPM) @mistweaverco/kulala-ls &>/dev/null
-	$(NPM) @google/gemini-cli &>/dev/null
+	$(NPM) opencode-ai 
 	echo '✅ selected npm packages installed'
 
 pull:
