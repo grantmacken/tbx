@@ -122,6 +122,7 @@ npm:
 	$(NPM) tree-sitter-cli &>/dev/null
 	# also install lsp server not on mason registry
 	$(NPM) @mistweaverco/kulala-ls &>/dev/null
+	$(NPM) @google/gemini-cli &>/dev/null
 	echo '✅ selected npm packages installed'
 
 treesitter: npm

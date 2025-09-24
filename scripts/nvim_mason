@@ -15,13 +15,14 @@ local bins = {
   'kulala-fmt',
   'lua-language-server',
   'marksman',
+  'lemminx',
   'shellcheck',
   'shfmt',
   -- 'stylelint-lsp',
   'tombi',
   'typescript-language-server',
   'yaml-language-server',
-  }
+}
 -- unset at scripts end
 vim.uv.os_setenv("XDG_DATA_HOME", "/usr/local/share")
 -- /usr/local/share/nvim/site/pack/core/opt/
