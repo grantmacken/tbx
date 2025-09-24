@@ -125,53 +125,6 @@ npm:
 	$(NPM) @google/gemini-cli &>/dev/null
 	echo '✅ selected npm packages installed'
 
-treesitter: npm
-	echo '##[ $@ ]##'
-	# create the dir where ts parser as queries will be installed
-	# run the script that install treesitter parsers and queries
-	$(RUN)  nvim_treesitter &>/dev/null
-	$(RUN) ls  $(DIR_SITE)/parser | grep -oP '^\w+'
-	echo '✅ selected treesitter parsers and queries added'
-
-plugins:
-	# echo '##[ $@ ]##'
-	$(RUN) nvim_plugins &> /dev/null
-	$(RUN) ls $(DIR_SITE)/pack/core/opt
-	echo '✅ selected nvim plugins installed'
-
-# files in $(DIR_SITE)/lsp
-lsp_confs: lsp_local lsp_urls
-	$(RUN) ls $(DIR_SITE)/lsp
-	echo '✅ Installed all lsp confs'
-
-lsp_local: $(lsp_targs)
-	echo '✅ preconfigured local lsp configs installed'
-
-LSPCONFIGS := copilot.lua
-lsp_urls:
-	for conf in $(LSPCONFIGS)
-	do
-	$(RW_ADD) $(URL_LSPCONFIG)/$$conf  $(DIR_SITE)/lsp/$$conf
-	done
-
-## @see https://github.com/neovim/nvim-lspconfig/tree/master/lsp
-info/site/lsp/%.md: site/lsp/%.lua
-	echo '##[ lsp: $* ]]##'
-	mkdir -p $(dir $@)
-	$(RUN) mkdir -p $(DIR_SITE)/lsp
-	$(RW_ADD) $< $(DIR_SITE)/lsp/$*
-
-ft_confs: $(ft_targs)
-	echo '✅ Installed preconfigured filetype confs'
-
-info/site/ftplugin/%.md: site/after/ftplugin/%.lua
-	echo '##[ lsp: $* ]]##'
-	mkdir -p $(dir $@)
-	$(RUN) mkdir -p $(DIR_SITE)/after/ftplugin
-	$(RW_ADD) $< $(DIR_SITE)/after/ftplugin/$*
-	$(RUN) ls -al $(DIR_SITE)/ftplugin/$*
-	echo '✅ lsp: $*' | tee $@
-
 pull:
 	echo '##[ $@ ]##'
 	hostspawn
