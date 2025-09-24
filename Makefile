@@ -70,7 +70,7 @@ python: info/python.md
 info/python.md:
 	echo '##[ $@ ]##'
 	$(INSTALL) uv
-	$(RUN) uv version
+	$(RUN) uv -V
 
 golang: info/golang.md
 info/golang.md:
