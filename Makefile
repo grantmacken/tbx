@@ -48,7 +48,7 @@ HEADING1 := \#
 HEADING2 := $(HEADING1)$(HEADING1)
 HEADING3 := $(HEADING2)$(HEADING1)
 
-default: init nvim mason npm # plugins treesitter plugins lsp_confs ft_confs
+default: init nvim mason npm google-cloud-cli
 
 ifdef GITHUB_ACTIONS
 	buildah config \
@@ -131,8 +131,6 @@ google-cloud-cli:
 	$(INSTALL) libxcrypt-compat google-cloud-sdk
 	$(RUN) which gcloud
 	$(RUN) gcloud --version
-
-
 
 pull:
 	echo '##[ $@ ]##'
