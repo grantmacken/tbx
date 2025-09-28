@@ -2,7 +2,6 @@
 info/*
 !info/readme/*
 latest/
-files
 tmp
 bin
 

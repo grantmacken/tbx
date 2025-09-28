@@ -125,6 +125,15 @@ npm:
 	$(NPM) @github/copilot
 	echo '✅ selected npm packages installed'
 
+google-cloud-cli:
+	$(RUN) mkdir -p /etc/yum.repos.d/
+	$(ADD) files/google-cloud-sdk.repo /etc/yum.repos.d/google-cloud-sdk.repo
+	$(INSTALL) libxcrypt-compat google-cloud-sdk
+	$(RUN) which gcloud
+	$(RUN) gcloud --version
+
+
+
 pull:
 	echo '##[ $@ ]##'
 	hostspawn
