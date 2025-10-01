@@ -36,7 +36,10 @@ default: init python golang nodejs $(LUA) $(OTP) README.md
 	buildah config \
 	--label summary='a toolbox with programming language runtimes' \
 	--label maintainer='Grant MacKenzie <grantmacken@gmail.com>' \
-	--env lang=C.UTF-8 $(WORKING_CONTAINER)
+	--env lang=C.UTF-8 \
+	--env ELIXIR_ERL_OPTIONS="+fnu" \
+	$(WORKING_CONTAINER)
+
 	buildah commit $(WORKING_CONTAINER) ghcr.io/grantmacken/tbx-runtimes
 	buildah push ghcr.io/grantmacken/tbx-runtimes:latest
 	echo '✅ ghcr.io/grantmacken/tbx-runtimes:latest built and pushed'
@@ -250,9 +253,9 @@ info/rebar3.md: latest/rebar3.json
 gleam: info/gleam.md
 
 latest/gleam.json:
-	# echo '##[ $@ ]##'
+	echo '##[ $@ ]##'
 	mkdir -p $(dir $@)
-	 $(WGET) https://api.github.com/repos/gleam-lang/gleam/releases/latest -O- |
+	$(WGET) https://api.github.com/repos/gleam-lang/gleam/releases/latest -O- |
 	jq -r '.assets[] | select(.name | endswith("x86_64-unknown-linux-musl.tar.gz"))' > $@
 
 files/gleam.tar: latest/gleam.json
