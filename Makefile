@@ -31,7 +31,7 @@ LUA := luajit luarocks
 HEADING1 := \#
 HEADING2 := $(HEADING1)$(HEADING1)
 
-default: init python golang nodejs $(LUA) $(OTP) README.md
+default: init  gleam#  python golang nodejs $(LUA) $(OTP)
 	echo '##[ $@ ]##'
 	buildah config \
 	--label summary='a toolbox with programming language runtimes' \
@@ -258,6 +258,7 @@ latest/gleam.json:
 	jq -r '.assets[] | select(.name | endswith("x86_64-unknown-linux-musl.tar.gz"))' > $@
 
 files/gleam.tar: latest/gleam.json
+	echo '##[ $@ ]##'
 	mkdir -p $(dir $@)
 	$(RUN) rm -f /usr/local/bin/gleam
 	SRC=$$(jq -r '.browser_download_url' $<)
@@ -266,10 +267,12 @@ files/gleam.tar: latest/gleam.json
 info/gleam.md: files/gleam.tar
 	echo '##[ $@ ]##'
 	$(ADD) $(WORKING_CONTAINER) $< /usr/local/bin/  &>/dev/null
-	echo -n 'checking gleam version...'
-	$(RUN) gleam --version
+	## success|failure check
+	$(RUN) gleam --version &>/dev/null
+	## extract version number
 	VER=$$(buildah run $(WORKING_CONTAINER) gleam --version | cut -d' ' -f2)
-	$(call tr,Gleam,$${VER},Gleam programming language,$@)
+	## create table row
+	$(call tr,gleam,$${VER},Gleam programming language,$@)
 
 pull:
 	echo '##[ $@ ]##'
