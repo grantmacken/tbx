@@ -46,7 +46,7 @@ init:
 	buildah from ghcr.io/grantmacken/tbx-build-tools
 
 ##[[ RUNTIMES ]]##
-READNE.md:
+README.md:
 	mkdir -p $(dir $@)
 	printf "\n$(HEADING2) %s\n\n" "Runtimes and associated languages" | tee $@
 	cat << EOF | tee -a $@
