@@ -30,10 +30,6 @@ jobs:
           run: |
             git config --local user.email "action@github.com"
             git config --local user.name "GitHub Action"
-            git add README.md
-            if git diff --staged --quiet; then
-              echo "No changes to README.md"
-            else
-              git commit -m "Update README.md from Makefile build [skip ci]"
-              git push
-            fi
+            git commit -m "Update README.md from Makefile build"  README.md
+            # NOTE: push does not trigger action run
+            git push
