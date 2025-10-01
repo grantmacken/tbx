@@ -39,7 +39,6 @@ default: init python golang nodejs $(LUA) $(OTP) README.md
 	--env lang=C.UTF-8 \
 	--env ELIXIR_ERL_OPTIONS="+fnu" \
 	$(WORKING_CONTAINER)
-
 	buildah commit $(WORKING_CONTAINER) ghcr.io/grantmacken/tbx-runtimes
 	buildah push ghcr.io/grantmacken/tbx-runtimes:latest
 	echo '✅ ghcr.io/grantmacken/tbx-runtimes:latest built and pushed'
