@@ -266,6 +266,7 @@ files/gleam.tar: latest/gleam.json
 
 info/gleam.md: files/gleam.tar
 	echo '##[ $@ ]##'
+	mkdir -p $(dir $@)
 	$(ADD) $(WORKING_CONTAINER) $< /usr/local/bin/  &>/dev/null
 	## success|failure check
 	$(RUN) gleam --version &>/dev/null
