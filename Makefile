@@ -31,7 +31,7 @@ LUA := luajit luarocks
 HEADING1 := \#
 HEADING2 := $(HEADING1)$(HEADING1)
 
-default: init  gleam#  python golang nodejs $(LUA) $(OTP)
+default: init  gleam README.md #  python golang nodejs $(LUA) $(OTP)
 	echo '##[ $@ ]##'
 	buildah config \
 	--label summary='a toolbox with programming language runtimes' \
@@ -66,7 +66,7 @@ README.md:
 	# cat info/rebar3.md | tee -a $@
 	# cat info/elixir.md | tee -a $@
 	cat info/gleam.md  | tee -a $@
-	cat info/nodejs.md | tee -a $@
+	#cat info/nodejs.md | tee -a $@
 	#
 python: info/python.md
 info/python.md:
