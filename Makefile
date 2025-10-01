@@ -63,7 +63,7 @@ README.md:
 	# cat info/otp.md    | tee -a $@
 	# cat info/rebar3.md | tee -a $@
 	# cat info/elixir.md | tee -a $@
-	# cat info/gleam.md  | tee -a $@
+	cat info/gleam.md  | tee -a $@
 	cat info/nodejs.md | tee -a $@
 	#
 python: info/python.md
