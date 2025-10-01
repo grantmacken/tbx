@@ -25,7 +25,7 @@ tr = printf "| %-14s | %-8s | %-83s |\n" "$(1)" "$(2)" "$(3)" | tee -a $(4)
 bdu = jq -r ".assets[] | select(.browser_download_url | contains(\"$1\")) | .browser_download_url" $2
 tarball = jq -r '.tarball_url' $1
 
-OTP := otp rebar3 elixir
+OTP := otp rebar3 elixir gleam
 LUA := luajit luarocks
 
 HEADING1 := \#
@@ -96,7 +96,6 @@ info/nodejs.md: latest/nodejs.json
 	VER=$$(jq -r '.tag_name' $< )
 	echo $${VER}
 	mkdir -p files/nodejs/usr/local
-	#$(WGET) https://nodejs.org/download/release/$${VER}/node-$${VER}-linux-x64.tar.gz -O- | 
 	$(WGET) https://nodejs.org/dist/$${VER}/node-$${VER}-linux-x64.tar.gz -O- |
 	$(TAR) files/nodejs/usr/local
 	$(ADD) files/nodejs &>/dev/null
@@ -113,7 +112,7 @@ luajit: info/luajit.md
 info/luajit.md:
 	echo '##[ $@ ]##'
 	mkdir -p $(dir $@)
-	$(INSTALL) luajit-devel luajit 
+	$(INSTALL) luajit-devel luajit
 	echo -n 'checking luajit version...'
 	$(RUN) luajit -v | tee $@
 	# VERSION=$$($(RUN) luajit -v | grep -oP 'LuaJIT \K\d+\.\d+\.\d{1,3}')
@@ -169,7 +168,7 @@ info/luarocks.md: latest/luarocks.json
 	# $(RUN) ln -sf /usr/local/cargo/bin/* /usr/local/bin/
 	# $(RUN) lx --help
 
-latest/otp.json: 
+latest/otp.json:
 	echo '##[ $@ ]##'
 	mkdir -p $(dir $@)
 	$(WGET) https://api.github.com/repos/erlang/otp/releases/latest -O $@
