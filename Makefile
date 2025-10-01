@@ -31,7 +31,7 @@ LUA := luajit luarocks
 HEADING1 := \#
 HEADING2 := $(HEADING1)$(HEADING1)
 
-default: init python golang nodejs $(LUA) $(OTP)
+default: init python golang nodejs $(LUA) $(OTP) README.md
 	echo '##[ $@ ]##'
 	buildah config \
 	--label summary='a toolbox with programming language runtimes' \
@@ -39,32 +39,32 @@ default: init python golang nodejs $(LUA) $(OTP)
 	--env lang=C.UTF-8 $(WORKING_CONTAINER)
 	buildah commit $(WORKING_CONTAINER) ghcr.io/grantmacken/tbx-runtimes
 	buildah push ghcr.io/grantmacken/tbx-runtimes:latest
+	echo '✅ ghcr.io/grantmacken/tbx-runtimes:latest built and pushed'
 
 init:
 	buildah pull ghcr.io/grantmacken/tbx-build-tools &>/dev/null
 	buildah from ghcr.io/grantmacken/tbx-build-tools
 
 ##[[ RUNTIMES ]]##
-runtimes: info/runtimes.md
-info/runtimes.md: nodejs $(LUA) $(OTP)
+READNE.md:
 	mkdir -p $(dir $@)
 	printf "\n$(HEADING2) %s\n\n" "Runtimes and associated languages" | tee $@
-	# cat << EOF | tee -a $@
-	# Included in this toolbox are the latest releases of the Erlang, Elixir and Gleam programming languages.
-	# The Erlang programming language is a general-purpose, concurrent, functional programming language
-	# and **runtime** system. It is used to build massively scalable soft real-time systems with high availability.
-	# The BEAM is the virtual machine at the core of the Erlang Open Telecom Platform (OTP).
-	# The included Elixir and Gleam programming languages also run on the BEAM.
-	# BEAM tooling included is the latest versions of the Rebar3 and the Mix build tools.
-	# The latest nodejs **runtime** is also installed, as Gleam can compile to javascript as well a Erlang.
-	# EOF
+	cat << EOF | tee -a $@
+	Included in this toolbox are the latest releases of the Erlang, Elixir and Gleam programming languages.
+	The Erlang programming language is a general-purpose, concurrent, functional programming language
+	and **runtime** system. It is used to build massively scalable soft real-time systems with high availability.
+	The BEAM is the virtual machine at the core of the Erlang Open Telecom Platform (OTP).
+	The included Elixir and Gleam programming languages also run on the BEAM.
+	BEAM tooling included is the latest versions of the Rebar3 and the Mix build tools.
+	The latest nodejs **runtime** is also installed, as Gleam can compile to javascript as well a Erlang.
+	EOF
 	# $(call tr,"Name","Version","Summary",$@)
 	# $(call tr,"----","-------","----------------------------",$@)
 	# cat info/otp.md    | tee -a $@
 	# cat info/rebar3.md | tee -a $@
 	# cat info/elixir.md | tee -a $@
 	# cat info/gleam.md  | tee -a $@
-	# cat info/nodejs.md | tee -a $@
+	cat info/nodejs.md | tee -a $@
 	#
 python: info/python.md
 info/python.md:

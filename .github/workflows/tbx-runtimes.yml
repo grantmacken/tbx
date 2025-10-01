@@ -22,5 +22,18 @@ jobs:
             username: ${{ github.repository_owner }}
             password: ${{ github.token }}
         - uses: actions/checkout@v4
+          with:
+            token: ${{ github.token }}
         - name: Make runtimes toolbox image
           run: make
+        - name: Commit and push README.md changes
+          run: |
+            git config --local user.email "action@github.com"
+            git config --local user.name "GitHub Action"
+            git add README.md
+            if git diff --staged --quiet; then
+              echo "No changes to README.md"
+            else
+              git commit -m "Update README.md from Makefile build [skip ci]"
+              git push
+            fi
