@@ -42,8 +42,8 @@ default: init  gleam #  python golang nodejs $(LUA) $(OTP)
 	buildah commit $(WORKING_CONTAINER) ghcr.io/grantmacken/tbx-runtimes
 	buildah push ghcr.io/grantmacken/tbx-runtimes:latest
 	echo '✅ ghcr.io/grantmacken/tbx-runtimes:latest built and pushed'
-	printf "\n$(HEADING2) %s\n\n" "Runtimes and associated languages" | tee $@
-	cat << EOF | tee -a $@
+	printf "\n$(HEADING2) %s\n\n" "Runtimes and associated languages" | tee README.md
+	cat << EOF | tee -a README.md
 	Included in this toolbox are the latest releases of the Erlang, Elixir and Gleam programming languages.
 	The Erlang programming language is a general-purpose, concurrent, functional programming language
 	and **runtime** system. It is used to build massively scalable soft real-time systems with high availability.
@@ -52,10 +52,8 @@ default: init  gleam #  python golang nodejs $(LUA) $(OTP)
 	BEAM tooling included is the latest versions of the Rebar3 and the Mix build tools.
 	The latest nodejs **runtime** is also installed, as Gleam can compile to javascript as well a Erlang.
 	EOF
-	cat info/gleam.md  | tee -a $@
+	cat info/gleam.md  | tee -a tee README.md
 	echo '✅ README commited and  pushed'
-
-
 
 init:
 	buildah pull ghcr.io/grantmacken/tbx-build-tools &>/dev/null
