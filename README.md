@@ -1,4 +1,4 @@
-# tbx
+# Toolbox Runtimes
 
 ```
 podman pull ghcr.io/grantmacken/tbx-runtimes:latest
