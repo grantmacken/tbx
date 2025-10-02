@@ -49,7 +49,6 @@ HEADING2 := $(HEADING1)$(HEADING1)
 HEADING3 := $(HEADING2)$(HEADING1)
 
 default: init nvim mason npm google-cloud-cli
-
 ifdef GITHUB_ACTIONS
 	buildah config \
 	--label summary='a toolbox with cli tools, neovim' \
@@ -58,6 +57,9 @@ ifdef GITHUB_ACTIONS
 	# REM
 	buildah commit $(WORKING_CONTAINER) $(TBX_IMAGE)
 	buildah push $(TBX_IMAGE):latest
+	echo '✅ ghcr.io/grantmacken/tbx-coding:latest built and pushed'
+	printf "\n$(HEADING2) %s\n\n" "Neovim tooling" | tee README.md
+	cat info/neovim.md    | tee -a README.md
 endif
 
 init:
