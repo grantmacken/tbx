@@ -26,10 +26,20 @@ jobs:
             token: ${{ github.token }}
         - name: Make runtimes toolbox image
           run: make
+        - name: Set up Git
+          run: |
+            git config --local user.name "github-actions[bot]"
+            git config --local user.email "github-actions[bot]@users.noreply.github.com"
+            git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git
+
         - name: Commit and push README.md changes
           run: |
-            git config --local user.email "action@github.com"
-            git config --local user.name "GitHub Action"
-            git commit -m "Update README.md from Makefile build"  README.md
-            # NOTE: push does not trigger action run
-            git push
+            if [[ -n "$(git status --porcelain README.md)" ]]; then
+              git add README.md
+              git commit -m "Update README.md from Makefile build"
+              git push origin HEAD:${GITHUB_REF#refs/heads/}
+            else
+              echo "No changes to README.md. Skipping commit and push."
+            fi
+          env:
+            GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
