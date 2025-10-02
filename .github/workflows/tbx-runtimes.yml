@@ -34,12 +34,8 @@ jobs:
 
         - name: Commit and push README.md changes
           run: |
-            if [[ -n "$(git status --porcelain README.md)" ]]; then
-              git add README.md
-              git commit -m "Update README.md from Makefile build"
-              git push origin HEAD:${GITHUB_REF#refs/heads/}
-            else
-              echo "No changes to README.md. Skipping commit and push."
-            fi
+            git add README.md
+            git commit -m "Update README.md from Makefile build"
+            git push origin HEAD:${GITHUB_REF#refs/heads/}
           env:
             GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

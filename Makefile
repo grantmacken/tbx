@@ -60,6 +60,11 @@ default: init  gleam #  python golang nodejs $(LUA) $(OTP)
 init:
 	buildah pull ghcr.io/grantmacken/tbx-build-tools &>/dev/null
 	buildah from ghcr.io/grantmacken/tbx-build-tools
+	buildah config \
+	--label summary='a toolbox with programming language runtimes' \
+	--label maintainer='Grant MacKenzie <grantmacken@gmail.com>' \
+	--env lang=C.UTF-8 \
+	--env ELIXIR_ERL_OPTIONS="+fnu" $(WORKING_CONTAINER)
 
 ##[[ RUNTIMES ]]##
 	# $(call tr,"Name","Version","Summary",$@)
