@@ -67,7 +67,7 @@ README.md:
 	# cat info/elixir.md | tee -a $@
 	cat info/gleam.md  | tee -a $@
 	#cat info/nodejs.md | tee -a $@
-	#
+
 python: info/python.md
 info/python.md:
 	echo '##[ $@ ]##'
