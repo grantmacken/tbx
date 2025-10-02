@@ -53,6 +53,7 @@ default: init  gleam #  python golang nodejs $(LUA) $(OTP)
 	The latest nodejs **runtime** is also installed, as Gleam can compile to javascript as well a Erlang.
 	EOF
 	cat info/gleam.md  | tee -a $@
+	echo '✅ README commited and  pushed'
 
 
 
