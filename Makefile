@@ -52,14 +52,14 @@ default: init  gleam python golang nodejs $(LUA) $(OTP)
 	BEAM tooling included is the latest versions of the Rebar3 and the Mix build tools.
 	The latest nodejs **runtime** is also installed, as Gleam can compile to javascript as well a Erlang.
 	EOF
-	$(call tr,"Name","Version","Summary",$@)
-	$(call tr,"----","-------","----------------------------",$@)
+	$(call tr,"Name","Version","Summary",README.md)
+	$(call tr,"----","-------","----------------------------",README.md)
 	cat info/otp.md    | tee -a README.md
 	cat info/rebar3.md | tee -a README.md
 	cat info/elixir.md | tee -a README.md
 	cat info/gleam.md | tee -a tee README.md
 	cat info/nodejs.md | tee -a README.md
-	echo '✅ README modified commited and  pushed'
+	echo '✅ README modified,commited and pushed'
 
 init:
 	buildah pull ghcr.io/grantmacken/tbx-build-tools &>/dev/null
