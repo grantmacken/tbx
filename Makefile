@@ -112,11 +112,11 @@ mason: mason_registry
 	# take a look at what is installed
 	$(RUN) ls $(DIR_MASON)/bin
 	# get version of each binary
-	BINS=$$(
-	for bin in $(RUN) ls $(DIR_MASON)/bin
+	BINS=$$($(RUN) ls $(DIR_MASON)/bin)
+	for bin in $$BINS
 	do
 	echo "$$bin:"
-	$$bin --version 2>/dev/null || $$bin -v 2>/dev/null || echo "no version flag"; 
+	$$bin --version 2>/dev/null || $$bin -v 2>/dev/null || echo "no version flag" 
 	done'
 	# link installed packages to $(DIR_BIN)
 	# use SH here to allow for globbing
