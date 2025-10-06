@@ -134,6 +134,17 @@ npm:
 	$(NPM) @github/copilot
 	echo '✅ selected npm packages installed'
 
+uv_tool:
+	echo '##[ $@ ]##'
+	# uv tool is a cli to install and manage universal-variant tools
+	UV_TOOL_BIN_DIR="/usr/local/bin"
+	UV_TOOL_DIR="/var/lib/uv_tools"
+	uv tool install specify-cli --from git+https://github.com/github/spec-kit.git
+	# check it is installed
+	$(RUN) which specify
+	$(RUN) specify --version
+
+
 google-cloud-cli:
 	$(RUN) mkdir -p /etc/yum.repos.d/
 	$(ADD) files/google-cloud-sdk.repo /etc/yum.repos.d/google-cloud-sdk.repo
