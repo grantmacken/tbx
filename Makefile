@@ -110,13 +110,17 @@ mason: mason_registry
 	# run the script that install mason packages
 	$(RUN) nvim_mason &>/dev/null #  2>&1 >/dev/null
 	# take a look at what is installed
-	$(RUN) ls $(DIR_MASON)/bin
+	# $(RUN) ls $(DIR_MASON)/bin
 	# get version of each binary
 	BINS=$$($(RUN) ls $(DIR_MASON)/bin)
 	for bin in $$BINS
 	do
 	echo "$$bin:"
-	$$bin --version 2>/dev/null || $$bin -v 2>/dev/null || echo "no version flag" 
+	VER=$(shell $(RUN) $$bin --version 2>/dev/null || $$bin -v 2>/dev/null || echo "unknown")
+	# some version strings are long, so just get the first line
+	VER=$$(echo "$$VER" | head -n 1)
+	# print the version
+	echo "$$VER"
 	done
 	# link installed packages to $(DIR_BIN)
 	# use SH here to allow for globbing
