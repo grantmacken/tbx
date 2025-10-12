@@ -12,6 +12,16 @@ MAKEFLAGS += --no-builtin-rules
 MAKEFLAGS += --silent
 unexport MAKEFLAGS
 
+# Colors
+RED=\033[0;31m
+GREEN=\033[0;32m
+YELLOW=\033[0;33m
+BLUE=\033[0;34m
+PURPLE=\033[0;35m
+CYAN=\033[0;36m
+WHITE=\033[0;37m
+NC=\033[0m # No Color
+
 WORKING_CONTAINER := tbx-runtimes-working-container
 TBX_IMAGE :=  ghcr.io/grantmacken/tbx-coding
 # actions
@@ -132,8 +142,9 @@ mason: mason_registry
 	echo '✅ selected mason lsp	 servers, linters and formaters installed'
 
 npm: info/npm.md
+info/npm.md: ## install some npm packages globally
 	echo '##[ $@ ]##'
-	# dependency for treesitter
+	# dep for treesitter
 	$(NPM) tree-sitter-cli &>/dev/null
 	# also install lsp server not on mason registry
 	$(NPM) @mistweaverco/kulala-ls &>/dev/null
@@ -143,10 +154,11 @@ npm: info/npm.md
 	$(RUN) which kulala-ls &> /dev/null
 	$(RUN) which copilot-cli &> /dev/null
 	# Write to file
-	$(NPM_LIST) | tail -n +2 | while read line; do \
-		NAME=$$(echo $$line | awk -F@ '{print $$1}' | xargs); \
-		VER=$$(echo $$line | awk -F@ '{print $$2}' | xargs); \
-		[ -n "$$NAME" ] && printf "| %-10s | %-13s | %-83s |\n" "$$NAME" "$$VER" "Node.js package" | tee -a info/neovim.md; \
+	$(NPM_LIST) | tail -n +2 | while read line;
+	do 
+	NAME=$$(echo $$line | awk -F@ '{print $$1}' | xargs);
+	VER=$$(echo $$line | awk -F@ '{print $$2}' | xargs);
+	[ -n "$$NAME" ] && printf "| %-10s | %-13s | %-83s |\n" "$$NAME" "$$VER" "Node.js package" | tee -a info/neovim.md; 
 	done
 	echo '✅ selected npm packages installed'
 
@@ -191,7 +203,50 @@ info/luarocks.md: ## install busted and nlua
 		[ -n "$$name" ] && printf "| %-10s | %-13s | %-83s |\n" "$$name" "$$version" "$$summary" | tee -a $@; \
 	done
 
+commit: ## use gopilot to add commit message since last commit
+	copilot -p "add commit message since last commit" --allow-all-tools --add-dir $(CURDIR)
 
+ssss:
+	if [ -s commit_message.txt ]; then
+	ask "Do you want to push the commit? (y/n) " answer
+	if [ "$$answer" != "${answer#[Yy]}" ] ;then
+		git push origin tbx-coding
+	else
+		echo "Commit not pushed."
+	fi
+
+watch: ## use gh to watch the  workflow in GitHub Actions
+	echo -e "$(CYAN)Watch the workflow in GitHub Actions...$(NC)"
+	# get the last run id
+	# gh run list --branch tbx-coding --limit 1 | awk '{print $$1}'
+	RUN_ID=$$(gh run list --branch tbx-coding --limit 1 --json databaseId | jq '.[0].databaseId')
+	# check if completed
+	STATUS=$$(gh run view $$RUN_ID --json status | jq -r '.status')
+	if [ "$$STATUS" = "completed" ]
+	then
+	# check if success
+	CONCLUSION=$$(gh run view $$RUN_ID --json conclusion | jq -r '.conclusion')
+	if [ "$$CONCLUSION" = "success" ]
+	then
+	echo -e "$(GREEN)The last run ($$RUN_ID) is already completed successfully! Exiting.$(NC)"
+	exit 0
+	else
+	echo -e "$(RED)The last run ($$RUN_ID) has completed but did not complete successfully. Status: $$CONCLUSION$(NC)"
+	# show the logs
+	gh run view $$RUN_ID --log | grep -oP '^.+Stop|^.+error.+$$'
+	exit 1
+	fi
+	fi
+	# if not completed, watch it
+	gh run watch $$RUN_ID
+	# confirm it is completed
+	STATUS=$$(gh run view $$RUN_ID --json conclusion | jq -r '.conclusion')
+	if [ "$$STATUS" = "success" ]; then
+		echo -e "$(GREEN)The run ($$RUN_ID) completed successfully!$(NC)"
+	else
+		echo -e "$(RED)The run ($$RUN_ID) did not complete successfully. Status: $$STATUS$(NC)"
+		exit 1
+	fi
 
 pull:
 	echo '##[ $@ ]##'
