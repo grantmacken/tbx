@@ -58,7 +58,7 @@ HEADING1 := \#
 HEADING2 := $(HEADING1)$(HEADING1)
 HEADING3 := $(HEADING2)$(HEADING1)
 
-default: init npm  # nvim mason google-cloud-cli uv_tool luarocks
+default: init nvim npm mason google-cloud-cli uv_tool luarocks
 
 xxxxx:
 ifdef GITHUB_ACTIONS
@@ -153,7 +153,8 @@ info/npm.md: ## install some npm packages globally
 	$(NPM) tree-sitter-cli &>/dev/null
 	# also install lsp server not on mason registry
 	$(NPM) @mistweaverco/kulala-ls &>/dev/null
-	$(NPM) @github/copilo t-cli &>/dev/null
+	# install github copilot cli
+	$(NPM) @github/copilot-cli &>/dev/null
 	# check it is installed
 	$(RUN) which tree-sitter &> /dev/null
 	$(RUN) which kulala-ls &> /dev/null
@@ -171,7 +172,8 @@ uv_tool: ## uv tool is a cli to install and manage universal-variant tools
 	echo '##[ $@ ]##'
 	UV_TOOL_BIN_DIR="/usr/local/bin"
 	UV_TOOL_DIR="/var/lib/uv_tools"
-	uv tool install specify-cli --from git+https://github.com/github/spec-kit.git
+	uv tool install specify-cli --from git+https://github.com/github/spec-kit.git 
+	# --to $(UV_TOOL_DIR)/specify-cli --bin-dir $(UV_TOOL_BIN_DIR) 
 	# check it is installed
 	$(RUN) which specify
 	$(RUN) specify --version
