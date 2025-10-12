@@ -48,7 +48,7 @@ HEADING1 := \#
 HEADING2 := $(HEADING1)$(HEADING1)
 HEADING3 := $(HEADING2)$(HEADING1)
 
-default: init nvim mason npm google-cloud-cli uv_tool luarocks
+default: init nvim  npm # mason google-cloud-cli uv_tool luarocks
 ifdef GITHUB_ACTIONS
 	buildah config \
 	--label summary='a toolbox with cli tools, neovim' \
@@ -70,6 +70,7 @@ init:
 	# the runtime should have
 	$(RUN) which make &> /dev/null
 	$(RUN) which npm &> /dev/null
+	$(RUN) which git &> /dev/null
 	$(RUN) which luarocks &> /dev/null
 	$(RUN) mkdir -p $(DIR_SITE)
 	$(ADD) scripts/ $(DIR_BIN)/
@@ -130,24 +131,37 @@ mason: mason_registry
 	# $(RUN) ls -l /usr/local/bin
 	echo '✅ selected mason lsp	 servers, linters and formaters installed'
 
-npm:
+npm: info/npm.md
 	echo '##[ $@ ]##'
 	# dependency for treesitter
 	$(NPM) tree-sitter-cli &>/dev/null
 	# also install lsp server not on mason registry
 	$(NPM) @mistweaverco/kulala-ls &>/dev/null
-	$(NPM) @github/copilot
+	$(NPM) @github/copilo t-cli &>/dev/null
+	# check it is installed
+	$(RUN) which tree-sitter &> /dev/null
+	$(RUN) which kulala-ls &> /dev/null
+	$(RUN) which copilot-cli &> /dev/null
+	# Write to file
+	$(NPM_LIST) | tail -n +2 | while read line; do \
+		NAME=$$(echo $$line | awk -F@ '{print $$1}' | xargs); \
+		VER=$$(echo $$line | awk -F@ '{print $$2}' | xargs); \
+		[ -n "$$NAME" ] && printf "| %-10s | %-13s | %-83s |\n" "$$NAME" "$$VER" "Node.js package" | tee -a info/neovim.md; \
+	done
 	echo '✅ selected npm packages installed'
 
-uv_tool:
+uv_tool: ## uv tool is a cli to install and manage universal-variant tools
 	echo '##[ $@ ]##'
-	# uv tool is a cli to install and manage universal-variant tools
 	UV_TOOL_BIN_DIR="/usr/local/bin"
 	UV_TOOL_DIR="/var/lib/uv_tools"
 	uv tool install specify-cli --from git+https://github.com/github/spec-kit.git
 	# check it is installed
 	$(RUN) which specify
 	$(RUN) specify --version
+	# extract 'name', 'version', 'summary' of exec into to a table row
+	# NAME=$$($(RUN) uv tool list | grep -oP '^\w+')
+	# VER=$$($(RUN) uv tool list | grep -oP '^\w+\s\K[\d\.]+')
+	# SUM=$$($(RUN) uv tool list
 
 google-cloud-cli:
 	$(RUN) mkdir -p /etc/yum.repos.d/
@@ -159,7 +173,7 @@ google-cloud-cli:
 luarocks: info/luarocks.md
 	echo '✅ luarocks packages busted and nlua installed'
 
-info/luarocks.md:
+info/luarocks.md: ## install busted and nlua
 	echo '##[ $@ ]##'
 	mkdir -p $(dir $@)
 	# install busted testing framework
