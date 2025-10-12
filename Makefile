@@ -58,7 +58,9 @@ HEADING1 := \#
 HEADING2 := $(HEADING1)$(HEADING1)
 HEADING3 := $(HEADING2)$(HEADING1)
 
-default: init nvim  npm # mason google-cloud-cli uv_tool luarocks
+default: init npm  # nvim mason google-cloud-cli uv_tool luarocks
+
+xxxxx:
 ifdef GITHUB_ACTIONS
 	buildah config \
 	--label summary='a toolbox with cli tools, neovim' \
@@ -74,7 +76,7 @@ ifdef GITHUB_ACTIONS
 endif
 
 init:
-	# echo '##[ $@ ]##'
+	echo '##[ $@ ]##'
 	buildah pull ghcr.io/grantmacken/tbx-runtimes &>/dev/null
 	buildah from ghcr.io/grantmacken/tbx-runtimes
 	# the runtime should have
@@ -142,8 +144,11 @@ mason: mason_registry
 	echo '✅ selected mason lsp	 servers, linters and formaters installed'
 
 npm: info/npm.md
+	echo '✅ selected npm packages installed'
+
 info/npm.md: ## install some npm packages globally
 	echo '##[ $@ ]##'
+	mkdir -p $(dir $@)
 	# dep for treesitter
 	$(NPM) tree-sitter-cli &>/dev/null
 	# also install lsp server not on mason registry
@@ -206,14 +211,8 @@ info/luarocks.md: ## install busted and nlua
 commit: ## use gopilot to add commit message since last commit
 	copilot -p "add commit message since last commit" --allow-all-tools --add-dir $(CURDIR)
 
-ssss:
-	if [ -s commit_message.txt ]; then
-	ask "Do you want to push the commit? (y/n) " answer
-	if [ "$$answer" != "${answer#[Yy]}" ] ;then
-		git push origin tbx-coding
-	else
-		echo "Commit not pushed."
-	fi
+view:
+	gh repo view --branch tbx-coding
 
 watch: ## use gh to watch the  workflow in GitHub Actions
 	echo -e "$(CYAN)Watch the workflow in GitHub Actions...$(NC)"
