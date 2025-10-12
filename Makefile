@@ -31,7 +31,7 @@ LUA := luajit luarocks
 HEADING1 := \#
 HEADING2 := $(HEADING1)$(HEADING1)
 
-default: init  gleam python golang nodejs $(LUA) $(OTP)
+default: init gleam python golang nodejs $(LUA) $(OTP) python
 	echo '##[ $@ ]##'
 	buildah config \
 	--label summary='a toolbox with programming language runtimes' \
@@ -70,18 +70,17 @@ init:
 	--env lang=C.UTF-8 \
 	--env ELIXIR_ERL_OPTIONS="+fnu" $(WORKING_CONTAINER)
 
-##[[ RUNTIMES ]]##
-	# $(call tr,"Name","Version","Summary",$@)
-	# $(call tr,"----","-------","----------------------------",$@)
-	# cat info/otp.md    | tee -a $@
-	# cat info/rebar3.md | tee -a $@
-	# cat info/elixir.md | tee -a $@
-	#cat info/nodejs.md | tee -a $@
-
 python: info/python.md
-info/python.md:
+info/python.md: ## uv tool is a cli to install and manage universal-variant tools
 	echo '##[ $@ ]##'
 	$(INSTALL) uv
+	# verify installation
+	$(RUN) which uv &> /dev/null
+	# Write to file
+	# extract 'name', 'version', 'summary' of exec into to a table row
+	# NAME=$$($(RUN) uv tool list | grep -oP '^\w+')
+	# VER=$$($(RUN) uv tool list | grep -oP '^\w+\s\K[\d\.]+')
+	# SUM=$$($(RUN) uv tool list
 	$(RUN) uv -V
 
 golang: info/golang.md
