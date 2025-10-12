@@ -1,0 +1,37 @@
+#!/usr/bin/env bash
+# Install luarocks packages: busted and nlua
+# Creates symlinks for executables in /usr/local/bin
+
+set -euo pipefail
+
+# Install busted - Lua testing framework
+echo "Installing busted..."
+luarocks install busted
+
+# Install nlua - Neovim Lua REPL
+echo "Installing nlua..."
+luarocks install nlua
+
+# Find where luarocks installed the executables
+LUAROCKS_BIN=$(luarocks path --lr-bin)
+
+# Create symlinks in /usr/local/bin
+echo "Creating symlinks in /usr/local/bin..."
+
+# Create symlink for busted
+if [ -f "${LUAROCKS_BIN}/busted" ]; then
+    ln -sf "${LUAROCKS_BIN}/busted" /usr/local/bin/busted
+    echo "✓ Symlink created: /usr/local/bin/busted -> ${LUAROCKS_BIN}/busted"
+else
+    echo "Warning: busted executable not found at ${LUAROCKS_BIN}/busted"
+fi
+
+# Create symlink for nlua
+if [ -f "${LUAROCKS_BIN}/nlua" ]; then
+    ln -sf "${LUAROCKS_BIN}/nlua" /usr/local/bin/nlua
+    echo "✓ Symlink created: /usr/local/bin/nlua -> ${LUAROCKS_BIN}/nlua"
+else
+    echo "Warning: nlua executable not found at ${LUAROCKS_BIN}/nlua"
+fi
+
+echo "✅ Luarocks packages installed and symlinks created successfully"
