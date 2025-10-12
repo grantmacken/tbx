@@ -1,0 +1,37 @@
+SHELL=/usr/bin/bash
+.SHELLFLAGS := -euo pipefail -c
+# -e Exit immediately if a pipeline fails
+# -u Error if there are unset variables and parameters
+# -o option-name Set the option corresponding to option-name
+.ONESHELL:
+.DELETE_ON_ERROR:
+.SECONDARY:
+
+MAKEFLAGS += --warn-undefined-variables
+MAKEFLAGS += --no-builtin-rules
+MAKEFLAGS += --silent
+unexport MAKEFLAGS
+
+# Colors
+RED=\033[0;31m
+GREEN=\033[0;32m
+YELLOW=\033[0;33m
+BLUE=\033[0;34m
+PURPLE=\033[0;35m
+CYAN=\033[0;36m
+WHITE=\033[0;37m
+NC=\033[0m # No Color
+
+help: ## show available make targets
+	cat $(MAKEFILE_LIST) |
+	grep -oP '^[a-zA-Z_-]+:.*?## .*$$' |
+	sort |
+	awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-10s\033[0m %s\n", $$1, $$2}'
+
+workflow: ## use gh to run the  workflow in GitHub Actions
+	echo -e "$(CYAN)Triggering the default.yml in GitHub Actions...$(NC)"
+	gh workflow run default.yml
+	echo -e "$(CYAN)Running the full workflow...$(NC)"
+	## watch the workflow until it completes
+	gh run watch
+
