@@ -48,7 +48,7 @@ HEADING1 := \#
 HEADING2 := $(HEADING1)$(HEADING1)
 HEADING3 := $(HEADING2)$(HEADING1)
 
-default: init nvim mason npm google-cloud-cli
+default: init nvim mason npm google-cloud-cli uv_tool luarocks
 ifdef GITHUB_ACTIONS
 	buildah config \
 	--label summary='a toolbox with cli tools, neovim' \
@@ -60,6 +60,7 @@ ifdef GITHUB_ACTIONS
 	echo '✅ ghcr.io/grantmacken/tbx-coding:latest built and pushed'
 	printf "\n$(HEADING2) %s\n\n" "Neovim tooling" | tee README.md
 	cat info/neovim.md    | tee -a README.md
+	cat info/luarocks.md  | tee -a README.md
 endif
 
 init:
@@ -112,16 +113,16 @@ mason: mason_registry
 	# take a look at what is installed
 	# $(RUN) ls $(DIR_MASON)/bin
 	# get version of each binary
-	BINS=$$($(RUN) ls $(DIR_MASON)/bin)
-	for bin in $$BINS
-	do
-	echo "$$bin:"
-	VER=$(shell $(RUN) $$bin --version 2>/dev/null || $$bin -v 2>/dev/null || echo "unknown")
-	# some version strings are long, so just get the first line
-	VER=$$(echo "$$VER" | head -n 1)
-	# print the version
-	echo "$$VER"
-	done
+	# BINS=$$($(RUN) ls $(DIR_MASON)/bin)
+	# for bin in $$BINS
+	# do
+	# echo "$$bin:"
+	# VER=$(shell $(RUN) $$bin --version 2>/dev/null || $$bin -v 2>/dev/null || echo "unknown")
+	# # some version strings are long, so just get the first line
+	# VER=$$(echo "$$VER" | head -n 1)
+	# # print the version
+	# echo "$$VER"
+	# done
 	# link installed packages to $(DIR_BIN)
 	# use SH here to allow for globbing
 	$(SH) 'ln -s $(DIR_MASON)/bin/* $(DIR_BIN)/'
@@ -148,13 +149,35 @@ uv_tool:
 	$(RUN) which specify
 	$(RUN) specify --version
 
-
 google-cloud-cli:
 	$(RUN) mkdir -p /etc/yum.repos.d/
 	$(ADD) files/google-cloud-sdk.repo /etc/yum.repos.d/google-cloud-sdk.repo
 	$(INSTALL) libxcrypt-compat google-cloud-sdk
 	$(RUN) which gcloud
 	$(RUN) gcloud --version
+
+luarocks: info/luarocks.md
+	echo '✅ luarocks packages busted and nlua installed'
+
+info/luarocks.md:
+	echo '##[ $@ ]##'
+	mkdir -p $(dir $@)
+	# install busted testing framework
+	$(RUN) luarocks install busted &>/dev/null
+	# install nlua neovim lua interpreter
+	$(RUN) luarocks install nlua &>/dev/null
+	# link installed packages to $(DIR_BIN)
+	$(SH) 'ln -sf /usr/local/lib/luarocks/bin/busted $(DIR_BIN)/busted'
+	$(SH) 'ln -sf /usr/local/lib/luarocks/bin/nlua $(DIR_BIN)/nlua'
+	# verify installation
+	$(RUN) which busted &> /dev/null
+	$(RUN) which nlua &> /dev/null
+	# Write to file
+	$(RUN) luarocks list --porcelain | while read name version summary; do \
+		[ -n "$$name" ] && printf "| %-10s | %-13s | %-83s |\n" "$$name" "$$version" "$$summary" | tee -a $@; \
+	done
+
+
 
 pull:
 	echo '##[ $@ ]##'
