@@ -59,6 +59,11 @@ default: init gleam python golang nodejs $(LUA) $(OTP) python
 	cat info/elixir.md | tee -a README.md
 	cat info/gleam.md | tee -a tee README.md
 	cat info/nodejs.md | tee -a README.md
+	# python uv tool to install and manage universal-variant tools
+	cat info/python.md | tee -a README.md
+	# luajit and luarocks
+	# cat info/luajit.md | tee -a README.md
+	# cat info/luarocks.md | tee -a README.md
 	echo '✅ README modified,commited and pushed'
 
 init:
@@ -72,16 +77,20 @@ init:
 
 python: info/python.md
 info/python.md: ## uv tool is a cli to install and manage universal-variant tools
+python: info/python.md
+	echo '✅ latest python uv tool installed'
+
+info/python.md: ## uv tool is a cli to install and manage universal-variant tools
 	echo '##[ $@ ]##'
-	$(INSTALL) uv
+	mkdir -p $(dir $@)
+	$(INSTALL) uv &>/dev/null
 	# verify installation
 	$(RUN) which uv &> /dev/null
-	# Write to file
-	# extract 'name', 'version', 'summary' of exec into to a table row
-	# NAME=$$($(RUN) uv tool list | grep -oP '^\w+')
-	# VER=$$($(RUN) uv tool list | grep -oP '^\w+\s\K[\d\.]+')
-	# SUM=$$($(RUN) uv tool list
-	$(RUN) uv -V
+	# Write to file - extract 'name', 'version', 'summary' into a table row
+	NAME=$$($(RUN) dnf list installed uv | grep -oP '^uv')
+	VER=$$($(RUN) dnf info installed uv | grep -oP '^Version\s+:\s+\K.+')
+	SUM=$$($(RUN) dnf info installed uv | grep -oP '^Summary\s+:\s+\K.+')
+	$(call tr,$${NAME},$${VER},$${SUM},$@)
 
 golang: info/golang.md
 info/golang.md:
