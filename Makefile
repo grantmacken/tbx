@@ -163,7 +163,7 @@ npm: ## install some npm packages globally
 	# check it is installed
 	$(RUN) which tree-sitter || true
 	$(RUN) which kulala-ls || true
-	$(RUN) which copilot || true:w
+	$(RUN) which copilot || true
 	# Write to file
 	$(NPM_LIST) | jq -r '.dependencies' || true
 	# $(NPM_LIST) | tail -n +2 | while read line
@@ -179,7 +179,9 @@ uv_tool: ## uv tool is a cli to install and manage universal-variant tools
 	echo '##[ $@ ]##'
 	$(RUN) uv tool install specify-cli --from git+https://github.com/github/spec-kit.git &> /dev/null
 	# check it is installed
-	$(RUN) which specify &> /dev/null
+	$(RUN) which specify || true
+	$(RUN) whereis specify || true
+	$(RUN) uv tool list | grep specify || true
 	# extract 'name', 'version', 'summary' of exec into to a table row
 	NAME=specify
 	VER=$$($(RUN) uv tool list | grep -oP 'specify.+\K[\d\.]+')
@@ -264,9 +266,9 @@ watch: ## use gh to watch the  workflow in GitHub Actions
 
 pull:
 	echo '##[ $@ ]##'
-	hostspawn
+	host-spawn
 	podman pull ghcr.io/grantmacken/tbx-coding:latest
-	toolbox list --containers
+	# toolbox list --containers
 	# toolbox list --images
-	toolbox create --image ghcr.io/grantmacken/tbx-coding:latest coding
+	#toolbox create --image ghcr.io/grantmacken/tbx-coding:latest coding
 	exit
