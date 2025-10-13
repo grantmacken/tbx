@@ -63,18 +63,17 @@ ifdef GITHUB_ACTIONS
 	buildah commit $(WORKING_CONTAINER) $(TBX_IMAGE)
 	buildah push $(TBX_IMAGE):latest
 	echo '✅ ghcr.io/grantmacken/tbx-coding:latest built and pushed'
-	printf "\n$(HEADING2) %s\n\n" "Neovim tooling" | tee README.md
 	# neovim
-	cat info/neovim.md    | tee -a README.md
+	cat info/neovim.md  | tee -a README.md || true
 	# uv_tool
-	cat info/uv_tool.md   | tee -a README.md
+	cat info/uv_tool.md  | tee -a README.md || true
 	# mason lsp servers, linters and formaters
 	# npm packages
 	# mason lsp servers, linters and formaters
-	cat info/luarocks.md  | tee -a README.md
-	cat info/uv_tool.md   | tee -a README.md
+	cat info/luarocks.md  | tee -a README.md  || true
+	cat info/uv_tool.md   | tee -a README.md  || true
 	# google-cloud-cli
-	cat info/google-cloud-cli.md | tee -a README.md
+	cat info/google-cloud-cli.md | tee -a README.md	 || true
 endif
 
 init:
@@ -210,20 +209,20 @@ luarocks:## install busted and nlua
 	echo '##[ $@ ]##'
 	mkdir -p $(dir $@)
 	# install busted testing framework
-	$(RUN) luarocks install busted &>/dev/null
+	$(RUN) luarocks install busted
 	# install nlua neovim lua interpreter
-	$(RUN) luarocks install nlua &>/dev/null
-	# link installed packages to $(DIR_BIN)
-	$(SH) 'ln -sf /usr/local/lib/luarocks/bin/busted $(DIR_BIN)/busted'
-	$(SH) 'ln -sf /usr/local/lib/luarocks/bin/nlua $(DIR_BIN)/nlua'
-	# verify installation
-	$(RUN) which busted &> /dev/null
-	$(RUN) which nlua &> /dev/null
-	# Write to file
-	$(RUN) luarocks list --porcelain | while read name version summary
-	do
-	[ -n "$$name" ] && printf "| %-10s | %-13s | %-83s |\n" "$$name" "$$version" "$$summary" | tee -a info/luarocks.md
-	done
+	# $(RUN) luarocks install --global nlua &>/dev/null
+	# # link installed packages to $(DIR_BIN)
+	# $(SH) 'ln -sf /usr/local/lib/luarocks/bin/busted $(DIR_BIN)/busted'
+	# $(SH) 'ln -sf /usr/local/lib/luarocks/bin/nlua $(DIR_BIN)/nlua'
+	# # verify installation
+	# $(RUN) which busted &> /dev/null
+	# $(RUN) which nlua &> /dev/null
+	# # Write to file
+	# $(RUN) luarocks list --porcelain | while read name version summary
+	# do
+	# [ -n "$$name" ] && printf "| %-10s | %-13s | %-83s |\n" "$$name" "$$version" "$$summary" | tee -a info/luarocks.md
+	# done
 
 commit: ## use gopilot to add commit message since last commit
 	copilot -p "add commit message since last commit" --allow-all-tools --add-dir $(CURDIR)
