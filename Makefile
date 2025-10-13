@@ -176,16 +176,16 @@ info/npm.md: ## install some npm packages globally
 
 uv_tool: ## uv tool is a cli to install and manage universal-variant tools
 	echo '##[ $@ ]##'
-	$(RUN) uv tool install specify-cli --from git+https://github.com/github/spec-kit.git 
-	# --to $(UV_TOOL_DIR)/specify-cli --bin-dir $(UV_TOOL_BIN_DIR) 
+	$(RUN) uv tool install specify-cli --from git+https://github.com/github/spec-kit.git &> /dev/null
 	# check it is installed
-	$(RUN) which specify
-	$(RUN) specify --version
+	$(RUN) which specify &> /dev/null
+	 $(RUN) specify check
 	# extract 'name', 'version', 'summary' of exec into to a table row
-	# NAME=$$($(RUN) uv tool list | grep -oP '^\w+')
-	# VER=$$($(RUN) uv tool list | grep -oP '^\w+\s\K[\d\.]+')
-	# SUM=$$($(RUN) uv tool list
-
+	NAME=specify
+	VER=$$($(RUN) uv tool list | grep -oP '^specify-cli\s\K[\d\.]+')
+	SUM='A tool to help you specify your software projects'
+	printf "| %-10s | %-13s | %-83s |\n" "$$NAME" "$$VER" "$$SUM" | tee info/uv_tool.md
+	echo '✅ uv_tool installed'
 
 google-cloud-cli: ## install google-cloud-cli
 	echo '##[ $@ ]##'
