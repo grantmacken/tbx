@@ -175,6 +175,7 @@ info/npm.md: ## install some npm packages globally
 	echo '✅ selected npm packages installed'
 
 uv_tool: ## uv tool is a cli to install and manage universal-variant tools
+	mkdir -p info
 	echo '##[ $@ ]##'
 	$(RUN) uv tool install specify-cli --from git+https://github.com/github/spec-kit.git &> /dev/null
 	# check it is installed
@@ -182,7 +183,7 @@ uv_tool: ## uv tool is a cli to install and manage universal-variant tools
 	 $(RUN) specify check
 	# extract 'name', 'version', 'summary' of exec into to a table row
 	NAME=specify
-	VER=$$($(RUN) uv tool list | grep -oP '^specify-cli\s\K[\d\.]+')
+	VER=$$($(RUN) uv tool list | grep -oP 'specify.+\K[\d\.]+')
 	SUM='A tool to help you specify your software projects'
 	printf "| %-10s | %-13s | %-83s |\n" "$$NAME" "$$VER" "$$SUM" | tee info/uv_tool.md
 	echo '✅ uv_tool installed'
