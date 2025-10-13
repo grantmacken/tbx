@@ -43,7 +43,7 @@ TAR          := tar xz --strip-components=1 -C
 # TAR_NO_STRIP := tar xz -C
 
 NPM      := $(RUN) npm install --global
-NPM_LIST := $(RUN) npm list -g --depth=0
+NPM_LIST := $(RUN) npm list -g --depth=0 --json
 
 tr = printf "| %-14s | %-8s | %-83s |\n" "$(1)" "$(2)" "$(3)" | tee -a $(4)
 bdu = jq -r ".assets[] | select(.browser_download_url | contains(\"$1\")) | .browser_download_url" $2
@@ -160,12 +160,13 @@ npm: ## install some npm packages globally
 	# also install lsp server not on mason registry
 	$(NPM) @mistweaverco/kulala-ls || true
 	# install github copilot cli
-	$(NPM) @github/copilot-cli || true
+	$(NPM) @github/copilot || true
 	# check it is installed
 	$(RUN) which tree-sitter || true
 	$(RUN) which kulala-ls || true
 	$(RUN) which copilot || true:w
 	# Write to file
+	$(NPM_LIST) | jq -r '.'
 	# $(NPM_LIST) | tail -n +2 | while read line
 	# do
 	# NAME=$$(echo $$line | awk -F@ '{print $$1}' | xargs)
