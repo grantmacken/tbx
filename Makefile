@@ -71,6 +71,8 @@ ifdef GITHUB_ACTIONS
 	printf "\n$(HEADING2) %s\n\n" "Neovim tooling" | tee README.md
 	cat info/neovim.md    | tee -a README.md
 	cat info/luarocks.md  | tee -a README.md
+	# google-cloud-cli
+	cat info/google-cloud-cli.md | tee -a README.md
 endif
 
 init:
