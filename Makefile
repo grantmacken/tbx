@@ -58,9 +58,7 @@ HEADING1 := \#
 HEADING2 := $(HEADING1)$(HEADING1)
 HEADING3 := $(HEADING2)$(HEADING1)
 
-default: init nvim npm mason google-cloud-cli uv_tool luarocks
-
-xxxxx:
+default: init nvim mason google-cloud-cli uv_tool luarocks
 ifdef GITHUB_ACTIONS
 	buildah config \
 	--label summary='a toolbox with cli tools, neovim' \
