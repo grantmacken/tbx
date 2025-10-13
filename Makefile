@@ -155,7 +155,6 @@ mason: mason_registry
 
 npm: ## install some npm packages globally
 	echo '##[ $@ ]##'
-	mkdir -p $(dir $@)
 	# dep for treesitter
 	$(NPM) tree-sitter-cli &>/dev/null
 	# also install lsp server not on mason registry
@@ -163,16 +162,16 @@ npm: ## install some npm packages globally
 	# install github copilot cli
 	$(NPM) @github/copilot-cli &>/dev/null
 	# check it is installed
-	$(RUN) which tree-sitter &> /dev/null
-	$(RUN) which kulala-ls &> /dev/null
-	$(RUN) which copilot &> /dev/nulls
+	$(RUN) which tree-sitter || true
+	$(RUN) which kulala-ls || true
+	$(RUN) which copilot || true:w
 	# Write to file
-	$(NPM_LIST) | tail -n +2 | while read line
-	do
-	NAME=$$(echo $$line | awk -F@ '{print $$1}' | xargs)
-	VER=$$(echo $$line | awk -F@ '{print $$2}' | xargs)
-	[ -n "$$NAME" ] && printf "| %-10s | %-13s | %-83s |\n" "$$NAME" "$$VER" "Node.js package" | tee -a info/neovim.md;
-	done
+	# $(NPM_LIST) | tail -n +2 | while read line
+	# do
+	# NAME=$$(echo $$line | awk -F@ '{print $$1}' | xargs)
+	# VER=$$(echo $$line | awk -F@ '{print $$2}' | xargs)
+	# [ -n "$$NAME" ] && printf "| %-10s | %-13s | %-83s |\n" "$$NAME" "$$VER" "Node.js package" | tee -a info/neovim.md;
+	# done
 	echo '✅ selected npm packages installed'
 
 uv_tool: ## uv tool is a cli to install and manage universal-variant tools
