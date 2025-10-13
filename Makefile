@@ -60,10 +60,7 @@ HEADING3 := $(HEADING2)$(HEADING1)
 
 default: init nvim mason google-cloud-cli uv_tool luarocks
 ifdef GITHUB_ACTIONS
-	buildah config \
-	--label summary='a toolbox with cli tools, neovim' \
-	--label maintainer='Grant MacKenzie <grantmacken@gmail.com>' \
-	--env lang=C.UTF-8 $(WORKING_CONTAINER)
+
 	# REM
 	buildah commit $(WORKING_CONTAINER) $(TBX_IMAGE)
 	buildah push $(TBX_IMAGE):latest
@@ -86,6 +83,10 @@ init:
 	$(RUN) which luarocks &> /dev/null
 	$(RUN) mkdir -p $(DIR_SITE)
 	$(ADD) scripts/ $(DIR_BIN)/
+	buildah config \
+	--label summary='a toolbox with cli tools, neovim' maintainer='Grant MacKenzie <grantmacken@gmail.com>' \
+	--env lang=C.UTF-8 UV_TOOL_BIN_DIR=/usr/local/bin UV_TOOL_DIR=/var/lib/uv_tools \
+	$(WORKING_CONTAINER)
 
 nvim: info/neovim.md
 	echo '✅ latest pre-release neovim installed'
@@ -170,9 +171,7 @@ info/npm.md: ## install some npm packages globally
 
 uv_tool: ## uv tool is a cli to install and manage universal-variant tools
 	echo '##[ $@ ]##'
-	UV_TOOL_BIN_DIR="/usr/local/bin"
-	UV_TOOL_DIR="/var/lib/uv_tools"
-	uv tool install specify-cli --from git+https://github.com/github/spec-kit.git 
+	$(RUN) uv tool install specify-cli --from git+https://github.com/github/spec-kit.git 
 	# --to $(UV_TOOL_DIR)/specify-cli --bin-dir $(UV_TOOL_BIN_DIR) 
 	# check it is installed
 	$(RUN) which specify
@@ -194,10 +193,9 @@ google-cloud-cli: ## install google-cloud-cli
 	$(RUN) which gcloud &> /dev/null
 	# Write to file
 	NAME=$@
-	$(RUN) gcloud --version	 | head -n 1 | grep -oP 'Google Cloud SDK \K.+' | tee -a info/google-cloud-cli.md
 	VERSION=$$($(RUN) gcloud --version | head -n 1 | awk '{print $$4}')
 	SUM='Google Cloud SDK: gcloud, gsutil, bq command line tools'
-	printf "| %-10s | %-13s | %-83s |\n" "$${NAME}" "$${VERSION}" "$${SUM}" | tee -a $@
+	printf "| %-10s | %-13s | %-83s |\n" "$${NAME}" "$${VERSION}" "$${SUM}" | tee info/google-cloud-cli.md
 	echo '✅ google-cloud-cli installed'
 
 
