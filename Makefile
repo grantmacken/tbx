@@ -184,7 +184,6 @@ uv_tool: ## uv tool is a cli to install and manage universal-variant tools
 	$(RUN) uv tool install specify-cli --from git+https://github.com/github/spec-kit.git &> /dev/null
 	# check it is installed
 	$(RUN) which specify &> /dev/null
-	 $(RUN) specify check
 	# extract 'name', 'version', 'summary' of exec into to a table row
 	NAME=specify
 	VER=$$($(RUN) uv tool list | grep -oP 'specify.+\K[\d\.]+')
@@ -210,7 +209,6 @@ google-cloud-cli: ## install google-cloud-cli
 
 
 luarocks:## install busted and nlua
-: 
 	echo '##[ $@ ]##'
 	mkdir -p $(dir $@)
 	# install busted testing framework
