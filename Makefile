@@ -84,8 +84,13 @@ init:
 	$(RUN) mkdir -p $(DIR_SITE)
 	$(ADD) scripts/ $(DIR_BIN)/
 	buildah config \
-	--label summary='a toolbox with cli tools, neovim' maintainer='Grant MacKenzie <grantmacken@gmail.com>' \
-	--env lang=C.UTF-8 UV_TOOL_BIN_DIR=/usr/local/bin UV_TOOL_DIR=/var/lib/uv_tools \
+	--label summary='a toolbox with cli tools, neovim' \
+	--label description='a toolbox with cli tools, neovim, lsp servers, linters and formaters' \
+	--label org.opencontainers.image.source='https://github.com/grantmacken/tbx-coding' \
+	--label maintainer='Grant MacKenzie <grantmacken@gmail.com>' \
+	--env lang=C.UTF-8 \
+	--env UV_TOOL_BIN_DIR=/usr/local/bin \
+	--env UV_TOOL_DIR=/var/lib/uv_tools \
 	$(WORKING_CONTAINER)
 
 nvim: info/neovim.md
