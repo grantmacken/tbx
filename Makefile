@@ -137,24 +137,22 @@ mason: mason_registry
 	# take a look at what is installed
 	# $(RUN) ls $(DIR_MASON)/bin
 	# get version of each binary
-	# BINS=$$($(RUN) ls $(DIR_MASON)/bin)
-	# for bin in $$BINS
-	# do
-	# echo "$$bin:"
-	# VER=$(shell $(RUN) $$bin --version 2>/dev/null || $$bin -v 2>/dev/null || echo "unknown")
-	# # some version strings are long, so just get the first line
-	# VER=$$(echo "$$VER" | head -n 1)
-	# # print the version
-	# echo "$$VER"
-	# done
+	BINS=$$($(RUN) ls $(DIR_MASON)/bin)
+	for bin in $$BINS
+	do
+	echo "$$bin:"
+	VER=$(shell $(RUN) $$bin --version 2>/dev/null || $$bin -v 2>/dev/null || echo "unknown")
+	# some version strings are long, so just get the first line
+	VER=$$(echo "$$VER" | head -n 1)
+	# print the version
+	echo "$$VER"
+	done
 	# link installed packages to $(DIR_BIN)
 	# use SH here to allow for globbing
 	$(SH) 'ln -s $(DIR_MASON)/bin/* $(DIR_BIN)/'
 	# check bin dir
 	# $(RUN) ls -l /usr/local/bin
 	echo '✅ selected mason lsp	 servers, linters and formaters installed'
-
-
 
 npm: ## install some npm packages globally
 	echo '##[ $@ ]##'
