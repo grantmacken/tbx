@@ -60,14 +60,19 @@ HEADING3 := $(HEADING2)$(HEADING1)
 
 default: init nvim mason google-cloud-cli uv_tool luarocks
 ifdef GITHUB_ACTIONS
-
-	# REM
 	buildah commit $(WORKING_CONTAINER) $(TBX_IMAGE)
 	buildah push $(TBX_IMAGE):latest
 	echo '✅ ghcr.io/grantmacken/tbx-coding:latest built and pushed'
 	printf "\n$(HEADING2) %s\n\n" "Neovim tooling" | tee README.md
+	# neovim
 	cat info/neovim.md    | tee -a README.md
+	# uv_tool
+	cat info/uv_tool.md   | tee -a README.md
+	# mason lsp servers, linters and formaters
+	# npm packages
+	# mason lsp servers, linters and formaters
 	cat info/luarocks.md  | tee -a README.md
+	cat info/uv_tool.md   | tee -a README.md
 	# google-cloud-cli
 	cat info/google-cloud-cli.md | tee -a README.md
 endif
@@ -149,10 +154,9 @@ mason: mason_registry
 	# $(RUN) ls -l /usr/local/bin
 	echo '✅ selected mason lsp	 servers, linters and formaters installed'
 
-npm: info/npm.md
-	echo '✅ selected npm packages installed'
 
-info/npm.md: ## install some npm packages globally
+
+npm: ## install some npm packages globally
 	echo '##[ $@ ]##'
 	mkdir -p $(dir $@)
 	# dep for treesitter
@@ -168,8 +172,8 @@ info/npm.md: ## install some npm packages globally
 	# Write to file
 	$(NPM_LIST) | tail -n +2 | while read line
 	do
-	NAME=$$(echo $$line | awk -F@ '{print $$1}' | xargs);
-	VER=$$(echo $$line | awk -F@ '{print $$2}' | xargs);
+	NAME=$$(echo $$line | awk -F@ '{print $$1}' | xargs)
+	VER=$$(echo $$line | awk -F@ '{print $$2}' | xargs)
 	[ -n "$$NAME" ] && printf "| %-10s | %-13s | %-83s |\n" "$$NAME" "$$VER" "Node.js package" | tee -a info/neovim.md;
 	done
 	echo '✅ selected npm packages installed'
@@ -205,10 +209,8 @@ google-cloud-cli: ## install google-cloud-cli
 	echo '✅ google-cloud-cli installed'
 
 
-luarocks: info/luarocks.md
-	echo '✅ luarocks packages busted and nlua installed'
-
-info/luarocks.md: ## install busted and nlua
+luarocks:## install busted and nlua
+: 
 	echo '##[ $@ ]##'
 	mkdir -p $(dir $@)
 	# install busted testing framework
@@ -222,8 +224,9 @@ info/luarocks.md: ## install busted and nlua
 	$(RUN) which busted &> /dev/null
 	$(RUN) which nlua &> /dev/null
 	# Write to file
-	$(RUN) luarocks list --porcelain | while read name version summary; do \
-		[ -n "$$name" ] && printf "| %-10s | %-13s | %-83s |\n" "$$name" "$$version" "$$summary" | tee -a $@; \
+	$(RUN) luarocks list --porcelain | while read name version summary
+	do
+	[ -n "$$name" ] && printf "| %-10s | %-13s | %-83s |\n" "$$name" "$$version" "$$summary" | tee -a info/luarocks.md
 	done
 
 commit: ## use gopilot to add commit message since last commit
