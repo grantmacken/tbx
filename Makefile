@@ -182,10 +182,8 @@ uv_tool: ## uv tool is a cli to install and manage universal-variant tools
 	# VER=$$($(RUN) uv tool list | grep -oP '^\w+\s\K[\d\.]+')
 	# SUM=$$($(RUN) uv tool list
 
-google-cloud-cli: info/google-cloud-cli.md
-	echo '✅ google-cloud-cli installed'
 
-info/google-cloud-cli.md: ## install google-cloud-cli
+google-cloud-cli: ## install google-cloud-cli
 	echo '##[ $@ ]##'
 	mkdir -p $(dir $@)
 	# add the repo
@@ -194,14 +192,14 @@ info/google-cloud-cli.md: ## install google-cloud-cli
 	$(INSTALL) libxcrypt-compat google-cloud-sdk &> /dev/null
 	# verify installation
 	$(RUN) which gcloud &> /dev/null
-	$(RUN) gcloud --version	 &> /dev/null
-	$(RUN) gsutil --version &> /dev/null
-	$(RUN) bq --version &> /dev/null
 	# Write to file
-	NAME=google-cloud-cli
+	NAME=$@
+	$(RUN) gcloud --version	 | head -n 1 | grep -oP 'Google Cloud SDK \K.+' | tee -a info/google-cloud-cli.md
 	VERSION=$$($(RUN) gcloud --version | head -n 1 | awk '{print $$4}')
 	SUM='Google Cloud SDK: gcloud, gsutil, bq command line tools'
 	printf "| %-10s | %-13s | %-83s |\n" "$${NAME}" "$${VERSION}" "$${SUM}" | tee -a $@
+	echo '✅ google-cloud-cli installed'
+
 
 luarocks: info/luarocks.md
 	echo '✅ luarocks packages busted and nlua installed'
