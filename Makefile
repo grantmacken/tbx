@@ -156,11 +156,11 @@ mason: mason_registry
 npm: ## install some npm packages globally
 	echo '##[ $@ ]##'
 	# dep for treesitter
-	$(NPM) tree-sitter-cli &>/dev/null
+	$(NPM) tree-sitter-cli || true
 	# also install lsp server not on mason registry
-	$(NPM) @mistweaverco/kulala-ls &>/dev/null
+	$(NPM) @mistweaverco/kulala-ls || true
 	# install github copilot cli
-	$(NPM) @github/copilot-cli &>/dev/null
+	$(NPM) @github/copilot-cli || true
 	# check it is installed
 	$(RUN) which tree-sitter || true
 	$(RUN) which kulala-ls || true
