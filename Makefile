@@ -59,7 +59,6 @@ HEADING2 := $(HEADING1)$(HEADING1)
 HEADING3 := $(HEADING2)$(HEADING1)
 
 default: init npm # nvim mason google-cloud-cli uv_tool luarocks 
-ifdef GITHUB_ACTIONS
 	buildah commit $(WORKING_CONTAINER) $(TBX_IMAGE)
 	buildah push $(TBX_IMAGE):latest
 	echo '✅ ghcr.io/grantmacken/tbx-coding:latest built and pushed'
@@ -69,12 +68,12 @@ ifdef GITHUB_ACTIONS
 	cat info/uv_tool.md  | tee -a README.md || true
 	# mason lsp servers, linters and formaters
 	# npm packages
+	cat info/npm.md  | tee -a README.md  || true
 	# mason lsp servers, linters and formaters
 	cat info/luarocks.md  | tee -a README.md  || true
 	cat info/uv_tool.md   | tee -a README.md  || true
 	# google-cloud-cli
 	cat info/google-cloud-cli.md | tee -a README.md	 || true
-endif
 
 init:
 	echo '##[ $@ ]##'
@@ -166,14 +165,14 @@ npm: ## install some npm packages globally
 	$(RUN) which kulala-ls || true
 	$(RUN) which copilot || true:w
 	# Write to file
-	$(NPM_LIST) | jq -r '.'
+	$(NPM_LIST) | jq -r '.dependencies' || true
 	# $(NPM_LIST) | tail -n +2 | while read line
 	# do
 	# NAME=$$(echo $$line | awk -F@ '{print $$1}' | xargs)
 	# VER=$$(echo $$line | awk -F@ '{print $$2}' | xargs)
 	# [ -n "$$NAME" ] && printf "| %-10s | %-13s | %-83s |\n" "$$NAME" "$$VER" "Node.js package" | tee -a info/neovim.md;
 	# done
-	echo '✅ selected npm packages installed'
+	echo '✅ selected npm packages installed' | tee -a info/$@.md
 
 uv_tool: ## uv tool is a cli to install and manage universal-variant tools
 	mkdir -p info
