@@ -58,7 +58,7 @@ HEADING1 := \#
 HEADING2 := $(HEADING1)$(HEADING1)
 HEADING3 := $(HEADING2)$(HEADING1)
 
-default: init npm # nvim mason google-cloud-cli uv_tool luarocks 
+default: init nvim mason google-cloud-cli uv_tool luarocks npm
 	buildah commit $(WORKING_CONTAINER) $(TBX_IMAGE)
 	buildah push $(TBX_IMAGE):latest
 	echo '✅ ghcr.io/grantmacken/tbx-coding:latest built and pushed'
