@@ -70,8 +70,12 @@ build-tools:
 	$(INSTALL) $(TOOLS) &>/dev/null
 	$(INSTALL) $(DEVEL) &>/dev/null
 	$(INSTALL) $(BUILD) &>/dev/null
+	echo '✅ Build tools installed'
 
-README.md: build-tools
+readme: README.md
+	echo '✅ README generated'
+
+README.md:
 	echo '##[ $@ ]##'
 	printf "# %s\n\n" "Fedora Toolbox with CLI Tools and Build Tools" | tee  $@
 	printf "\n$(HEADING2) %s\n\n" "Selected CLI Tools" | tee -a $@
