@@ -32,12 +32,14 @@ HEADING1 := \#
 HEADING2 := $(HEADING1)$(HEADING1)
 
 default:  info/README.md # python golang nodejs $(LUA) $(OTP) python
+
+rem:
 	echo '##[ $@ ]##'
 	buildah commit $(WORKING_CONTAINER) ghcr.io/grantmacken/tbx-runtimes
 	buildah push ghcr.io/grantmacken/tbx-runtimes:latest
 	echo '✅ ghcr.io/grantmacken/tbx-runtimes:latest built and pushed'
 
-info/README.md: init python
+info/README.md: init python golang
 	echo '##[ $@ ]##'
 	mkdir -p $(dir $@)
 	# create or overwrite README.md
@@ -46,9 +48,13 @@ info/README.md: init python
 	$(call tr,"----","-------","----------------------------", $@)
 	# python uv tool to install and manage universal-variant tools
 	# Write to file - extract 'name', 'version', 'summary' into a table row
-	NAME=$$($(RUN) dnf list installed uv | grep -oP '^uv')
+	NAME=$$($(RUN) dnf list installed uv | grep -oP '^Name\s+:\s+\K.+'))
 	VER=$$($(RUN) dnf info installed uv | grep -oP '^Version\s+:\s+\K.+')
 	SUM=$$($(RUN) dnf info installed uv | grep -oP '^Summary\s+:\s+\K.+')
+	$(call tr,$${NAME},$${VER},$${SUM},$@)
+	NAME=$$($(RUN) dnf list installed golang | grep -oP '^Name\s+:\s+\K.+')
+	VER=$$($(RUN) dnf info installed golang | grep -oP '^Version\s+:\s+\K.+')
+	SUM=$$($(RUN) dnf info installed golang | grep -oP '^Summary\s+:\s+\K.+')
 	$(call tr,$${NAME},$${VER},$${SUM},$@)
 
 
@@ -94,15 +100,13 @@ python:
 	# verify installation
 	$(RUN) which uv &> /dev/null
 
-
-
-golang: info/golang.md
-info/golang.md:
+golang::
 	echo '##[ $@ ]##'
 	$(RUN) dnf copr enable -y @go-sig/golang-rawhide
 	$(RUN) dnf info golang
-	$(INSTALL) golang
-	$(RUN) go version
+	$(INSTALL) golang &>/dev/null
+	# verify installation
+	$(RUN) go version &> /dev/null
 	# $(RUN) whereis go
 
 ##[[ NODEJS ]]##
