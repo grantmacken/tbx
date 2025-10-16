@@ -87,7 +87,7 @@ info/README.md: info/build-tools.md
 	paste  - - -  | sort -u ' | \
 	awk -F'\t' '{printf "| %-14s | %-8s | %-83s |\n", $$1, $$2, $$3}' | \
 	tee -a $@
-	printf "\n$(HEADING2) %s\n\n" "Selected Build Tooling for Make Installs" | tee $@
+	printf "\n$(HEADING2) %s\n\n" "Selected Build Tooling for Make Installs" | tee - $@
 	$(call tr,"Name","Version","Summary",$@)
 	$(call tr,"----","-------","----------------------------",$@)
 	$(RUN) sh -c  'dnf info -q --installed $(BUILD) | \
@@ -95,7 +95,7 @@ info/README.md: info/build-tools.md
 	paste  - - -  | sort -u ' | \
 	awk -F'\t' '{printf "| %-14s | %-8s | %-83s |\n", $$1, $$2, $$3}' | \
 	tee -a $@
-	printf "\n$(HEADING2) %s\n\n" "Selected Development files for BUILD" | tee $@
+	printf "\n$(HEADING2) %s\n\n" "Selected Development files for BUILD" | tee -a $@
 	$(call tr,"Name","Version","Summary",$@)
 	$(call tr,"----","-------","----------------------------",$@)
 	$(RUN) sh -c  'dnf info -q --installed $(DEVEL) | \
