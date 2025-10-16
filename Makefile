@@ -31,19 +31,29 @@ LUA := luajit luarocks
 HEADING1 := \#
 HEADING2 := $(HEADING1)$(HEADING1)
 
-default: init gleam python golang nodejs $(LUA) $(OTP) python
+default:  info/README.md # python golang nodejs $(LUA) $(OTP) python
 	echo '##[ $@ ]##'
-	buildah config \
-	--label summary='a toolbox with programming language runtimes' \
-	--label maintainer='Grant MacKenzie <grantmacken@gmail.com>' \
-	--env lang=C.UTF-8 \
-	--env ELIXIR_ERL_OPTIONS="+fnu" \
-	$(WORKING_CONTAINER)
 	buildah commit $(WORKING_CONTAINER) ghcr.io/grantmacken/tbx-runtimes
 	buildah push ghcr.io/grantmacken/tbx-runtimes:latest
 	echo '✅ ghcr.io/grantmacken/tbx-runtimes:latest built and pushed'
-	printf "\n$(HEADING2) %s\n\n" "Runtimes and associated languages" | tee README.md
-	cat << EOF | tee -a README.md
+
+info/README.md: init python
+	echo '##[ $@ ]##'
+	mkdir -p $(dir $@)
+	# create or overwrite README.md
+	printf "\n$(HEADING2) %s\n\n" "Runtimes and associated languages" | tee $@
+	$(call tr,"Name","Version","Summary", $@)
+	$(call tr,"----","-------","----------------------------", $@)
+	# python uv tool to install and manage universal-variant tools
+	# Write to file - extract 'name', 'version', 'summary' into a table row
+	NAME=$$($(RUN) dnf list installed uv | grep -oP '^uv')
+	VER=$$($(RUN) dnf info installed uv | grep -oP '^Version\s+:\s+\K.+')
+	SUM=$$($(RUN) dnf info installed uv | grep -oP '^Summary\s+:\s+\K.+')
+	$(call tr,$${NAME},$${VER},$${SUM},$@)
+
+
+xxxxx:
+	cat << EOF | tee -a $@
 	Included in this toolbox are the latest releases of the Erlang, Elixir and Gleam programming languages.
 	The Erlang programming language is a general-purpose, concurrent, functional programming language
 	and **runtime** system. It is used to build massively scalable soft real-time systems with high availability.
@@ -52,6 +62,8 @@ default: init gleam python golang nodejs $(LUA) $(OTP) python
 	BEAM tooling included is the latest versions of the Rebar3 and the Mix build tools.
 	The latest nodejs **runtime** is also installed, as Gleam can compile to javascript as well a Erlang.
 	EOF
+
+ddddddd:
 	$(call tr,"Name","Version","Summary",README.md)
 	$(call tr,"----","-------","----------------------------",README.md)
 	cat info/otp.md    | tee -a README.md
@@ -75,22 +87,14 @@ init:
 	--env lang=C.UTF-8 \
 	--env ELIXIR_ERL_OPTIONS="+fnu" $(WORKING_CONTAINER)
 
-python: info/python.md
-info/python.md: ## uv tool is a cli to install and manage universal-variant tools
-python: info/python.md
-	echo '✅ latest python uv tool installed'
 
-info/python.md: ## uv tool is a cli to install and manage universal-variant tools
+python:
 	echo '##[ $@ ]##'
-	mkdir -p $(dir $@)
 	$(INSTALL) uv &>/dev/null
 	# verify installation
 	$(RUN) which uv &> /dev/null
-	# Write to file - extract 'name', 'version', 'summary' into a table row
-	NAME=$$($(RUN) dnf list installed uv | grep -oP '^uv')
-	VER=$$($(RUN) dnf info installed uv | grep -oP '^Version\s+:\s+\K.+')
-	SUM=$$($(RUN) dnf info installed uv | grep -oP '^Summary\s+:\s+\K.+')
-	$(call tr,$${NAME},$${VER},$${SUM},$@)
+
+
 
 golang: info/golang.md
 info/golang.md:
