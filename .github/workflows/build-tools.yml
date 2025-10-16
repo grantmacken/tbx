@@ -32,6 +32,11 @@ jobs:
             make .env
             make
             make README.md
+        - name: Set up Git
+          run: |
+            git config --local user.name "github-actions[bot]"
+            git config --local user.email "github-actions[bot]@users.noreply.github.com"
+            git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git
         - name: Commit and push README.md changes
           run: |
             git add README.md
