@@ -32,7 +32,7 @@ DEVEL := libicu gettext-devel glibc-devel libevent-devel ncurses-devel openssl-d
 tr = printf "| %-14s | %-8s | %-83s |\n" "$(1)" "$(2)" "$(3)" | tee -a $(4)
 bdu = jq -r ".assets[] | select(.browser_download_url | contains(\"$1\")) | .browser_download_url" $2
 
-default: build-tools
+default: build-tools readme
 	echo '##[ $@ ]##'
 	buildah config \
 	--label summary='a toolbox with cli tools, neovim' \
@@ -72,12 +72,14 @@ build-tools:
 	$(INSTALL) $(BUILD) &>/dev/null
 	echo '✅ Build tools installed'
 
+.PHONY: readme
 readme: README.md
 	echo '✅ README generated'
 
 README.md:
 	echo '##[ $@ ]##'
-	printf "# %s\n\n" "Fedora Toolbox with CLI Tools and Build Tools" | tee  $@
+	touch $@
+	printf "# %s\n\n" "Fedora Toolbox with CLI Tools and Build Tools" | tee -a $@
 	printf "\n$(HEADING2) %s\n\n" "Selected CLI Tools" | tee -a $@
 	$(call tr,"Name","Version","Summary",$@)
 	$(call tr,"----","-------","----------------------------",$@)
