@@ -39,7 +39,7 @@ rem:
 	buildah push ghcr.io/grantmacken/tbx-runtimes:latest
 	echo '✅ ghcr.io/grantmacken/tbx-runtimes:latest built and pushed'
 
-info/README.md: init python golang
+info/README.md: init python golang nodejs
 	echo '##[ $@ ]##'
 	mkdir -p $(dir $@)
 	# create or overwrite README.md
@@ -55,8 +55,17 @@ info/README.md: init python golang
 	NAME=$$($(RUN) dnf list installed golang | grep -oP '^Name\s+:\s+\K.+')
 	VER=$$($(RUN) dnf info installed golang | grep -oP '^Version\s+:\s+\K.+')
 	SUM=$$($(RUN) dnf info installed golang | grep -oP '^Summary\s+:\s+\K.+')
+	# nodejs
+	NAME=nodejs
+	VER=$$($(RUN) node --version)
+	SUM="Nodejs javascript runtime"
 	$(call tr,$${NAME},$${VER},$${SUM},$@)
-
+	# luajit
+	NAME=$$($(RUN) dnf list installed luajit | grep -oP '^Name\s+:\s+\K.+')
+	VER=$$($(RUN) dnf info installed luajit | grep -oP '^Version\s+:\s+\K.+')
+	SUM=$$($(RUN) dnf info installed luajit | grep -oP '^Summary\s+:\s+\K.+')
+	$(call tr,$${NAME},$${VER},$${SUM},$@)
+	# luarocks
 
 xxxxx:
 	cat << EOF | tee -a $@
@@ -110,41 +119,30 @@ golang::
 	# $(RUN) whereis go
 
 ##[[ NODEJS ]]##
-nodejs: info/nodejs.md
-	echo '✅ latest nodejs added'
 
 latest/nodejs.json:
 	echo '##[ $@ ]##'
 	mkdir -p $(dir $@)
 	$(WGET) 'https://api.github.com/repos/nodejs/node/releases/latest' -O $@
 
-info/nodejs.md: latest/nodejs.json
+nodejs: latest/nodejs.json
 	echo '##[ $@ ]##'
 	mkdir -p $(dir $@)
 	VER=$$(jq -r '.tag_name' $< )
-	echo $${VER}
 	mkdir -p files/nodejs/usr/local
 	$(WGET) https://nodejs.org/dist/$${VER}/node-$${VER}-linux-x64.tar.gz -O- |
 	$(TAR) files/nodejs/usr/local
 	$(ADD) files/nodejs &>/dev/null
-	echo -n 'checking node version...'
-	NODE_VER=$$($(RUN) node --version | tee)
-	$(call tr,node,$${NODE_VER},Nodejs runtime, $@)
-	echo -n 'checking npm version...'
-	NPM_VER=$$($(RUN) npm --version | tee)
-	$(call tr,npm,$${NPM_VER},Node Package Manager, $@)
+	# success|failure check
+	$(RUN) node --version &>/dev/null
+	$(RUN) npm --version &>/dev/null
 
-luajit: info/luajit.md
-	echo '✅ latest $@ installed'
-
-info/luajit.md:
+luajit:
 	echo '##[ $@ ]##'
 	mkdir -p $(dir $@)
 	$(INSTALL) luajit-devel luajit
-	echo -n 'checking luajit version...'
-	$(RUN) luajit -v | tee $@
-	# VERSION=$$($(RUN) luajit -v | grep -oP 'LuaJIT \K\d+\.\d+\.\d{1,3}')
-	# $(call tr,luajit,$${VERSION},The LuaJIT compiler,$@)
+	# success|failure check
+	$(RUN) luajit -v &>/dev/null
 
 luarocks: info/luarocks.md
 	echo '✅ latest luarocks installed'
