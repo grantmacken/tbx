@@ -46,11 +46,16 @@ info/README.md: init python golang nodejs
 	printf "\n$(HEADING2) %s\n\n" "Runtimes and associated languages" | tee $@
 	$(call tr,"Name","Version","Summary", $@)
 	$(call tr,"----","-------","----------------------------", $@)
-	# python uv tool to install and manage universal-variant tools
 	# Write to file - extract 'name', 'version', 'summary' into a table row
+	# nodejs 
+	NAME=$$($(RUN) dnf list installed nodejs | grep -oP '^Name\s+:\s+\K.+'))
+	VER=$$($(RUN) dnf info installed nodejs | grep -oP '^Version\s+:\s+\K.+')
+	SUM=$$($(RUN) dnf info installed nodejs | grep -oP '^Summary\s+:\s+\K.+')
+	# python uv tool to install and manage universal-variant tools
 	NAME=$$($(RUN) dnf list installed uv | grep -oP '^Name\s+:\s+\K.+'))
 	VER=$$($(RUN) dnf info installed uv | grep -oP '^Version\s+:\s+\K.+')
 	SUM=$$($(RUN) dnf info installed uv | grep -oP '^Summary\s+:\s+\K.+')
+	# golang
 	NAME=$$($(RUN) dnf list installed golang | grep -oP '^Name\s+:\s+\K.+')
 	VER=$$($(RUN) dnf info installed golang | grep -oP '^Version\s+:\s+\K.+')
 	SUM=$$($(RUN) dnf info installed golang | grep -oP '^Summary\s+:\s+\K.+')
@@ -104,6 +109,8 @@ init:
 	--label maintainer='Grant MacKenzie <grantmacken@gmail.com>' \
 	--env lang=C.UTF-8 \
 	--env ELIXIR_ERL_OPTIONS="+fnu" $(WORKING_CONTAINER)
+	install fedora-repos-rawhide
+
 
 
 python:
@@ -121,20 +128,20 @@ golang::
 	# $(RUN) whereis go
 
 ##[[ NODEJS ]]##
+# latest/nodejs.json:
+# 	echo '##[ $@ ]##'
+# 	mkdir -p $(dir $@)
+# 	$(WGET) 'https://api.github.com/repos/nodejs/node/releases/latest' -O $@
 
-latest/nodejs.json:
+nodejs: # latest/nodejs.json
 	echo '##[ $@ ]##'
-	mkdir -p $(dir $@)
-	$(WGET) 'https://api.github.com/repos/nodejs/node/releases/latest' -O $@
-
-nodejs: latest/nodejs.json
-	echo '##[ $@ ]##'
-	mkdir -p $(dir $@)
-	VER=$$(jq -r '.tag_name' $< )
-	mkdir -p files/nodejs/usr/local
-	$(WGET) https://nodejs.org/dist/$${VER}/node-$${VER}-linux-x64.tar.gz -O- |
-	$(TAR) files/nodejs/usr/local
-	$(ADD) files/nodejs &>/dev/null
+	$(RUN) nodejs --enablerepo=rawhide
+	# mkdir -p $(dir $@)
+	# VER=$$(jq -r '.tag_name' $< )
+	# mkdir -p files/nodejs/usr/local
+	# $(WGET) https://nodejs.org/dist/$${VER}/node-$${VER}-linux-x64.tar.gz -O- |
+	# $(TAR) files/nodejs/usr/local
+	# $(ADD) files/nodejs &>/dev/null
 	# success|failure check
 	$(RUN) node --version &>/dev/null
 	$(RUN) npm --version &>/dev/null
@@ -293,6 +300,5 @@ info/gleam.md: files/gleam.tar
 	$(call tr,gleam,$${VER},Gleam programming language,$@)
 
 pull:
-	echo '##[ $@ ]##'
 	podman pull ghcr.io/grantmacken/tbx-runtimes:latest
 
