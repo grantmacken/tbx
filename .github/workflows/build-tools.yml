@@ -8,7 +8,7 @@ on:
     paths-ignore:
     - '**/README.md'
 jobs:
-  buildah_images:
+  build_tools_toolbox:
     runs-on: ubuntu-latest
     timeout-minutes: 20
     continue-on-error: false
@@ -24,7 +24,18 @@ jobs:
             username: ${{ github.repository_owner }}
             password: ${{ github.token }}
         - uses: actions/checkout@v4
+          with:
+            token: ${{ github.token }}
+        - uses: actions/checkout@v4
         - name: Toolbox Build
           run: |
             make .env
             make
+            make README.md
+        - name: Commit and push README.md changes
+          run: |
+            git add README.md
+            git commit -m "Update README.md from Makefile build" README.md
+            git push origin HEAD:${GITHUB_REF#refs/heads/}
+          env:
+            GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
