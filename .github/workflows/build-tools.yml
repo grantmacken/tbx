@@ -28,7 +28,7 @@ jobs:
             token: ${{ github.token }}
         - uses: actions/checkout@v4
         - name: Toolbox Build
-          run: make .env && make build-tools
+          run: make .env && make
         - name: Set up Git
           run: |
             git config --local user.name "github-actions[bot]"
@@ -36,7 +36,9 @@ jobs:
             git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git
         - name: Commit and push README.md changes
           run: |
-            make readme
+            rm -f README.md # remove if exists to avoid git add errors
+            cat ./info/README.md
+            cp ./info/README.md README.md
             git add README.md
             git commit -m "Update README.md from Makefile build" README.md || echo "No changes to commit"
             git push origin HEAD:${GITHUB_REF#refs/heads/}

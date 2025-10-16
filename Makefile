@@ -32,7 +32,7 @@ DEVEL := libicu gettext-devel glibc-devel libevent-devel ncurses-devel openssl-d
 tr = printf "| %-14s | %-8s | %-83s |\n" "$(1)" "$(2)" "$(3)" | tee -a $(4)
 bdu = jq -r ".assets[] | select(.browser_download_url | contains(\"$1\")) | .browser_download_url" $2
 
-default: build-tools readme
+default: info/README.md
 	echo '##[ $@ ]##'
 	buildah config \
 	--label summary='a toolbox with cli tools, neovim' \
@@ -40,6 +40,7 @@ default: build-tools readme
 	--env lang=C.UTF-8 $(WORKING_CONTAINER)
 	buildah commit $(WORKING_CONTAINER) $(TBX_IMAGE)
 	buildah push $(TBX_IMAGE):latest
+	echo '✅ Image pushed to $(TBX_IMAGE):latest'
 
 init: .env
 	echo '##[ $@ ]##'
@@ -61,8 +62,8 @@ latest/fedora-toolbox.json:
 	mkdir -p $(dir $@)
 	skopeo inspect docker://${FED_IMAGE}:latest | jq '.' > $@
 
-.PHONY: build-tools
-build-tools:
+
+info/build-tools.md:
 	echo '##[ $@ ]##'
 	mkdir -p $(dir $@)
 	$(RUN) dnf config-manager addrepo --from-repofile=https://cli.github.com/packages/rpm/gh-cli.repo &> /dev/null
@@ -70,14 +71,12 @@ build-tools:
 	$(INSTALL) $(TOOLS) &>/dev/null
 	$(INSTALL) $(DEVEL) &>/dev/null
 	$(INSTALL) $(BUILD) &>/dev/null
-	echo '✅ Build tools installed'
+	echo '✅ Build tools installed' | tee $@
 
-.PHONY: readme
-readme: README.md
-	echo '✅ README generated'
 
-README.md:
+info/README.md: info/build-tools.md
 	echo '##[ $@ ]##'
+	mkdir -p $(dir $@)
 	touch $@
 	printf "# %s\n\n" "Fedora Toolbox with CLI Tools and Build Tools" | tee -a $@
 	printf "\n$(HEADING2) %s\n\n" "Selected CLI Tools" | tee -a $@
@@ -104,5 +103,3 @@ README.md:
 	paste  - - -  | sort -u ' | \
 	awk -F'\t' '{printf "| %-14s | %-8s | %-83s |\n", $$1, $$2, $$3}' | \
 	tee -a $@
-
-
