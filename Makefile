@@ -81,21 +81,15 @@ info/README.md: info/build-tools.md
 	printf "\n$(HEADING1) %s\n" "$(TBX_IMAGE)" | tee -a $@
 	printf "%s\n" "$(TBX_SUMMARY)" | tee -a $@
 	# built from
-	printf "\nBuilt From:  %s\n\n" "$(FROM_NAME"| tee
+	printf "Built From: %s\n\n" "$(FROM_NAME)" | tee -a $@
+	printf "Version:    %s\n\n" "$(FROM_VERSION)" | tee -a $@
+	printf "Registry:   %s\n\n" "$(FROM_REGISTRY)" | tee -a $@
+	# description
 	cat << EOF | tee -a $@
 	This toolbox contains a selection of CLI tools and build tools to help with
 	development and building software from source. 
 	It is the foundation for other toolboxes I use for development.
 	It is the first toolbox I create when setting up a new system.
-	You can create a toolbox from this image with:
-	```
-	toolbox create -i $(TBX_IMAGE) -c my-toolbox
-	toolbox enter my-toolbox
-	```
-	You can also use this image as a base image for your own toolbox:
-	```
-	FROM $(TBX_IMAGE)
-	```
 	EOF
 	printf "# %s\n\n" "The toolbox contains ... " | tee -a $@
 	printf "\n$(HEADING2) %s\n\n" "Selected CLI Tools" | tee -a $@
