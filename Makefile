@@ -51,21 +51,24 @@ info/README.md: init python golang nodejs
 	NAME=$$($(RUN) dnf list installed uv | grep -oP '^Name\s+:\s+\K.+'))
 	VER=$$($(RUN) dnf info installed uv | grep -oP '^Version\s+:\s+\K.+')
 	SUM=$$($(RUN) dnf info installed uv | grep -oP '^Summary\s+:\s+\K.+')
-	$(call tr,$${NAME},$${VER},$${SUM},$@)
 	NAME=$$($(RUN) dnf list installed golang | grep -oP '^Name\s+:\s+\K.+')
 	VER=$$($(RUN) dnf info installed golang | grep -oP '^Version\s+:\s+\K.+')
 	SUM=$$($(RUN) dnf info installed golang | grep -oP '^Summary\s+:\s+\K.+')
-	# nodejs
-	NAME=nodejs
-	VER=$$($(RUN) node --version)
-	SUM="Nodejs javascript runtime"
-	$(call tr,$${NAME},$${VER},$${SUM},$@)
-	# luajit
+	# # nodejs
+	# NAME=nodejs
+	# VER=$$($(RUN) node --version)
+	# SUM="Nodejs javascript runtime"
+	# $(call tr,$${NAME},$${VER},$${SUM},$@)
+	luajit
 	NAME=$$($(RUN) dnf list installed luajit | grep -oP '^Name\s+:\s+\K.+')
 	VER=$$($(RUN) dnf info installed luajit | grep -oP '^Version\s+:\s+\K.+')
 	SUM=$$($(RUN) dnf info installed luajit | grep -oP '^Summary\s+:\s+\K.+')
-	$(call tr,$${NAME},$${VER},$${SUM},$@)
 	# luarocks
+	LINE=$$($(RUN) luarocks | grep -oP '^Lua.+')
+	NAME=$$(echo $$LINE | grep -oP '^Lua\w+')
+	VER=$$(echo $$LINE | grep -oP '^Lua\w+\s\K.+' | cut -d, -f1)
+	SUM=$$(echo $$LINE | grep -oP '^Lua\w+\s\K.+' | cut -d, -f2)
+	$(call tr,$${NAME},$${VER},$${SUM},$@)
 
 xxxxx:
 	cat << EOF | tee -a $@
@@ -111,8 +114,7 @@ python:
 
 golang::
 	echo '##[ $@ ]##'
-	$(RUN) dnf copr enable -y @go-sig/golang-rawhide
-	$(RUN) dnf info golang
+	$(RUN) dnf copr enable -y @go-sig/golang-rawhide &>/dev/null
 	$(INSTALL) golang &>/dev/null
 	# verify installation
 	$(RUN) go version &> /dev/null
@@ -144,15 +146,12 @@ luajit:
 	# success|failure check
 	$(RUN) luajit -v &>/dev/null
 
-luarocks: info/luarocks.md
-	echo '✅ latest luarocks installed'
-
 latest/luarocks.json:
 	echo '##[ $@ ]##'
 	mkdir -p $(dir $@)
 	$(WGET) https://api.github.com/repos/luarocks/luarocks/tags -O- | jq '.[0]' > $@
 
-info/luarocks.md: latest/luarocks.json
+luarocks: latest/luarocks.json
 	echo '##[ $@ ]##'
 	mkdir -p $(dir $@)
 	mkdir -p files/luarocks
@@ -168,15 +167,9 @@ info/luarocks.md: latest/luarocks.json
 		--with-lua-include=/usr/include/luajit-2.1' &>/dev/null
 	# $(RUN) sh -c 'cd /tmp && make bootstrap' &>/dev/null
 	$(RUN) sh -c 'cd /tmp/luarocks && make && make install' &>/dev/null
-	echo -n 'checking luarocks version...'
-	$(RUN) luarocks --version
-	# $(RUN) luarocks config --json | jq '.' &>/dev/null
-	LINE=$$($(RUN) luarocks | grep -oP '^Lua.+')
-	NAME=$$(echo $$LINE | grep -oP '^Lua\w+')
-	VER=$$(echo $$LINE | grep -oP '^Lua\w+\s\K.+' | cut -d, -f1)
-	SUM=$$(echo $$LINE | grep -oP '^Lua\w+\s\K.+' | cut -d, -f2)
-	$(call tr,$${NAME},$${VER},$${SUM},$@)
 	$(RUN) rm -fR tmp/luarocks
+	# success|failure check
+	$(RUN) luarocks --version &>/dev/null
 
 # rust:
 # 	echo '##[ $@ ]##'
