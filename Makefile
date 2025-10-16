@@ -24,9 +24,7 @@ TBX_IMAGE := ghcr.io/grantmacken/tbx-build-tools
 RUN := buildah run $(WORKING_CONTAINER)
 ADD := buildah add --chmod 755 $(WORKING_CONTAINER)
 INSTALL := $(RUN) dnf install --allowerasing --skip-unavailable --skip-broken --no-allow-downgrade -y
-
 WGET := wget -q --no-check-certificate --timeout=10 --tries=3
-
 TOOLS := atuin bat direnv eza fd-find fzf host-spawn jq ripgrep wl-clipboard zoxide stow
 BUILD := make gcc gcc-c++ pcre2 autoconf pkgconf
 DEVEL := libicu gettext-devel glibc-devel libevent-devel ncurses-devel openssl-devel perl-devel readline-devel zlib-devel
