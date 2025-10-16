@@ -37,7 +37,6 @@ jobs:
         - name: Commit and push README.md changes
           run: |
             rm -f README.md # remove if exists to avoid git add errors
-            cat ./info/README.md
             cp ./info/README.md README.md
             git add README.md
             git commit -m "Update README.md from Makefile build" README.md || echo "No changes to commit"

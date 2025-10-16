@@ -19,7 +19,9 @@ HEADING3 := $(HEADING2)$(HEADING1)
 include .env
 WORKING_CONTAINER ?= fedora-toolbox-working-container
 FED_IMAGE := registry.fedoraproject.org/fedora-toolbox
-TBX_IMAGE := ghcr.io/grantmacken/tbx-build-tools
+TBX_NAME := tbx-build-tools
+TBX_SUMMARY := A Fedora Toolbox image with CLI tools and build tools
+TBX_IMAGE := ghcr.io/grantmacken/$(TBX_NAME)
 
 RUN := buildah run $(WORKING_CONTAINER)
 ADD := buildah add --chmod 755 $(WORKING_CONTAINER)
@@ -62,7 +64,6 @@ latest/fedora-toolbox.json:
 	mkdir -p $(dir $@)
 	skopeo inspect docker://${FED_IMAGE}:latest | jq '.' > $@
 
-
 info/build-tools.md:
 	echo '##[ $@ ]##'
 	mkdir -p $(dir $@)
@@ -73,12 +74,30 @@ info/build-tools.md:
 	$(INSTALL) $(BUILD) &>/dev/null
 	echo '✅ Build tools installed' | tee $@
 
-
 info/README.md: info/build-tools.md
 	echo '##[ $@ ]##'
 	mkdir -p $(dir $@)
 	touch $@
-	printf "# %s\n\n" "Fedora Toolbox with CLI Tools and Build Tools" | tee -a $@
+	printf "\n$(HEADING1) %s\n" "$(TBX_IMAGE)" | tee -a $@
+	printf "%s\n" "$(TBX_SUMMARY)" | tee -a $@
+	# built from
+	printf "\nBuilt From:  %s\n\n" "$(FROM_NAME"| tee
+	cat << EOF | tee -a $@
+	This toolbox contains a selection of CLI tools and build tools to help with
+	development and building software from source. 
+	It is the foundation for other toolboxes I use for development.
+	It is the first toolbox I create when setting up a new system.
+	You can create a toolbox from this image with:
+	```
+	toolbox create -i $(TBX_IMAGE) -c my-toolbox
+	toolbox enter my-toolbox
+	```
+	You can also use this image as a base image for your own toolbox:
+	```
+	FROM $(TBX_IMAGE)
+	```
+	EOF
+	printf "# %s\n\n" "The toolbox contains ... " | tee -a $@
 	printf "\n$(HEADING2) %s\n\n" "Selected CLI Tools" | tee -a $@
 	$(call tr,"Name","Version","Summary",$@)
 	$(call tr,"----","-------","----------------------------",$@)
@@ -87,7 +106,7 @@ info/README.md: info/build-tools.md
 	paste  - - -  | sort -u ' | \
 	awk -F'\t' '{printf "| %-14s | %-8s | %-83s |\n", $$1, $$2, $$3}' | \
 	tee -a $@
-	printf "\n$(HEADING2) %s\n\n" "Selected Build Tooling for Make Installs" | tee - $@
+	printf "\n$(HEADING2) %s\n\n" "Selected Build Tooling for Make Installs" | tee -a $@
 	$(call tr,"Name","Version","Summary",$@)
 	$(call tr,"----","-------","----------------------------",$@)
 	$(RUN) sh -c  'dnf info -q --installed $(BUILD) | \
