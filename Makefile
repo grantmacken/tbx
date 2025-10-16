@@ -61,6 +61,7 @@ latest/fedora-toolbox.json:
 	mkdir -p $(dir $@)
 	skopeo inspect docker://${FED_IMAGE}:latest | jq '.' > $@
 
+.PHONY: build-tools
 build-tools:
 	echo '##[ $@ ]##'
 	mkdir -p $(dir $@)
@@ -70,7 +71,8 @@ build-tools:
 	$(INSTALL) $(DEVEL) &>/dev/null
 	$(INSTALL) $(BUILD) &>/dev/null
 
-README.md: info/build-tools.md
+README.md: build-tools
+	echo '##[ $@ ]##'
 	printf "# %s\n\n" "Fedora Toolbox with CLI Tools and Build Tools" | tee  $@
 	printf "\n$(HEADING2) %s\n\n" "Selected CLI Tools" | tee -a $@
 	$(call tr,"Name","Version","Summary",$@)

@@ -28,10 +28,7 @@ jobs:
             token: ${{ github.token }}
         - uses: actions/checkout@v4
         - name: Toolbox Build
-          run: |
-            make .env
-            make
-            make README.md
+          run: make .env && make
         - name: Set up Git
           run: |
             git config --local user.name "github-actions[bot]"
