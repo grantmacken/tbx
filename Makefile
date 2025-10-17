@@ -47,19 +47,19 @@ info/README.md: init python golang nodejs luajit luarocks # $(OTP) xxxxx ddddddd
 	$(call tr,"Name","Version","Summary", $@)
 	$(call tr,"----","-------","----------------------------", $@)
 	# Write to file - extract 'name', 'version', 'summary' into a table row
-
+	# nodejs 
+	NAME=$$($(RUN) dnf list installed nodejs | grep -oP '^Name\s+:\s+\K.+'))
+	VER=$$($(RUN) dnf info installed nodejs | grep -oP '^Version\s+:\s+\K.+')
+	SUM=$$($(RUN) dnf info installed nodejs | grep -oP '^Summary\s+:\s+\K.+')
 	# python uv tool to install and manage universal-variant tools
 	NAME=$$($(RUN) dnf list installed uv | grep -oP '^Name\s+:\s+\K.+'))
 	VER=$$($(RUN) dnf info installed uv | grep -oP '^Version\s+:\s+\K.+')
 	SUM=$$($(RUN) dnf info installed uv | grep -oP '^Summary\s+:\s+\K.+')
 	# golang
-	NAME=$$($(RUN) dnf info installed golang | grep -oP '^Name\s+:\s+\K.+')
-	VER=$$($(RUN)  dnf info installed golang | grep -oP '^Version\s+:\s+\K.+')
-	SUM=$$($(RUN)  dnf info installed golang | grep -oP '^Summary\s+:\s+\K.+')
-	# nodejs 
-	NAME=$$($(RUN) dnf list installed nodejs | grep -oP '^Name\s+:\s+\K.+'))
-	VER=$$($(RUN) dnf info installed nodejs | grep -oP '^Version\s+:\s+\K.+')
-	SUM=$$($(RUN) dnf info installed nodejs | grep -oP '^Summary\s+:\s+\K.+')
+	NAME=$$($(RUN) dnf list installed golang | grep -oP '^Name\s+:\s+\K.+')
+	VER=$$($(RUN) dnf info installed golang | grep -oP '^Version\s+:\s+\K.+')
+	SUM=$$($(RUN) dnf info installed golang | grep -oP '^Summary\s+:\s+\K.+')
+	# # nodejs
 	# NAME=nodejs
 	# VER=$$($(RUN) node --version)
 	# SUM="Nodejs javascript runtime"
@@ -78,8 +78,8 @@ info/README.md: init python golang nodejs luajit luarocks # $(OTP) xxxxx ddddddd
 	echo -n 'checking otp version...'
 	NAME=$$($(RUN) dnf info erlang | grep -oP '^Name\s+:\s+\K.+')
 	SUM=$$($(RUN) dnf info erlang | grep -oP '^Summary\s+:\s+\K.+')
-	VER=xxx
 	$(RUN) erl -eval 'erlang:display(erlang:system_info(otp_release)), halt().'  -noshell
+	VER=$$(jq -r '.tag_name' latest/otp.json | cut -d'-' -f2)
 	$(call tr,$${NAME},$${VER},$${SUM},$@)
 	# $(call tr ,Erlang/OTP,$(ver),the Erlang Open Telecom Platform OTP,$@)
 
@@ -117,7 +117,7 @@ init:
 	--label maintainer='Grant MacKenzie <grantmacken@gmail.com>' \
 	--env lang=C.UTF-8 \
 	--env ELIXIR_ERL_OPTIONS="+fnu" $(WORKING_CONTAINER)
-	
+	$(INSTALL) fedora-repos-rawhide
 
 python:
 	echo '##[ $@ ]##'
@@ -134,14 +134,23 @@ golang::
 	# $(RUN) whereis go
 
 ##[[ NODEJS ]]##
+# latest/nodejs.json:
+# 	echo '##[ $@ ]##'
+# 	mkdir -p $(dir $@)
+# 	$(WGET) 'https://api.github.com/repos/nodejs/node/releases/latest' -O $@
 
 nodejs: # latest/nodejs.json
 	echo '##[ $@ ]##'
-	$(RUN) dnf install fedora-repos-rawhide -y &>/dev/null
-	$(RUN) dnf install nodejs --enablerepo=rawhide -y  || true
+	$(RUN) nodejs --enablerepo=rawhide
+	# mkdir -p $(dir $@)
+	# VER=$$(jq -r '.tag_name' $< )
+	# mkdir -p files/nodejs/usr/local
+	# $(WGET) https://nodejs.org/dist/$${VER}/node-$${VER}-linux-x64.tar.gz -O- |
+	# $(TAR) files/nodejs/usr/local
+	# $(ADD) files/nodejs &>/dev/null
 	# success|failure check
-	$(RUN) node --version  || true
-	$(RUN) npm  --version || true
+	$(RUN) node --version &>/dev/null
+	$(RUN) npm --version &>/dev/null
 
 luajit:
 	echo '##[ $@ ]##'
@@ -202,9 +211,11 @@ info/otp.md: latest/otp.json
 	mkdir -p $(dir $@)
 	$(RUN) mkdir -p /tmp/otp
 	TAGNAME=$$(jq -r '.tag_name' $<)
-	ASSET=$$(jq -r '.assets[] | select(.name=="otp_src_$(ver).tar.gz") ' $<)
+	VER=$$(echo $${TAGNAME} | cut -d'-' -f2)
+	ASSET=$$(jq -r '.assets[] | select(.name=="otp_src_$$(VER).tar.gz") ' $<)
 	SRC=$$(echo $${ASSET} | jq -r '.browser_download_url')
-	mkdir -p files/otp && $(WGET) $${SRC} -O- | $(TAR) files/otp &>/dev/null
+	mkdir -p files/otp && $(WGET) $${SRC} -O- |
+	$(TAR) files/otp &>/dev/null
 	$(ADD) files/otp /tmp/otp &>/dev/null
 	$(RUN) sh -c 'cd /tmp/otp && ./configure \
 		--prefix=/usr/local \
@@ -221,7 +232,6 @@ info/otp.md: latest/otp.json
 		--without-cosEvent \
 		--without-odbc' &>/dev/null
 	$(RUN) sh -c 'cd /tmp/otp && make && make install' &>/dev/null
-	# success|failure check
 	$(RUN) rm -fR /tmp/otp
 
 latest/elixir.json:
