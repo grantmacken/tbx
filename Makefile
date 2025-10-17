@@ -136,7 +136,7 @@ golang::
 
 nodejs:
 	echo '##[ $@ ]##'
-	$(INSTALL) nodejs --enablerepo=rawhide
+	$(INSTALL) nodejs
 	$(RUN) node --version &>/dev/null
 	$(RUN) npm --version &>/dev/null
 
