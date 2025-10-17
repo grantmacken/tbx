@@ -17,6 +17,7 @@ WORKING_CONTAINER := tbx-build-tools-working-container
 RUN := buildah run $(WORKING_CONTAINER)
 ADD := buildah add --chmod 755 $(WORKING_CONTAINER)
 INSTALL := $(RUN) dnf install --allowerasing --skip-unavailable --skip-broken --no-allow-downgrade -y
+INFO    := $(RUN) dnf info --installed 
 WGET := wget -q --no-check-certificate --timeout=10 --tries=3
 TAR  := tar xz --strip-components=1 -C
 TAR_NO_STRIP := tar xz -C
@@ -25,6 +26,7 @@ tr = printf "| %-14s | %-8s | %-83s |\n" "$(1)" "$(2)" "$(3)" | tee -a $(4)
 bdu = jq -r ".assets[] | select(.browser_download_url | contains(\"$1\")) | .browser_download_url" $2
 tarball = jq -r '.tarball_url' $1
 
+DNF_LIST := golang
 OTP := otp rebar3 elixir gleam
 LUA := luajit luarocks
 
@@ -39,7 +41,7 @@ rem:
 	buildah push ghcr.io/grantmacken/tbx-runtimes:latest
 	echo '✅ ghcr.io/grantmacken/tbx-runtimes:latest built and pushed'
 
-info/README.md: init python golang nodejs luajit luarocks # $(OTP) xxxxx ddddddd
+info/README.md: init golang # nodejs luajit luarocks python # $(OTP) xxxxx ddddddd
 	echo '##[ $@ ]##'
 	mkdir -p $(dir $@)
 	# create or overwrite README.md
@@ -47,48 +49,61 @@ info/README.md: init python golang nodejs luajit luarocks # $(OTP) xxxxx ddddddd
 	$(call tr,"Name","Version","Summary", $@)
 	$(call tr,"----","-------","----------------------------", $@)
 	# Write to file - extract 'name', 'version', 'summary' into a table row
-	# nodejs 
-	NAME=$$($(RUN) dnf info installed nodejs | grep -oP '^Name\s+:\s+\K.+')
-	VER=$$($(RUN)  dnf info installed nodejs | grep -oP '^Version\s+:\s+\K.+')
-	SUM=$$($(RUN)  dnf info installed nodejs | grep -oP '^Summary\s+:\s+\K.+')
-	# python uv tool to install and manage universal-variant tools
-	NAME=$$($(RUN) dnf list installed uv | grep -oP '^Name\s+:\s+\K.+')
-	VER=$$($(RUN)  dnf info installed uv | grep -oP '^Version\s+:\s+\K.+')
-	SUM=$$($(RUN)  dnf info installed uv | grep -oP '^Summary\s+:\s+\K.+')
-	# golang
-	NAME=$$($(RUN) dnf list installed golang | grep -oP '^Name\s+:\s+\K.+')
-	VER=$$($(RUN)  dnf info installed golang | grep -oP '^Version\s+:\s+\K.+')
-	SUM=$$($(RUN)  dnf info installed golang | grep -oP '^Summary\s+:\s+\K.+')
-	# luajit
-	NAME=$$($(RUN) dnf list installed luajit | grep -oP '^Name\s+:\s+\K.+')
-	VER=$$($(RUN)  dnf info installed luajit | grep -oP '^Version\s+:\s+\K.+')
-	SUM=$$($(RUN)  dnf info installed luajit | grep -oP '^Summary\s+:\s+\K.+')
-	# luarocks
-	LINE=$$($(RUN) luarocks | grep -oP '^Lua.+')
-	NAME=$$(echo $$LINE | grep -oP '^Lua\w+')
-	VER=$$(echo $$LINE | grep -oP '^Lua\w+\s\K.+' | cut -d, -f1)
-	SUM=$$(echo $$LINE | grep -oP '^Lua\w+\s\K.+' | cut -d, -f2)
+	# for each installed package in the DNF_LIST variable
+	# usea cat info/{package}.md files to fill in the README.md
+	for pkg in $(DNF_LIST)
+	do
+	NAME=$$(cat info/$${pkg}.md | grep -oP '^Name\s+:\s+\K.+')
+	VER=$$(cat info/$${pkg}.md | grep -oP '^Version\s+:\s+\K.+')
+	SUM=$$(cat info/$${pkg}.md | grep -oP '^Summary\s+:\s+\K.+')
 	$(call tr,$${NAME},$${VER},$${SUM},$@)
-	## erlang otp
-	echo -n 'checking otp version...'
-	NAME=$$($(RUN) dnf info erlang | grep -oP '^Name\s+:\s+\K.+')
-	SUM=$$($(RUN) dnf info erlang | grep -oP '^Summary\s+:\s+\K.+')
-	$(RUN) erl -eval 'erlang:display(erlang:system_info(otp_release)), halt().'  -noshell
-	VER=$$(jq -r '.tag_name' latest/otp.json | cut -d'-' -f2)
-	$(call tr,$${NAME},$${VER},$${SUM},$@)
-	# rebar3
-	LINE=$$($(RUN) rebar3 --version | grep -oP '^rebar3.+')
-	NAME=$$(echo $$LINE | cut -d' ' -f1)
-	VER=$$(echo $$LINE | cut -d' ' -f2)
-	SUM="Erlang build tool"
-	$(call tr,$${NAME},$${VER},$${SUM},$@)
-	# elixir
-	LINE=$$( $(RUN) elixir --version | grep -oP '^Elixir.+')
-	VER=$$(echo "$${LINE}" | cut -d' ' -f1)
-	VER=$$(echo "$${LINE}" | cut -d' ' -f2)
-	SUM=$$($(RUN) dnf info elixir | grep -oP '^Summary\s+:\s+\K.+')
-	$(call tr,$${NAME},$${VER},$${SUM},$@)
-	# gleam
+	done
+	# NAME=$$($(RUN) dnf info installed nodejs | grep -oP '^Name\s+:\s+\K.+')
+	# VER=$$($(RUN)  dnf info installed nodejs | grep -oP '^Version\s+:\s+\K.+')
+	# SUM=$$($(RUN)  dnf info installed nodejs | grep -oP '^Summary\s+:\s+\K.+')
+	# # python uv tool to install and manage universal-variant tools
+	# NAME=$$($(RUN) dnf list installed uv | grep -oP '^Name\s+:\s+\K.+')
+	# VER=$$($(RUN)  dnf info installed uv | grep -oP '^Version\s+:\s+\K.+')
+	# SUM=$$($(RUN)  dnf info installed uv | grep -oP '^Summary\s+:\s+\K.+')
+	# # golang
+	# NAME=$$($(RUN) dnf list installed golang | grep -oP '^Name\s+:\s+\K.+')
+	# VER=$$($(RUN)  dnf info installed golang | grep -oP '^Version\s+:\s+\K.+')
+	# SUM=$$($(RUN)  dnf info installed golang | grep -oP '^Summary\s+:\s+\K.+')
+	# # luajit
+	# NAME=$$($(RUN) dnf list installed luajit | grep -oP '^Name\s+:\s+\K.+')
+	# VER=$$($(RUN)  dnf info installed luajit | grep -oP '^Version\s+:\s+\K.+')
+	# SUM=$$($(RUN)  dnf info installed luajit | grep -oP '^Summary\s+:\s+\K.+')
+	# # luarocks
+	# LINE=$$($(RUN) luarocks | grep -oP '^Lua.+')
+	# NAME=$$(echo $$LINE | grep -oP '^Lua\w+')
+	# VER=$$(echo $$LINE | grep -oP '^Lua\w+\s\K.+' | cut -d, -f1)
+	# SUM=$$(echo $$LINE | grep -oP '^Lua\w+\s\K.+' | cut -d, -f2)
+	# $(call tr,$${NAME},$${VER},$${SUM},$@)
+	# ## erlang otp
+	# echo -n 'checking otp version...'
+	# NAME=$$($(RUN) dnf info erlang | grep -oP '^Name\s+:\s+\K.+')
+	# SUM=$$($(RUN) dnf info erlang | grep -oP '^Summary\s+:\s+\K.+')
+	# $(RUN) erl -eval 'erlang:display(erlang:system_info(otp_release)), halt().'  -noshell
+	# VER=$$(jq -r '.tag_name' latest/otp.json | cut -d'-' -f2)
+	# $(call tr,$${NAME},$${VER},$${SUM},$@)
+	# # rebar3
+	# LINE=$$($(RUN) rebar3 --version | grep -oP '^rebar3.+')
+	# NAME=$$(echo $$LINE | cut -d' ' -f1)
+	# VER=$$(echo $$LINE | cut -d' ' -f2)
+	# SUM="Erlang build tool"
+	# $(call tr,$${NAME},$${VER},$${SUM},$@)
+	# # elixir
+	# LINE=$$( $(RUN) elixir --version | grep -oP '^Elixir.+')
+	# NAME=$$(echo "$${LINE}" | cut -d' ' -f1)
+	# VER=$$(echo "$${LINE}" | cut -d' ' -f2)
+	# SUM=$$($(RUN) dnf info elixir | grep -oP '^Summary\s+:\s+\K.+')
+	# $(call tr,$${NAME},$${VER},$${SUM},$@)
+	# # gleam
+	# LINE=$$($(RUN) gleam --version)
+	# NAME=$$(echo $$LINE | cut -d' ' -f1)
+	# VER=$$(echo $$LINE | cut -d' ' -f2)
+	# SUM="Gleam programming language"
+	# $(call tr,$${NAME},$${VER},$${SUM},$@)
 	# $(call tr,Elixir,$${VER},Elixir programming language, $@)
 	# VER=$$(buildah run $(WORKING_CONTAINER) mix --version | grep -oP 'Mix \K.+' | cut -d' ' -f1)
 	# $(call tr,Mix,$${VER},Elixir build tool, $@)
@@ -134,13 +149,14 @@ python:
 	# verify installation
 	$(RUN) which uv &> /dev/null
 
-golang::
+golang: info/golang.md
+info/golang.md
 	echo '##[ $@ ]##'
 	$(RUN) dnf copr enable -y @go-sig/golang-rawhide &>/dev/null
 	$(INSTALL) golang &>/dev/null
 	# verify installation
 	$(RUN) go version &> /dev/null
-	# $(RUN) whereis go
+	$(INFO) golang > $@
 
 ##[[ NODEJS ]]##
 
