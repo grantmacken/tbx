@@ -117,7 +117,6 @@ init:
 	--label maintainer='Grant MacKenzie <grantmacken@gmail.com>' \
 	--env lang=C.UTF-8 \
 	--env ELIXIR_ERL_OPTIONS="+fnu" $(WORKING_CONTAINER)
-	$(INSTALL) fedora-repos-rawhide
 
 python:
 	echo '##[ $@ ]##'
@@ -134,21 +133,10 @@ golang::
 	# $(RUN) whereis go
 
 ##[[ NODEJS ]]##
-# latest/nodejs.json:
-# 	echo '##[ $@ ]##'
-# 	mkdir -p $(dir $@)
-# 	$(WGET) 'https://api.github.com/repos/nodejs/node/releases/latest' -O $@
 
-nodejs: # latest/nodejs.json
+nodejs:
 	echo '##[ $@ ]##'
-	$(RUN) nodejs --enablerepo=rawhide
-	# mkdir -p $(dir $@)
-	# VER=$$(jq -r '.tag_name' $< )
-	# mkdir -p files/nodejs/usr/local
-	# $(WGET) https://nodejs.org/dist/$${VER}/node-$${VER}-linux-x64.tar.gz -O- |
-	# $(TAR) files/nodejs/usr/local
-	# $(ADD) files/nodejs &>/dev/null
-	# success|failure check
+	$(INSTALL) nodejs --enablerepo=rawhide
 	$(RUN) node --version &>/dev/null
 	$(RUN) npm --version &>/dev/null
 
