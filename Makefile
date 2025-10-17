@@ -41,7 +41,7 @@ rem:
 	buildah push ghcr.io/grantmacken/tbx-runtimes:latest
 	echo '✅ ghcr.io/grantmacken/tbx-runtimes:latest built and pushed'
 
-info/README.md: init $(DNF_LIST) luarocks # python # $(OTP) xxxxx ddddddd
+info/README.md: init $(DNF_LIST) luarocks  $(OTP)
 	echo '##[ $@ ]##'
 	mkdir -p $(dir $@)
 	# create or overwrite README.md
@@ -65,9 +65,8 @@ info/README.md: init $(DNF_LIST) luarocks # python # $(OTP) xxxxx ddddddd
 	SUM=$$(echo $$LINE | grep -oP '^Lua\w+\s\K.+' | cut -d, -f2)
 	$(call tr,$${NAME},$${VER},$${SUM},$@)
 	# ## erlang otp
-	# echo -n 'checking otp version...'
 	# NAME=$$($(RUN) dnf info erlang | grep -oP '^Name\s+:\s+\K.+')
-	# SUM=$$($(RUN) dnf info erlang | grep -oP '^Summary\s+:\s+\K.+')
+	# SUM=$$($(RUN)  dnf info erlang | grep -oP '^Summary\s+:\s+\K.+')
 	# $(RUN) erl -eval 'erlang:display(erlang:system_info(otp_release)), halt().'  -noshell
 	# VER=$$(jq -r '.tag_name' latest/otp.json | cut -d'-' -f2)
 	# $(call tr,$${NAME},$${VER},$${SUM},$@)
