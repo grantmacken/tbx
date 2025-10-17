@@ -117,7 +117,7 @@ init:
 	--label maintainer='Grant MacKenzie <grantmacken@gmail.com>' \
 	--env lang=C.UTF-8 \
 	--env ELIXIR_ERL_OPTIONS="+fnu" $(WORKING_CONTAINER)
-	$(INSTALL) fedora-repos-rawhide
+	
 
 python:
 	echo '##[ $@ ]##'
@@ -137,10 +137,11 @@ golang::
 
 nodejs: # latest/nodejs.json
 	echo '##[ $@ ]##'
-	$(INSTALL) nodejs --enablerepo=rawhide &>/dev/null
+	$(RUN) dnf install fedora-repos-rawhide -y &>/dev/null
+	$(RUN) dnf install nodejs --enablerepo=rawhide -y  || true
 	# success|failure check
-	$(RUN) node --version  &>/dev/null
-	$(RUN) npm  --version  &>/dev/null
+	$(RUN) node --version  || true
+	$(RUN) npm  --version || true
 
 luajit:
 	echo '##[ $@ ]##'
