@@ -60,11 +60,7 @@ info/README.md: init python golang nodejs luajit luarocks # $(OTP) xxxxx ddddddd
 	VER=$$($(RUN) dnf info installed golang | grep -oP '^Version\s+:\s+\K.+')
 	SUM=$$($(RUN) dnf info installed golang | grep -oP '^Summary\s+:\s+\K.+')
 	# # nodejs
-	# NAME=nodejs
-	# VER=$$($(RUN) node --version)
-	# SUM="Nodejs javascript runtime"
-	# $(call tr,$${NAME},$${VER},$${SUM},$@)
-	luajit
+	# luajit
 	NAME=$$($(RUN) dnf list installed luajit | grep -oP '^Name\s+:\s+\K.+')
 	VER=$$($(RUN) dnf info installed luajit | grep -oP '^Version\s+:\s+\K.+')
 	SUM=$$($(RUN) dnf info installed luajit | grep -oP '^Summary\s+:\s+\K.+')
@@ -143,7 +139,7 @@ nodejs:
 luajit:
 	echo '##[ $@ ]##'
 	mkdir -p $(dir $@)
-	$(INSTALL) luajit-devel luajit
+	$(INSTALL) luajit-devel luajit &>/dev/null
 	# success|failure check
 	$(RUN) luajit -v &>/dev/null
 
