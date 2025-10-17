@@ -48,21 +48,21 @@ info/README.md: init python golang nodejs luajit luarocks # $(OTP) xxxxx ddddddd
 	$(call tr,"----","-------","----------------------------", $@)
 	# Write to file - extract 'name', 'version', 'summary' into a table row
 	# nodejs 
-	NAME=$$($(RUN) dnf list installed nodejs | grep -oP '^Name\s+:\s+\K.+'))
-	VER=$$($(RUN) dnf info installed nodejs | grep -oP '^Version\s+:\s+\K.+')
-	SUM=$$($(RUN) dnf info installed nodejs | grep -oP '^Summary\s+:\s+\K.+')
+	NAME=$$($(RUN) dnf info installed nodejs | grep -oP '^Name\s+:\s+\K.+')
+	VER=$$($(RUN)  dnf info installed nodejs | grep -oP '^Version\s+:\s+\K.+')
+	SUM=$$($(RUN)  dnf info installed nodejs | grep -oP '^Summary\s+:\s+\K.+')
 	# python uv tool to install and manage universal-variant tools
 	NAME=$$($(RUN) dnf list installed uv | grep -oP '^Name\s+:\s+\K.+')
-	VER=$$($(RUN) dnf info installed uv | grep -oP '^Version\s+:\s+\K.+')
-	SUM=$$($(RUN) dnf info installed uv | grep -oP '^Summary\s+:\s+\K.+')
+	VER=$$($(RUN)  dnf info installed uv | grep -oP '^Version\s+:\s+\K.+')
+	SUM=$$($(RUN)  dnf info installed uv | grep -oP '^Summary\s+:\s+\K.+')
 	# golang
 	NAME=$$($(RUN) dnf list installed golang | grep -oP '^Name\s+:\s+\K.+')
-	VER=$$($(RUN) dnf info installed golang | grep -oP '^Version\s+:\s+\K.+')
-	SUM=$$($(RUN) dnf info installed golang | grep -oP '^Summary\s+:\s+\K.+')
+	VER=$$($(RUN)  dnf info installed golang | grep -oP '^Version\s+:\s+\K.+')
+	SUM=$$($(RUN)  dnf info installed golang | grep -oP '^Summary\s+:\s+\K.+')
 	# luajit
 	NAME=$$($(RUN) dnf list installed luajit | grep -oP '^Name\s+:\s+\K.+')
-	VER=$$($(RUN) dnf info installed luajit | grep -oP '^Version\s+:\s+\K.+')
-	SUM=$$($(RUN) dnf info installed luajit | grep -oP '^Summary\s+:\s+\K.+')
+	VER=$$($(RUN)  dnf info installed luajit | grep -oP '^Version\s+:\s+\K.+')
+	SUM=$$($(RUN)  dnf info installed luajit | grep -oP '^Summary\s+:\s+\K.+')
 	# luarocks
 	LINE=$$($(RUN) luarocks | grep -oP '^Lua.+')
 	NAME=$$(echo $$LINE | grep -oP '^Lua\w+')
@@ -88,6 +88,7 @@ info/README.md: init python golang nodejs luajit luarocks # $(OTP) xxxxx ddddddd
 	VER=$$(echo "$${LINE}" | cut -d' ' -f2)
 	SUM=$$($(RUN) dnf info elixir | grep -oP '^Summary\s+:\s+\K.+')
 	$(call tr,$${NAME},$${VER},$${SUM},$@)
+	# gleam
 	# $(call tr,Elixir,$${VER},Elixir programming language, $@)
 	# VER=$$(buildah run $(WORKING_CONTAINER) mix --version | grep -oP 'Mix \K.+' | cut -d' ' -f1)
 	# $(call tr,Mix,$${VER},Elixir build tool, $@)
@@ -290,9 +291,7 @@ info/gleam.md: files/gleam.tar
 	## success|failure check
 	$(RUN) gleam --version &>/dev/null
 	## extract version number
-	VER=$$(buildah run $(WORKING_CONTAINER) gleam --version | cut -d' ' -f2)
-	## create table row
-	$(call tr,gleam,$${VER},Gleam programming language,$@)
+
 
 pull:
 	podman pull ghcr.io/grantmacken/tbx-runtimes:latest
