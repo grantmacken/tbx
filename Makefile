@@ -109,9 +109,7 @@ init:
 	--label maintainer='Grant MacKenzie <grantmacken@gmail.com>' \
 	--env lang=C.UTF-8 \
 	--env ELIXIR_ERL_OPTIONS="+fnu" $(WORKING_CONTAINER)
-	install fedora-repos-rawhide
-
-
+	$(INSTALL) fedora-repos-rawhide
 
 python:
 	echo '##[ $@ ]##'
