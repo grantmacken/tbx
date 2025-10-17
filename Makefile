@@ -52,14 +52,13 @@ info/README.md: init python golang nodejs luajit luarocks # $(OTP) xxxxx ddddddd
 	VER=$$($(RUN) dnf info installed nodejs | grep -oP '^Version\s+:\s+\K.+')
 	SUM=$$($(RUN) dnf info installed nodejs | grep -oP '^Summary\s+:\s+\K.+')
 	# python uv tool to install and manage universal-variant tools
-	NAME=$$($(RUN) dnf list installed uv | grep -oP '^Name\s+:\s+\K.+'))
+	NAME=$$($(RUN) dnf list installed uv | grep -oP '^Name\s+:\s+\K.+')
 	VER=$$($(RUN) dnf info installed uv | grep -oP '^Version\s+:\s+\K.+')
 	SUM=$$($(RUN) dnf info installed uv | grep -oP '^Summary\s+:\s+\K.+')
 	# golang
 	NAME=$$($(RUN) dnf list installed golang | grep -oP '^Name\s+:\s+\K.+')
 	VER=$$($(RUN) dnf info installed golang | grep -oP '^Version\s+:\s+\K.+')
 	SUM=$$($(RUN) dnf info installed golang | grep -oP '^Summary\s+:\s+\K.+')
-	# # nodejs
 	# luajit
 	NAME=$$($(RUN) dnf list installed luajit | grep -oP '^Name\s+:\s+\K.+')
 	VER=$$($(RUN) dnf info installed luajit | grep -oP '^Version\s+:\s+\K.+')
@@ -77,7 +76,12 @@ info/README.md: init python golang nodejs luajit luarocks # $(OTP) xxxxx ddddddd
 	$(RUN) erl -eval 'erlang:display(erlang:system_info(otp_release)), halt().'  -noshell
 	VER=$$(jq -r '.tag_name' latest/otp.json | cut -d'-' -f2)
 	$(call tr,$${NAME},$${VER},$${SUM},$@)
-	# $(call tr ,Erlang/OTP,$(ver),the Erlang Open Telecom Platform OTP,$@)
+	# rebar3
+	LINE=$$($(RUN) rebar3 --version | grep -oP '^rebar3.+')
+	NAME=$$(echo $$LINE | cut -d' ' -f1)
+	VER=$$(echo $$LINE | cut -d' ' -f2)
+	SUM="Erlang build tool"
+	$(call tr,$${NAME},$${VER},$${SUM},$@)
 
 xxxxx:
 	cat << EOF | tee -a $@
@@ -132,7 +136,8 @@ golang::
 
 nodejs:
 	echo '##[ $@ ]##'
-	$(INSTALL) nodejs
+	$(INSTALL) nodejs &>/dev/null
+	# success|failure check
 	$(RUN) node --version &>/dev/null
 	$(RUN) npm --version &>/dev/null
 
@@ -234,6 +239,11 @@ info/elixir.md: latest/elixir.json
 	$(RUN) mkdir -p /tmp/elixir
 	$(ADD) files/elixir /tmp/elixir &>/dev/null
 	$(RUN) sh -c 'cd /tmp/elixir && make && make install' &>/dev/null
+	$(RUN) rm -fR /tmp/elixir
+	# success|failure check
+	$(RUN) elixir --version
+
+xxxxsss
 	echo -n 'checking elixir version...'
 	# buildah run $(WORKING_CONTAINER) erl -eval 'erlang:display(erlang:system_info(otp_release)), halt().'  -noshell
 	$(RUN) elixir --version
@@ -242,7 +252,6 @@ info/elixir.md: latest/elixir.json
 	$(call tr,Elixir,$${VER},Elixir programming language, $@)
 	VER=$$(buildah run $(WORKING_CONTAINER) mix --version | grep -oP 'Mix \K.+' | cut -d' ' -f1)
 	$(call tr,Mix,$${VER},Elixir build tool, $@)
-	$(RUN) rm -fR /tmp/elixir
 
 ##[[ rebar3 ]]##
 rebar3: info/rebar3.md
@@ -254,10 +263,10 @@ latest/rebar3.json:
 
 info/rebar3.md: latest/rebar3.json
 	# echo '##[ $@ ]##'
-	VER=$$(jq -r '.tag_name' $<)
 	SRC=$(shell $(call bdu,rebar3,$<))
 	$(ADD) $${SRC} /usr/local/bin/rebar3 &>/dev/null
-	$(call tr,Rebar3,$${VER},the erlang build tool,$@)
+	# success|failure check
+	$(RUN) rebar3 --version &>/dev/null
 
 ##[[ GLEAM ]]##
 gleam: info/gleam.md
