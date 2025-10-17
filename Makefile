@@ -150,7 +150,7 @@ python:
 	$(RUN) which uv &> /dev/null
 
 golang: info/golang.md
-info/golang.md
+info/golang.md:
 	echo '##[ $@ ]##'
 	$(RUN) dnf copr enable -y @go-sig/golang-rawhide &>/dev/null
 	$(INSTALL) golang &>/dev/null
