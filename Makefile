@@ -41,7 +41,7 @@ rem:
 	buildah push ghcr.io/grantmacken/tbx-runtimes:latest
 	echo '✅ ghcr.io/grantmacken/tbx-runtimes:latest built and pushed'
 
-info/README.md: init $(DNF_LIST) # luarocks python # $(OTP) xxxxx ddddddd
+info/README.md: init $(DNF_LIST) luarocks # python # $(OTP) xxxxx ddddddd
 	echo '##[ $@ ]##'
 	mkdir -p $(dir $@)
 	# create or overwrite README.md
@@ -58,27 +58,12 @@ info/README.md: init $(DNF_LIST) # luarocks python # $(OTP) xxxxx ddddddd
 	SUM=$$(cat info/$${pkg}.md | grep -oP '^Summary\s+:\s+\K.+')
 	$(call tr,$${NAME},$${VER},$${SUM},$@)
 	done
-	# NAME=$$($(RUN) dnf info installed nodejs | grep -oP '^Name\s+:\s+\K.+')
-	# VER=$$($(RUN)  dnf info installed nodejs | grep -oP '^Version\s+:\s+\K.+')
-	# SUM=$$($(RUN)  dnf info installed nodejs | grep -oP '^Summary\s+:\s+\K.+')
-	# # python uv tool to install and manage universal-variant tools
-	# NAME=$$($(RUN) dnf list installed uv | grep -oP '^Name\s+:\s+\K.+')
-	# VER=$$($(RUN)  dnf info installed uv | grep -oP '^Version\s+:\s+\K.+')
-	# SUM=$$($(RUN)  dnf info installed uv | grep -oP '^Summary\s+:\s+\K.+')
-	# # golang
-	# NAME=$$($(RUN) dnf list installed golang | grep -oP '^Name\s+:\s+\K.+')
-	# VER=$$($(RUN)  dnf info installed golang | grep -oP '^Version\s+:\s+\K.+')
-	# SUM=$$($(RUN)  dnf info installed golang | grep -oP '^Summary\s+:\s+\K.+')
-	# # luajit
-	# NAME=$$($(RUN) dnf list installed luajit | grep -oP '^Name\s+:\s+\K.+')
-	# VER=$$($(RUN)  dnf info installed luajit | grep -oP '^Version\s+:\s+\K.+')
-	# SUM=$$($(RUN)  dnf info installed luajit | grep -oP '^Summary\s+:\s+\K.+')
-	# # luarocks
-	# LINE=$$($(RUN) luarocks | grep -oP '^Lua.+')
-	# NAME=$$(echo $$LINE | grep -oP '^Lua\w+')
-	# VER=$$(echo $$LINE | grep -oP '^Lua\w+\s\K.+' | cut -d, -f1)
-	# SUM=$$(echo $$LINE | grep -oP '^Lua\w+\s\K.+' | cut -d, -f2)
-	# $(call tr,$${NAME},$${VER},$${SUM},$@)
+	# luarocks
+	LINE=$$($(RUN) luarocks | grep -oP '^Lua.+')
+	NAME=$$(echo $$LINE | grep -oP '^Lua\w+')
+	VER=$$(echo $$LINE | grep -oP '^Lua\w+\s\K.+' | cut -d, -f1)
+	SUM=$$(echo $$LINE | grep -oP '^Lua\w+\s\K.+' | cut -d, -f2)
+	$(call tr,$${NAME},$${VER},$${SUM},$@)
 	# ## erlang otp
 	# echo -n 'checking otp version...'
 	# NAME=$$($(RUN) dnf info erlang | grep -oP '^Name\s+:\s+\K.+')
@@ -118,21 +103,6 @@ xxxxx:
 	BEAM tooling included is the latest versions of the Rebar3 and the Mix build tools.
 	The latest nodejs **runtime** is also installed, as Gleam can compile to javascript as well a Erlang.
 	EOF
-
-ddddddd:
-	$(call tr,"Name","Version","Summary",README.md)
-	$(call tr,"----","-------","----------------------------",README.md)
-	cat info/otp.md    | tee -a README.md
-	cat info/rebar3.md | tee -a README.md
-	cat info/elixir.md | tee -a README.md
-	cat info/gleam.md | tee -a tee README.md
-	cat info/nodejs.md | tee -a README.md
-	# python uv tool to install and manage universal-variant tools
-	cat info/python.md | tee -a README.md
-	# luajit and luarocks
-	# cat info/luajit.md | tee -a README.md
-	# cat info/luarocks.md | tee -a README.md
-	echo '✅ README modified,commited and pushed'
 
 init:
 	buildah pull ghcr.io/grantmacken/tbx-build-tools &>/dev/null
