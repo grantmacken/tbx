@@ -17,7 +17,7 @@ WORKING_CONTAINER := tbx-build-tools-working-container
 RUN := buildah run $(WORKING_CONTAINER)
 ADD := buildah add --chmod 755 $(WORKING_CONTAINER)
 INSTALL := $(RUN) dnf install --allowerasing --skip-unavailable --skip-broken --no-allow-downgrade -y
-INFO    := $(RUN) dnf info --installed 
+INFO    := $(RUN) dnf info --installed
 WGET := wget -q --no-check-certificate --timeout=10 --tries=3
 TAR  := tar xz --strip-components=1 -C
 TAR_NO_STRIP := tar xz -C
@@ -204,7 +204,7 @@ info/otp.md: latest/otp.json
 	TAGNAME=$$(jq -r '.tag_name' $<)
 	VER=$$(echo $${TAGNAME} | cut -d'-' -f2)
 	echo "Erlang/OTP Version: $${VER}"
-	ASSET=$$(jq -r '.assets[] | select(.name=="otp_src_$$(VER).tar.gz") ' $<)
+	ASSET=$$(jq -r '.assets[] | select(.name=="otp_src_$${VER}.tar.gz") ' $<)
 	SRC=$$(echo $${ASSET} | jq -r '.browser_download_url')
 	mkdir -p files/otp && $(WGET) $${SRC} -O- | $(TAR) files/otp &>/dev/null
 	$(ADD) files/otp /tmp/otp &>/dev/null
