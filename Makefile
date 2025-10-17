@@ -39,7 +39,7 @@ rem:
 	buildah push ghcr.io/grantmacken/tbx-runtimes:latest
 	echo '✅ ghcr.io/grantmacken/tbx-runtimes:latest built and pushed'
 
-info/README.md: init python golang nodejs
+info/README.md: init python golang nodejs luajit luarocks # $(OTP) xxxxx ddddddd
 	echo '##[ $@ ]##'
 	mkdir -p $(dir $@)
 	# create or overwrite README.md
@@ -74,6 +74,14 @@ info/README.md: init python golang nodejs
 	VER=$$(echo $$LINE | grep -oP '^Lua\w+\s\K.+' | cut -d, -f1)
 	SUM=$$(echo $$LINE | grep -oP '^Lua\w+\s\K.+' | cut -d, -f2)
 	$(call tr,$${NAME},$${VER},$${SUM},$@)
+	## erlang otp
+	echo -n 'checking otp version...'
+	NAME=$$($(RUN) dnf info erlang | grep -oP '^Name\s+:\s+\K.+')
+	SUM=$$($(RUN) dnf info erlang | grep -oP '^Summary\s+:\s+\K.+')
+	VER=xxx
+	$(RUN) erl -eval 'erlang:display(erlang:system_info(otp_release)), halt().'  -noshell
+	$(call tr,$${NAME},$${VER},$${SUM},$@)
+	# $(call tr ,Erlang/OTP,$(ver),the Erlang Open Telecom Platform OTP,$@)
 
 xxxxx:
 	cat << EOF | tee -a $@
@@ -133,7 +141,7 @@ golang::
 
 nodejs: # latest/nodejs.json
 	echo '##[ $@ ]##'
-	$(RUN) nodejs --enablerepo=rawhide
+	$(INSTALL) nodejs --enablerepo=rawhide
 	# mkdir -p $(dir $@)
 	# VER=$$(jq -r '.tag_name' $< )
 	# mkdir -p files/nodejs/usr/local
@@ -203,7 +211,6 @@ info/otp.md: latest/otp.json
 	mkdir -p $(dir $@)
 	$(RUN) mkdir -p /tmp/otp
 	TAGNAME=$$(jq -r '.tag_name' $<)
-	$(eval ver := $(shell jq -r '.name' $< | cut -d' ' -f2))
 	ASSET=$$(jq -r '.assets[] | select(.name=="otp_src_$(ver).tar.gz") ' $<)
 	SRC=$$(echo $${ASSET} | jq -r '.browser_download_url')
 	mkdir -p files/otp && $(WGET) $${SRC} -O- |
@@ -224,9 +231,6 @@ info/otp.md: latest/otp.json
 		--without-cosEvent \
 		--without-odbc' &>/dev/null
 	$(RUN) sh -c 'cd /tmp/otp && make && make install' &>/dev/null
-	echo -n 'checking otp version...'
-	$(RUN) erl -eval 'erlang:display(erlang:system_info(otp_release)), halt().'  -noshell
-	$(call tr ,Erlang/OTP,$(ver),the Erlang Open Telecom Platform OTP,$@)
 	$(RUN) rm -fR /tmp/otp
 
 latest/elixir.json:
