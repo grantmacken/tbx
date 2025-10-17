@@ -142,6 +142,8 @@ init:
 	--label maintainer='Grant MacKenzie <grantmacken@gmail.com>' \
 	--env lang=C.UTF-8 \
 	--env ELIXIR_ERL_OPTIONS="+fnu" $(WORKING_CONTAINER)
+	mkdir -p info
+	$(RUN) dnf update -y &>/dev/null
 
 python:
 	echo '##[ $@ ]##'
@@ -160,19 +162,23 @@ info/golang.md:
 
 ##[[ NODEJS ]]##
 
-nodejs:
+nodejs: info/golang.md
+info/nodejs.md:
 	echo '##[ $@ ]##'
 	$(INSTALL) nodejs &>/dev/null
 	# success|failure check
 	$(RUN) node --version &>/dev/null
 	$(RUN) npm --version &>/dev/null
+	$(INFO) nodejs > $@
 
-luajit:
+luajit: info/luajit.md
+info/luajit.md:
 	echo '##[ $@ ]##'
 	mkdir -p $(dir $@)
 	$(INSTALL) luajit-devel luajit &>/dev/null
 	# success|failure check
 	$(RUN) luajit -v &>/dev/null
+	$(INFO) luajit > $@
 
 latest/luarocks.json:
 	echo '##[ $@ ]##'
