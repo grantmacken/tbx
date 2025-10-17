@@ -82,6 +82,15 @@ info/README.md: init python golang nodejs luajit luarocks # $(OTP) xxxxx ddddddd
 	VER=$$(echo $$LINE | cut -d' ' -f2)
 	SUM="Erlang build tool"
 	$(call tr,$${NAME},$${VER},$${SUM},$@)
+	# elixir
+	LINE=$$( $(RUN) elixir --version | grep -oP '^Elixir.+')
+	VER=$$(echo "$${LINE}" | cut -d' ' -f1)
+	VER=$$(echo "$${LINE}" | cut -d' ' -f2)
+	SUM=$$($(RUN) dnf info elixir | grep -oP '^Summary\s+:\s+\K.+')
+	$(call tr,$${NAME},$${VER},$${SUM},$@)
+	# $(call tr,Elixir,$${VER},Elixir programming language, $@)
+	# VER=$$(buildah run $(WORKING_CONTAINER) mix --version | grep -oP 'Mix \K.+' | cut -d' ' -f1)
+	# $(call tr,Mix,$${VER},Elixir build tool, $@)
 
 xxxxx:
 	cat << EOF | tee -a $@
@@ -228,30 +237,20 @@ latest/elixir.json:
 	mkdir -p $(dir $@)
 	$(WGET) https://api.github.com/repos/elixir-lang/elixir/releases/latest -O $@
 
-elixir: info/elixir.md
-info/elixir.md: latest/elixir.json
+elixir: latest/elixir.json
 	echo '##[ $@ ]##'
 	mkdir -p $(dir $@)
 	TAGNAME=$$(jq -r '.tag_name' $<)
 	SRC=https://github.com/elixir-lang/elixir/archive/$${TAGNAME}.tar.gz
-	mkdir -p files/elixir && $(WGET) $${SRC} -O- |
-	$(TAR) files/elixir &>/dev/null
+	mkdir -p files/elixir && $(WGET) $${SRC} -O- | $(TAR) files/elixir &>/dev/null
 	$(RUN) mkdir -p /tmp/elixir
 	$(ADD) files/elixir /tmp/elixir &>/dev/null
 	$(RUN) sh -c 'cd /tmp/elixir && make && make install' &>/dev/null
 	$(RUN) rm -fR /tmp/elixir
 	# success|failure check
 	$(RUN) elixir --version
+	$(RUN) mix --version
 
-xxxxsss
-	echo -n 'checking elixir version...'
-	# buildah run $(WORKING_CONTAINER) erl -eval 'erlang:display(erlang:system_info(otp_release)), halt().'  -noshell
-	$(RUN) elixir --version
-	LINE=$$(buildah run $(WORKING_CONTAINER) elixir --version | grep -oP '^Elixir.+')
-	VER=$$(echo "$${LINE}" | grep -oP 'Elixir\s\K.+' | cut -d' ' -f1)
-	$(call tr,Elixir,$${VER},Elixir programming language, $@)
-	VER=$$(buildah run $(WORKING_CONTAINER) mix --version | grep -oP 'Mix \K.+' | cut -d' ' -f1)
-	$(call tr,Mix,$${VER},Elixir build tool, $@)
 
 ##[[ rebar3 ]]##
 rebar3: info/rebar3.md
