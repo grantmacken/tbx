@@ -164,13 +164,12 @@ info/golang.md:
 
 ##[[ NODEJS ]]##
 
-nodejs: info/golang.md
+nodejs: info/nodejs.md
 info/nodejs.md:
 	echo '##[ $@ ]##'
 	$(INSTALL) nodejs &>/dev/null
 	# success|failure check
 	$(RUN) node --version &>/dev/null
-	$(RUN) npm --version &>/dev/null
 	$(INFO) nodejs > $@
 
 luajit: info/luajit.md
