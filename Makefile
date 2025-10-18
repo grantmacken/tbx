@@ -229,12 +229,15 @@ info/erlang.md: latest/erlang.json
 	$(INFO) erlang > $@
 	$(RUN) rm -fR /tmp/otp
 
+##[[ ELIXIR ]]##
+elixir: info/elixir.md
+
 latest/elixir.json:
 	echo '##[ $@ ]##'
 	mkdir -p $(dir $@)
 	$(WGET) https://api.github.com/repos/elixir-lang/elixir/releases/latest -O $@
 
-elixir: latest/elixir.json
+info/elixir.md: latest/elixir.json
 	echo '##[ $@ ]##'
 	mkdir -p $(dir $@)
 	TAGNAME=$$(jq -r '.tag_name' $<)
