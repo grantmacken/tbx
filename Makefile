@@ -41,11 +41,12 @@ rem:
 	buildah push ghcr.io/grantmacken/tbx-runtimes:latest
 	echo '✅ ghcr.io/grantmacken/tbx-runtimes:latest built and pushed'
 
-info/README.md: init $(DNF_LIST) luarocks  $(OTP)
+info/README.md: init $(DNF_LIST) luarocks $(OTP)
 	echo '##[ $@ ]##'
 	mkdir -p $(dir $@)
 	# create or overwrite README.md
 	printf "\n$(HEADING2) %s\n\n" "Runtimes and associated languages" | tee $@
+	# The latest nodejs **runtime** is also installed, as Gleam can compile to javascript as well a Erlang.
 	$(call tr,"Name","Version","Summary", $@)
 	$(call tr,"----","-------","----------------------------", $@)
 	# Write to file - extract 'name', 'version', 'summary' into a table row
@@ -64,12 +65,24 @@ info/README.md: init $(DNF_LIST) luarocks  $(OTP)
 	VER=$$(echo $$LINE | grep -oP '^Lua\w+\s\K.+' | cut -d, -f1)
 	SUM=$$(echo $$LINE | grep -oP '^Lua\w+\s\K.+' | cut -d, -f2)
 	$(call tr,$${NAME},$${VER},$${SUM},$@)
+	printf "\n$(HEADING2) %s\n\n" "Erlang/OTP and run on the Beam languages" | tee $@
+	cat << EOF | tee -a $@
+	Included in this toolbox are the latest releases of the Erlang, Elixir and Gleam programming languages.
+	The Erlang programming language is a general-purpose, concurrent, functional programming language
+	and **runtime** system. It is used to build massively scalable soft real-time systems with high availability.
+	The BEAM is the virtual machine at the core of the Erlang Open Telecom Platform (OTP).
+	The included Elixir and Gleam programming languages also run on the BEAM.
+	BEAM tooling included is the latest versions of the Rebar3 and the Mix build tools.
+	EOF
+	echo "" | tee -a $@
+	$(call tr,"Name","Version","Summary", $@)
+	$(call tr,"----","-------","----------------------------", $@)
 	# ## erlang otp
-	# NAME=$$($(RUN) dnf info erlang | grep -oP '^Name\s+:\s+\K.+')
-	# SUM=$$($(RUN)  dnf info erlang | grep -oP '^Summary\s+:\s+\K.+')
+	NAME=$$($(RUN) dnf info erlang | grep -oP '^Name\s+:\s+\K.+')
+	VER=$$(jq -r '.name' latest/otp.json | cut -d'-' -f2)
+	SUM=$$($(RUN)  dnf info erlang | grep -oP '^Summary\s+:\s+\K.+')
 	# $(RUN) erl -eval 'erlang:display(erlang:system_info(otp_release)), halt().'  -noshell
-	# VER=$$(jq -r '.tag_name' latest/otp.json | cut -d'-' -f2)
-	# $(call tr,$${NAME},$${VER},$${SUM},$@)
+	$(call tr,$${NAME},$${VER},$${SUM},$@)
 	# # rebar3
 	# LINE=$$($(RUN) rebar3 --version | grep -oP '^rebar3.+')
 	# NAME=$$(echo $$LINE | cut -d' ' -f1)
@@ -91,17 +104,6 @@ info/README.md: init $(DNF_LIST) luarocks  $(OTP)
 	# $(call tr,Elixir,$${VER},Elixir programming language, $@)
 	# VER=$$(buildah run $(WORKING_CONTAINER) mix --version | grep -oP 'Mix \K.+' | cut -d' ' -f1)
 	# $(call tr,Mix,$${VER},Elixir build tool, $@)
-
-xxxxx:
-	cat << EOF | tee -a $@
-	Included in this toolbox are the latest releases of the Erlang, Elixir and Gleam programming languages.
-	The Erlang programming language is a general-purpose, concurrent, functional programming language
-	and **runtime** system. It is used to build massively scalable soft real-time systems with high availability.
-	The BEAM is the virtual machine at the core of the Erlang Open Telecom Platform (OTP).
-	The included Elixir and Gleam programming languages also run on the BEAM.
-	BEAM tooling included is the latest versions of the Rebar3 and the Mix build tools.
-	The latest nodejs **runtime** is also installed, as Gleam can compile to javascript as well a Erlang.
-	EOF
 
 init:
 	buildah pull ghcr.io/grantmacken/tbx-build-tools &>/dev/null
