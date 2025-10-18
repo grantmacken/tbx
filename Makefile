@@ -27,7 +27,7 @@ bdu = jq -r ".assets[] | select(.browser_download_url | contains(\"$1\")) | .bro
 tarball = jq -r '.tarball_url' $1
 
 DNF_LIST := golang luajit nodejs uv
-OTP := otp erlang-rebar3 elixir gleam
+OTP := erlang erlang-rebar3 elixir gleam
 LUA := luajit luarocks
 
 HEADING1 := \#
@@ -41,7 +41,7 @@ rem:
 	buildah push ghcr.io/grantmacken/tbx-runtimes:latest
 	echo '✅ ghcr.io/grantmacken/tbx-runtimes:latest built and pushed'
 
-info/README.md: init $(DNF_LIST) luarocks $(OTP)
+info/README.md: init $(DNF_LIST) $(OTP) luarocks 
 	echo '##[ $@ ]##'
 	mkdir -p $(dir $@)
 	# create or overwrite README.md
@@ -88,6 +88,11 @@ info/README.md: init $(DNF_LIST) luarocks $(OTP)
 	SUM=$$(cat info/erlang-rebar3.md | grep -oP '^Summary\s+:\s+\K.+')
 	$(call tr,$${NAME},$${VER},$${SUM},$@)
 	# elixir
+	NAME=$$(cat info/elixir.md | grep -oP '^Name\s+:\s+\K.+')
+	VER=$$(jq -r '.tag_name' latest/elixir.json | cut -d'v' -f2)
+	SUM=$$(cat info/elixir.md | grep -oP '^Summary\s+:\s+\K.+')
+	$(call tr,$${NAME},$${VER},$${SUM},$@)
+	# gleam
 	# SUM="Erlang build tool"
 	# $(call tr,$${NAME},$${VER},$${SUM},$@)
 	# # elixir
@@ -161,7 +166,6 @@ latest/luarocks.json:
 	$(WGET) https://api.github.com/repos/luarocks/luarocks/tags -O- | jq '.[0]' > $@
 
 info/luarocks.md: latest/luarocks.json
-	latest/luarocks.json
 	echo '##[ $@ ]##'
 	mkdir -p $(dir $@)
 	mkdir -p files/luarocks
@@ -198,13 +202,13 @@ info/luarocks.md: latest/luarocks.json
 	# $(RUN) ln -sf /usr/local/cargo/bin/* /usr/local/bin/
 	# $(RUN) lx --help
 
-latest/otp.json:
+latest/erlang.json:
 	echo '##[ $@ ]##'
 	mkdir -p $(dir $@)
 	$(WGET) https://api.github.com/repos/erlang/otp/releases/latest -O $@
 
-otp: info/otp.md
-info/otp.md: latest/otp.json
+erlang: info/erlang.md
+info/erlang.md: latest/erlang.json
 	echo '##[ $@ ]##'
 	mkdir -p $(dir $@)
 	mkdir -p files/otp
