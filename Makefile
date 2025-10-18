@@ -201,12 +201,10 @@ info/otp.md: latest/otp.json
 	echo '##[ $@ ]##'
 	mkdir -p $(dir $@)
 	$(RUN) mkdir -p /tmp/otp
-	TAGNAME=$$(jq -r '.tag_name' $<)
-	VER=$$(echo $${TAGNAME} | cut -d'-' -f2)
+	VER=$$(jq -r '.tag_name' $< | cut -d' ' -f2)
 	echo "Erlang/OTP Version: $${VER}"
-	ASSET=$$(jq -r '.assets[] | select(.name=="otp_src_$${VER}.tar.gz") ' $<)
-	SRC=$$(echo $${ASSET} | jq -r '.browser_download_url')
-	mkdir -p files/otp && $(WGET) $${SRC} -O- | $(TAR) files/otp &>/dev/null
+	SRC=https://github.com/erlang/otp/releases/download/OTP-$${VER}/otp_src_$${VER}.tar.gz
+	$(WGET) $${SRC} -O- | $(TAR) files/otp &>/dev/null
 	$(ADD) files/otp /tmp/otp &>/dev/null
 	$(RUN) sh -c 'cd /tmp/otp && ./configure \
 		--prefix=/usr/local \
