@@ -17,7 +17,7 @@ WORKING_CONTAINER := tbx-build-tools-working-container
 RUN := buildah run $(WORKING_CONTAINER)
 ADD := buildah add --chmod 755 $(WORKING_CONTAINER)
 INSTALL := $(RUN) dnf install --allowerasing --skip-unavailable --skip-broken --no-allow-downgrade -y
-INFO    := $(RUN) dnf info --installed
+INFO    := $(RUN) dnf info
 WGET := wget -q --no-check-certificate --timeout=10 --tries=3
 TAR  := tar xz --strip-components=1 -C
 TAR_NO_STRIP := tar xz -C
@@ -61,9 +61,9 @@ info/README.md: init $(DNF_LIST) luarocks $(OTP)
 	done
 	# luarocks
 	LINE=$$($(RUN) luarocks | grep -oP '^Lua.+')
-	NAME=$$(echo $$LINE | grep -oP '^Lua\w+')
-	VER=$$(echo $$LINE | grep -oP '^Lua\w+\s\K.+' | cut -d, -f1)
-	SUM=$$(echo $$LINE | grep -oP '^Lua\w+\s\K.+' | cut -d, -f2)
+	NAME=$$(cat info/luarocks.md | grep -oP '^Summary\s+:\s+\K.+')
+	VER=$$($(RUN) luarocks --version | head -1 | cut -d' ' -f2)
+	SUM=$$(cat info/luarocks.md | grep -oP '^Summary\s+:\s+\K.+')
 	$(call tr,$${NAME},$${VER},$${SUM},$@)
 	printf "\n$(HEADING2) %s\n\n" "Erlang/OTP and run on the Beam languages" | tee $@
 	cat << EOF | tee -a $@
@@ -80,7 +80,7 @@ info/README.md: init $(DNF_LIST) luarocks $(OTP)
 	# ## erlang otp
 	NAME=$$($(RUN) dnf info erlang | grep -oP '^Name\s+:\s+\K.+')
 	VER=$$(jq -r '.name' latest/otp.json | cut -d'-' -f2)
-	SUM=$$($(RUN)  dnf info erlang | grep -oP '^Summary\s+:\s+\K.+')
+	SUM=$$($(RUN) dnf info erlang | grep -oP '^Summary\s+:\s+\K.+')
 	# $(RUN) erl -eval 'erlang:display(erlang:system_info(otp_release)), halt().'  -noshell
 	$(call tr,$${NAME},$${VER},$${SUM},$@)
 	# # rebar3
@@ -122,7 +122,7 @@ info/uv.md:
 	$(INSTALL) uv &>/dev/null
 	# verify installation
 	$(RUN) which uv &> /dev/null
-	$(INFO) uv > $@
+	$(INFO) --installed uv > $@
 
 golang: info/golang.md
 info/golang.md:
@@ -131,7 +131,7 @@ info/golang.md:
 	$(INSTALL) golang &>/dev/null
 	# verify installation
 	$(RUN) go version &> /dev/null
-	$(INFO) golang > $@
+	$(INFO) --installed golang > $@
 
 ##[[ NODEJS ]]##
 
@@ -141,7 +141,7 @@ info/nodejs.md:
 	$(INSTALL) nodejs &>/dev/null
 	# success|failure check
 	$(RUN) node --version &>/dev/null
-	$(INFO) nodejs > $@
+	$(INFO) --installed nodejs > $@
 
 luajit: info/luajit.md
 info/luajit.md:
@@ -150,14 +150,17 @@ info/luajit.md:
 	$(INSTALL) luajit-devel luajit &>/dev/null
 	# success|failure check
 	$(RUN) luajit -v &>/dev/null
-	$(INFO) luajit > $@
+	$(INFO) --installed luajit > $@
 
+##[[ LUAROCKS ]]##
+luarocks: info/luarocks.md
 latest/luarocks.json:
 	echo '##[ $@ ]##'
 	mkdir -p $(dir $@)
 	$(WGET) https://api.github.com/repos/luarocks/luarocks/tags -O- | jq '.[0]' > $@
 
-luarocks: latest/luarocks.json
+info/luarocks.md: latest/luarocks.jso
+	latest/luarocks.json
 	echo '##[ $@ ]##'
 	mkdir -p $(dir $@)
 	mkdir -p files/luarocks
@@ -176,6 +179,7 @@ luarocks: latest/luarocks.json
 	$(RUN) rm -fR tmp/luarocks
 	# success|failure check
 	$(RUN) luarocks --version &>/dev/null
+	$(INFO) luarocks > $@
 
 # rust:
 # 	echo '##[ $@ ]##'
@@ -202,10 +206,12 @@ otp: info/otp.md
 info/otp.md: latest/otp.json
 	echo '##[ $@ ]##'
 	mkdir -p $(dir $@)
+	mkdir -p files/otp
 	$(RUN) mkdir -p /tmp/otp
 	VER=$$(jq -r '.name' $< | cut -d' ' -f2)
 	echo "Erlang/OTP Version: $${VER}"
 	SRC="https://github.com/erlang/otp/releases/download/OTP-$${VER}/otp_src_$${VER}.tar.gz"
+	echo "Source URL: $${SRC}"
 	$(WGET) $${SRC} -O- | $(TAR) files/otp &>/dev/null
 	$(ADD) files/otp /tmp/otp &>/dev/null
 	$(RUN) sh -c 'cd /tmp/otp && ./configure \
