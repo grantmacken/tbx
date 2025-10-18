@@ -33,7 +33,7 @@ LUA := luajit luarocks
 HEADING1 := \#
 HEADING2 := $(HEADING1)$(HEADING1)
 
-default:  info/README.md # python golang nodejs $(LUA) $(OTP) python
+default:  info/README.md
 
 rem:
 	echo '##[ $@ ]##'
@@ -41,7 +41,7 @@ rem:
 	buildah push ghcr.io/grantmacken/tbx-runtimes:latest
 	echo '✅ ghcr.io/grantmacken/tbx-runtimes:latest built and pushed'
 
-info/README.md: init $(DNF_LIST) $(OTP) luarocks 
+info/README.md: init $(DNF_LIST) $(OTP) luarocks
 	echo '##[ $@ ]##'
 	mkdir -p $(dir $@)
 	# create or overwrite README.md
@@ -78,9 +78,9 @@ info/README.md: init $(DNF_LIST) $(OTP) luarocks
 	$(call tr,"Name","Version","Summary", $@)
 	$(call tr,"----","-------","----------------------------", $@)
 	# ## erlang otp
-	NAME=$$(cat info/otp.md | grep -oP '^Name\s+:\s+\K.+')
-	VER=$$(jq -r '.name' latest/otp.json | cut -d'-' -f2)
-	SUM=$$(cat info/otp.md | grep -oP '^Summary\s+:\s+\K.+')
+	NAME=$$(cat info/erlang.md | grep -oP '^Name\s+:\s+\K.+')
+	VER=$$(jq -r '.name' latest/erlang.json | cut -d' ' -f2)
+	SUM=$$(cat info/erlang.md | grep -oP '^Summary\s+:\s+\K.+')
 	$(call tr,$${NAME},$${VER},$${SUM},$@)
 	# erlang-rebar3
 	NAME=$$(cat info/erlang-rebar3.md | grep -oP '^Name\s+:\s+\K.+')
@@ -93,22 +93,12 @@ info/README.md: init $(DNF_LIST) $(OTP) luarocks
 	SUM=$$(cat info/elixir.md | grep -oP '^Summary\s+:\s+\K.+')
 	$(call tr,$${NAME},$${VER},$${SUM},$@)
 	# gleam
-	# SUM="Erlang build tool"
-	# $(call tr,$${NAME},$${VER},$${SUM},$@)
-	# # elixir
-	# LINE=$$( $(RUN) elixir --version | grep -oP '^Elixir.+')
-	# NAME=$$(echo "$${LINE}" | cut -d' ' -f1)
-	# VER=$$(echo "$${LINE}" | cut -d' ' -f2)
-	# SUM=$$($(RUN) dnf info elixir | grep -oP '^Summary\s+:\s+\K.+')
-	# $(call tr,$${NAME},$${VER},$${SUM},$@)
-	# # gleam
-	# LINE=$$($(RUN) gleam --version)
-	# NAME=$$(echo $$LINE | cut -d' ' -f1)
-	# VER=$$(echo $$LINE | cut -d' ' -f2)
-	# SUM="Gleam programming language"
-	# $(call tr,$${NAME},$${VER},$${SUM},$@)
-	# $(call tr,Elixir,$${VER},Elixir programming language, $@)
-	# VER=$$(buildah run $(WORKING_CONTAINER) mix --version | grep -oP 'Mix \K.+' | cut -d' ' -f1)
+	LINE=$$($(RUN) gleam --version)
+	NAME=$$(echo $$LINE | cut -d' ' -f1)
+	VER=$$(echo $$LINE | cut -d' ' -f2)
+	SUM="Gleam programming language"
+	$(call tr,$${NAME},$${VER},$${SUM},$@)
+	# TODO:  mix
 	# $(call tr,Mix,$${VER},Elixir build tool, $@)
 
 init:
