@@ -247,6 +247,7 @@ elixir: latest/elixir.json
 	# success|failure check
 	$(RUN) elixir --version
 	$(RUN) mix --version
+	$(INFO) elixir > $@
 
 
 ##[[ rebar3 ]]##
@@ -288,7 +289,6 @@ info/gleam.md: files/gleam.tar
 	## success|failure check
 	$(RUN) gleam --version &>/dev/null
 	## extract version number
-
 
 pull:
 	podman pull ghcr.io/grantmacken/tbx-runtimes:latest
