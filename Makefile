@@ -159,7 +159,7 @@ latest/luarocks.json:
 	mkdir -p $(dir $@)
 	$(WGET) https://api.github.com/repos/luarocks/luarocks/tags -O- | jq '.[0]' > $@
 
-info/luarocks.md: latest/luarocks.jso
+info/luarocks.md: latest/luarocks.json
 	latest/luarocks.json
 	echo '##[ $@ ]##'
 	mkdir -p $(dir $@)
