@@ -27,7 +27,7 @@ bdu = jq -r ".assets[] | select(.browser_download_url | contains(\"$1\")) | .bro
 tarball = jq -r '.tarball_url' $1
 
 DNF_LIST := golang luajit nodejs uv
-OTP := otp rebar3 elixir gleam
+OTP := otp erlang-rebar3 elixir gleam
 LUA := luajit luarocks
 
 HEADING1 := \#
@@ -78,15 +78,16 @@ info/README.md: init $(DNF_LIST) luarocks $(OTP)
 	$(call tr,"Name","Version","Summary", $@)
 	$(call tr,"----","-------","----------------------------", $@)
 	# ## erlang otp
-	NAME=$$($(RUN) dnf info erlang | grep -oP '^Name\s+:\s+\K.+')
+	NAME=$$(cat info/otp.md | grep -oP '^Name\s+:\s+\K.+')
 	VER=$$(jq -r '.name' latest/otp.json | cut -d'-' -f2)
-	SUM=$$($(RUN) dnf info erlang | grep -oP '^Summary\s+:\s+\K.+')
-	# $(RUN) erl -eval 'erlang:display(erlang:system_info(otp_release)), halt().'  -noshell
+	SUM=$$(cat info/otp.md | grep -oP '^Summary\s+:\s+\K.+')
 	$(call tr,$${NAME},$${VER},$${SUM},$@)
-	# # rebar3
-	# LINE=$$($(RUN) rebar3 --version | grep -oP '^rebar3.+')
-	# NAME=$$(echo $$LINE | cut -d' ' -f1)
-	# VER=$$(echo $$LINE | cut -d' ' -f2)
+	# erlang-rebar3
+	NAME=$$(cat info/erlang-rebar3.md | grep -oP '^Name\s+:\s+\K.+')
+	VER=$$(jq -r '.tag_name' latest/erlang-rebar3.json | cut -d'v' -f2)
+	SUM=$$(cat info/erlang-rebar3.md | grep -oP '^Summary\s+:\s+\K.+')
+	$(call tr,$${NAME},$${VER},$${SUM},$@)
+	# elixir
 	# SUM="Erlang build tool"
 	# $(call tr,$${NAME},$${VER},$${SUM},$@)
 	# # elixir
@@ -229,6 +230,9 @@ info/otp.md: latest/otp.json
 		--without-cosEvent \
 		--without-odbc' &>/dev/null
 	$(RUN) sh -c 'cd /tmp/otp && make && make install' &>/dev/null
+	# success|failure check
+	$(RUN) erl -eval 'erlang:display(erlang:system_info(otp_release)), halt().'  -noshell &>/dev/null
+	$(INFO) erlang > $@
 	$(RUN) rm -fR /tmp/otp
 
 latest/elixir.json:
@@ -252,19 +256,20 @@ elixir: latest/elixir.json
 
 
 ##[[ rebar3 ]]##
-rebar3: info/rebar3.md
+erlang-rebar3: info/erlang-rebar3.md
 
-latest/rebar3.json:
+latest/erlang-rebar3.json:
 	# echo '##[ $@ ]##'
 	mkdir -p $(dir $@)
 	$(WGET) https://api.github.com/repos/erlang/rebar3/releases/latest -O $@
 
-info/rebar3.md: latest/rebar3.json
-	# echo '##[ $@ ]##'
+info/erlang-rebar3.md: latest/erlang-rebar3.json
+	echo '##[ $(basename $(notdir $@)) ]##'
 	SRC=$(shell $(call bdu,rebar3,$<))
 	$(ADD) $${SRC} /usr/local/bin/rebar3 &>/dev/null
 	# success|failure check
 	$(RUN) rebar3 --version &>/dev/null
+	$(INFO) erlang-rebar3 > $@
 
 ##[[ GLEAM ]]##
 gleam: info/gleam.md
