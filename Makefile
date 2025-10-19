@@ -221,7 +221,7 @@ info/tree-sitter-cli.md:
 	# check it is installed
 	$(RUN) whereis tree-sitter || true
 	$(RUN) tree-sitter --version || true
-	$(RUN) npm list -g $${NAME} --long
+	$(RUN) npm list -g $${NAME} | tee $@
 	# extract 'name', 'version', 'summary' of exec into to a table row
 
 aasassss:
