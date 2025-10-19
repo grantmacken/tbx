@@ -26,6 +26,7 @@ WORKING_CONTAINER := tbx-runtimes-working-container
 # actions
 RUN     := buildah run $(WORKING_CONTAINER)
 INSTALL := $(RUN) dnf install --allowerasing --skip-unavailable --skip-broken --no-allow-downgrade -y
+INFO    := $(RUN) dnf info
 SH      := $(RUN) sh -c
 # LINK    := $(RUN) ln -s $(shell which host-spawn)
 ADD     := buildah add --chmod 755 $(WORKING_CONTAINER)
@@ -118,24 +119,18 @@ init:
 	$(RUN) dnf update -y &>/dev/null
 
 neovim: info/neovim.md
-
-files/nvim.tar.gz:
-	# echo '##[ $@ ]##'
-	mkdir -p $(dir $@)
-	$(WGET) "https://github.com/neovim/neovim/releases/download/nightly/nvim-linux-x86_64.tar.gz" -O $@
-
-info/neovim.md: files/nvim.tar.gz
+info/neovim.md:
 	echo '##[ $@ ]##'
 	mkdir -p $(dir $@)
-	NAME=$(basename $(notdir $@))
-	TARGET=files/$${NAME}/usr/local
+	TARGET=files/neovim/usr/local
 	mkdir -p $${TARGET}
-	$(TAR) $${TARGET} -f $<
-	$(ADD) files/$${NAME} &> /dev/null
+	SRC="https://github.com/neovim/neovim/releases/download/nightly/nvim-linux-x86_64.tar.gz"
+	$(WGET) $${SRC} -O- $(TAR) $${TARGET}
+	$(ADD) files/neovim &> /dev/null
+	$(RUN) ls /usr/local/bin &> /dev/null
 	# success|failure check
 	$(RUN) nvim -v &> /dev/null
 	$(INFO) neovim > $@
-
 
 mason_registry:
 	echo '##[ $@ ]##'
