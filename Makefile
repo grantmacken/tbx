@@ -94,7 +94,7 @@ info/README.md: init $(DNF_LIST) $(OTP) luarocks
 	done
 	# luarocks
 	LINE=$$($(RUN) luarocks | grep -oP '^Lua.+')
-	NAME=$$(cat info/luarocks.md | grep -oP '^Summary\s+:\s+\K.+')
+	NAME=$$(cat info/luarocks.md | grep -oP '^Name\s+:\s+\K.+')
 	VER=$$($(RUN) luarocks --version | head -1 | cut -d' ' -f2)
 	SUM=$$(cat info/luarocks.md | grep -oP '^Summary\s+:\s+\K.+')
 	$(call tr,$${NAME},$${VER},$${SUM},$@)
