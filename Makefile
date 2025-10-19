@@ -143,7 +143,7 @@ info/neovim.md:
 	# success|failure check
 	VER=$$($(RUN) nvim -v | grep -oP 'NVIM v\K\d+\.\d+\.\d+' )
 	echo "Updating neovim version to $$VER in $@"
-	$(INFO) neovim | sed "s/^Version.*$/Version : ${VER}/" >  $@
+	$(INFO) neovim | sed "s/^Version.*$$/Version : $${VER}/" >  $@
 	echo '✅ neovim installed'
 
 mason_registry:
