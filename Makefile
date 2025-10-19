@@ -59,8 +59,8 @@ HEADING2 := $(HEADING1)$(HEADING1)
 HEADING3 := $(HEADING2)$(HEADING1)
 
 DNF_LIST := neovim google-cloud-cli
-NPM_LIST := tree-sitter-cli # @github/copilot # @mistweaverco/kulala-ls 
-ROCKS_LIST := busted
+NPM_LIST := tree-sitter-cli copilot copilot-language-server # @mistweaverco/kulala-ls
+ROCKS_LIST := busted nlua
 
 default: info/README.md
 
@@ -194,8 +194,7 @@ info/copilot.md:
 	NAME=$(basename $(notdir $@))
 	$(NPM) @github/copilot &> /dev/null
 	# check it is installed
-	$(RUN) which copilot || true
-
+	$(RUN) $${NAME} --version
 
 tree-sitter-cli: info/tree-sitter-cli.md
 info/tree-sitter-cli.md:
@@ -257,6 +256,17 @@ info/busted.md:
 	$(RUN) which $${NAME} &> /dev/null
 	$(RUN) whereis busted
 	$(RUN) luarocks show --porcelain $${NAME} > $@
+
+busted: info/nlua.md
+info/nlua.md:
+	echo '##[ $(basename $(notdir $@)) ]##'
+	NAME=$(basename $(notdir $@))
+	mkdir -p $(dir $@)
+	$(LUAROCKS) $${NAME} &> /dev/null
+	# verify installation
+	$(RUN) which $${NAME} &> /dev/null
+	$(RUN) luarocks show --porcelain $${NAME} > $@
+
 	# Write to file
 
 ## luarocks is a package manager for lua modules
