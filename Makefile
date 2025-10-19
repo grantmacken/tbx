@@ -57,7 +57,7 @@ HEADING1 := \#
 HEADING2 := $(HEADING1)$(HEADING1)
 HEADING3 := $(HEADING2)$(HEADING1)
 
-DNF_LIST := google-cloud-cli
+DNF_LIST := neovim # google-cloud-cli
 NPM_LIST := tree-sitter-cli # @github/copilot # @mistweaverco/kulala-ls 
 
 default: info/README.md
@@ -68,7 +68,7 @@ rem:
 	buildah push ghcr.io/grantmacken/tbx-coding:latest
 	echo '✅ ghcr.io/grantmacken/tbx-coding:latest built and pushed'
 
-info/README.md: init neovim # $(DNF_LIST) $(NPM_LIST) 
+info/README.md: init $(DNF_LIST) # $(NPM_LIST)
 	echo '##[ $@ ]##'
 	mkdir -p $(dir $@)
 	# create or overwrite README.md
@@ -143,6 +143,11 @@ info/neovim.md:
 	# success|failure check
 	$(RUN) nvim -v &> /dev/null
 	$(INFO) neovim > $@
+	# use sed to replace 'Version     : ' line with actual version
+	pattern='^Version\s\+:\s\+.*$$'
+	VER=$$($(RUN) nvim -v | grep -oP 'NVIM \K.+' | cut -d'-' -f1 )
+	$(SH) "sed -i 's/$$pattern/Version     : $$VER/' $@"
+	echo '✅ neovim installed'
 
 mason_registry:
 	echo '##[ $@ ]##'
