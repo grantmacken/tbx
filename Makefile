@@ -59,7 +59,7 @@ HEADING2 := $(HEADING1)$(HEADING1)
 HEADING3 := $(HEADING2)$(HEADING1)
 
 DNF_LIST := neovim google-cloud-cli
-NPM_LIST := tree-sitter-cli copilot copilot-language-server # @mistweaverco/kulala-ls
+NPM_LIST := tree-sitter-cli # copilot copilot-language-server # @mistweaverco/kulala-ls
 ROCKS_LIST := busted nlua
 
 default: info/README.md
@@ -70,7 +70,7 @@ rem:
 	buildah push ghcr.io/grantmacken/tbx-coding:latest
 	echo '✅ ghcr.io/grantmacken/tbx-coding:latest built and pushed'
 
-info/README.md: init $(ROCKS_LIST) #  DNF_LIST$(NPM_LIST)
+info/README.md: init $(NPM_LIST) #$(ROCKS_LIST) #  DNF_LIST$
 	echo '##[ $@ ]##'
 	mkdir -p $(dir $@)
 	# create or overwrite README.md
@@ -78,6 +78,19 @@ info/README.md: init $(ROCKS_LIST) #  DNF_LIST$(NPM_LIST)
 	printf "# %s\n\n" "tbx-coding: a toolbox for coding" | tee $@
 	printf "A toolbox container image with cli tools, neovim, lsp servers, linters and formaters.\n\n" | tee -a $@
 	printf "## %s\n\n" "Installed applications" | tee -a $@
+
+npm_table:
+	$(call tr,"Name","Version","Summary", $@)
+	$(call tr,"----","-------","----------------------------", $@)
+	for pkg in $(NPM_LIST)
+	do
+	NAME=$$(cat info/$${pkg}.md | grep -oP '^package\s+\K.+')
+	VER=$$(cat info/$${pkg}.md | grep -oP '^version\s+\K.+')
+	SUM=$$(cat info/$${pkg}.md | grep -oP '^summary\s+\K.+')
+	$(call tr,$${NAME},$${VER},$${SUM},$@)
+	done
+
+rocks_table: 
 	for rock in $(ROCKS_LIST)
 	do
 	NAME=$$(cat info/$${rock}.md | grep -oP '^package\s+\K.+')
@@ -86,7 +99,7 @@ info/README.md: init $(ROCKS_LIST) #  DNF_LIST$(NPM_LIST)
 	$(call tr,$${NAME},$${VER},$${SUM},$@)
 	done
 
-sdsdsds:
+dnf_table:
 	$(call tr,"Name","Version","Summary", $@)
 	$(call tr,"----","-------","----------------------------", $@)
 	for pkg in $(DNF_LIST)
@@ -206,7 +219,10 @@ info/tree-sitter-cli.md:
 	# # install github copilot cli
 	# $(NPM) @github/copilot || true
 	# check it is installed
-	$(RUN) which tree-sitter || true
+	$(RUN) whereis tree-sitter || true
+	$(RUN) tree-sitter --version || true
+	# extract 'name', 'version', 'summary' of exec into to a table row
+aasassss:
 	# $(RUN) which kulala-ls || true
 	# $(RUN) which copilot || true
 	# Write to file
@@ -257,7 +273,7 @@ info/busted.md:
 	$(RUN) whereis busted
 	$(RUN) luarocks show --porcelain $${NAME} > $@
 
-busted: info/nlua.md
+nlua: info/nlua.md
 info/nlua.md:
 	echo '##[ $(basename $(notdir $@)) ]##'
 	NAME=$(basename $(notdir $@))
