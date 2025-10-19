@@ -78,6 +78,13 @@ info/README.md: init $(ROCKS_LIST) #  DNF_LIST$(NPM_LIST)
 	printf "# %s\n\n" "tbx-coding: a toolbox for coding" | tee $@
 	printf "A toolbox container image with cli tools, neovim, lsp servers, linters and formaters.\n\n" | tee -a $@
 	printf "## %s\n\n" "Installed applications" | tee -a $@
+	for rock in $(ROCKS_LIST)
+	do
+	NAME=$$(cat info/$${rock}.md | grep -oP '^package\s+\K.+')
+	VER=$$(cat info/$${rock}.md | grep -oP '^version\s+\K.+')
+	SUM=$$(cat info/$${rock}.md | grep -oP '^summary\s+\K.+')
+	$(call tr,$${NAME},$${VER},$${SUM},$@)
+	done
 
 sdsdsds:
 	$(call tr,"Name","Version","Summary", $@)
@@ -249,6 +256,7 @@ info/busted.md:
 	# verify installation
 	$(RUN) which $${NAME} &> /dev/null
 	$(RUN) whereis busted
+	$(RUN) luarocks show --porcelain $${NAME} > $@
 	# Write to file
 
 ## luarocks is a package manager for lua modules
