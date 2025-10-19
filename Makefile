@@ -141,12 +141,9 @@ info/neovim.md:
 	$(ADD) files/neovim &> /dev/null
 	$(RUN) ls /usr/local/bin &> /dev/null
 	# success|failure check
-	$(RUN) nvim -v &> /dev/null
-	$(INFO) neovim > $@
-	# use sed to replace 'Version     : ' line with actual version
-	pattern='^Version\s\+:\s\+.*$$'
-	VER=$$($(RUN) nvim -v | grep -oP 'NVIM \K.+' | cut -d'-' -f1 )
-	sed -i 's/$$pattern/Version     : $$VER/' $@
+	VER=$$($(RUN) nvim -v | grep -oP 'NVIM v\K\d+\.\d+\.\d+' )
+	echo "Updating neovim version to $$VER in $@"
+	$(INFO) neovim | sed "s/^Version.*$/Version : ${VER}/" >  $@
 	echo '✅ neovim installed'
 
 mason_registry:
