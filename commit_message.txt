@@ -1,9 +1,0 @@
-Refactor Makefile: integrate google-cloud-cli into build pipeline
-
-- Convert google-cloud-cli target to use info file pattern
-- Add google-cloud-cli to DNF_LIST for automatic inclusion in README
-- Extract package info using dnf info instead of custom formatting
-- Update info/README.md dependencies to include DNF_LIST packages
-- Add loop to generate table rows for all DNF_LIST packages
-- Simplify neovim installation by piping wget directly to tar
-- Clean up whitespace and alignment formatting

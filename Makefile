@@ -68,7 +68,7 @@ rem:
 	buildah push ghcr.io/grantmacken/tbx-coding:latest
 	echo '✅ ghcr.io/grantmacken/tbx-coding:latest built and pushed'
 
-info/README.md: init $(DNF_LIST) $(NPM_LIST) neovim
+info/README.md: init neovim # $(DNF_LIST) $(NPM_LIST) 
 	echo '##[ $@ ]##'
 	mkdir -p $(dir $@)
 	# create or overwrite README.md
@@ -91,10 +91,10 @@ info/README.md: init $(DNF_LIST) $(NPM_LIST) neovim
 	# binary `--version` output
 	# Otherwise ... use hacks
 	# neovim
-	SUM=$$(cat info/neovim.md | grep -oP '^Name\s+:\s+\K.+')
-	VER=$$($(RUN) nvim -v | grep -oP 'NVIM \K.+' | cut -d'-' -f1 )
-	SUM=$$(cat info/neovim.md | grep -oP '^Summary\s+:\s+\K.+')
-	$(call tr,$${NAME},$${VER},$${SUM},$@)
+	# SUM=$$(cat info/neovim.md | grep -oP '^Name\s+:\s+\K.+')
+	# VER=$$($(RUN) nvim -v | grep -oP 'NVIM \K.+' | cut -d'-' -f1 )
+	# SUM=$$(cat info/neovim.md | grep -oP '^Summary\s+:\s+\K.+')
+	# $(call tr,$${NAME},$${VER},$${SUM},$@)
 
 xxdefault: init nvim mason google-cloud-cli uv_tool luarocks npm
 	buildah commit $(WORKING_CONTAINER) $(TBX_IMAGE)
@@ -117,7 +117,7 @@ init:
 	echo '##[ $@ ]##'
 	buildah pull ghcr.io/grantmacken/tbx-runtimes &>/dev/null
 	buildah from ghcr.io/grantmacken/tbx-runtimes &>/dev/null
-	$(ADD) scripts/ $(DIR_BIN)/
+	$(ADD) scripts/ $(DIR_BIN)/ &>/dev/null
 	buildah config \
 	--label summary='a toolbox with cli tools, neovim' \
 	--label description='a toolbox with cli tools, neovim, lsp servers, linters and formaters' \
@@ -175,6 +175,15 @@ mason: mason_registry
 	# $(RUN) ls -l /usr/local/bin
 	echo '✅ selected mason lsp	 servers, linters and formaters installed'
 
+copilot: info/copilot.md
+info/copilot.md:
+	echo '##[ $(basename $(notdir $@)) ]##'
+	NAME=$(basename $(notdir $@))
+	$(NPM) @github/copilot &> /dev/null
+	# check it is installed
+	$(RUN) which copilot || true
+
+
 tree-sitter-cli: info/tree-sitter-cli.md
 info/tree-sitter-cli.md:
 	echo '##[ $(basename $(notdir $@)) ]##'
@@ -213,7 +222,7 @@ uv_tool: ## uv tool is a cli to install and manage universal-variant tools
 	printf "| %-10s | %-13s | %-83s |\n" "$$NAME" "$$VER" "$$SUM" | tee info/uv_tool.md
 	echo '✅ uv_tool installed'
 
-google-cloud-cli: info/google-cloud-cli.md ## install google-cloud-cli
+google-cloud-cli: info/google-cloud-cli.md
 info/google-cloud-cli.md:
 	echo '##[ $(basename $(notdir $@)) ]##'
 	mkdir -p $(dir $@)
@@ -224,11 +233,6 @@ info/google-cloud-cli.md:
 	# verify installation
 	$(RUN) which gcloud &> /dev/null
 	$(INFO) --installed google-cloud-cli > $@
-	# NAME=$@
-	# VER=$$($(RUN) gcloud --version | head -n 1 | awk '{print $$4}')
-	# SUM='Google Cloud SDK: gcloud, gsutil, bq command line tools'
-	# printf "| %-10s | %-13s | %-83s |\n" "$${NAME}" "$${VER}" "$${SUM}" | tee info/google-cloud-cli.md
-	# echo '✅ google-cloud-cli installed'
 
 
 luarocks:## install busted and nlua
