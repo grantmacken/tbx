@@ -34,8 +34,6 @@ HEADING1 := \#
 HEADING2 := $(HEADING1)$(HEADING1)
 
 default:  info/README.md
-
-rem:
 	echo '##[ $@ ]##'
 	buildah commit $(WORKING_CONTAINER) ghcr.io/grantmacken/tbx-runtimes
 	buildah push ghcr.io/grantmacken/tbx-runtimes:latest
@@ -45,7 +43,42 @@ info/README.md: init $(DNF_LIST) $(OTP) luarocks
 	echo '##[ $@ ]##'
 	mkdir -p $(dir $@)
 	# create or overwrite README.md
-	printf "\n$(HEADING2) %s\n\n" "Runtimes and associated languages" | tee $@
+	printf "\n$(HEADING2) %s\n\n" "Erlang/OTP and run on the Beam languages" | tee $@
+	cat << EOF | tee -a $@
+	Included in this toolbox are the latest releases of the Erlang, Elixir and Gleam programming languages.
+	The Erlang programming language is a general-purpose, concurrent, functional programming language
+	and **runtime** system. It is used to build massively scalable soft real-time systems with high availability.
+	The BEAM is the virtual machine at the core of the Erlang Open Telecom Platform (OTP).
+	The included Elixir and Gleam programming languages also run on the BEAM.
+	BEAM tooling included is the latest versions of the Rebar3 and the Mix build tools.
+	EOF
+	echo "" | tee -a $@
+	$(call tr,"Name","Version","Summary", $@)
+	$(call tr,"----","-------","----------------------------", $@)
+	# ## erlang otp
+	NAME=$$(cat info/erlang.md | grep -oP '^Name\s+:\s+\K.+')
+	VER=$$(jq -r '.name' latest/erlang.json | cut -d' ' -f2)
+	SUM=$$(cat info/erlang.md | grep -oP '^Summary\s+:\s+\K.+')
+	$(call tr,$${NAME},$${VER},$${SUM},$@)
+	# erlang-rebar3
+	NAME=rebar3
+	VER=$$(jq -r '.tag_name' latest/erlang-rebar3.json | cut -d'v' -f2)
+	SUM=$$(cat info/erlang-rebar3.md | grep -oP '^Summary\s+:\s+\K.+')
+	$(call tr,$${NAME},$${VER},$${SUM},$@)
+	# elixir
+	NAME=$$(cat info/elixir.md | grep -oP '^Name\s+:\s+\K.+')
+	VER=$$(jq -r '.tag_name' latest/elixir.json | cut -d'v' -f2)
+	SUM=$$(cat info/elixir.md | grep -oP '^Summary\s+:\s+\K.+')
+	$(call tr,$${NAME},$${VER},$${SUM},$@)
+	# gleam
+	LINE=$$($(RUN) gleam --version)
+	NAME=$$(echo $$LINE | cut -d' ' -f1)
+	VER=$$(echo $$LINE | cut -d' ' -f2)
+	SUM="Gleam programming language"
+	$(call tr,$${NAME},$${VER},$${SUM},$@)
+	# TODO:  mix
+	# $(call tr,Mix,$${VER},Elixir build tool, $@)
+	printf "\n$(HEADING2) %s\n\n" "Other runtimes and associated languages" | tee -a $@
 	# The latest nodejs **runtime** is also installed, as Gleam can compile to javascript as well a Erlang.
 	$(call tr,"Name","Version","Summary", $@)
 	$(call tr,"----","-------","----------------------------", $@)
@@ -65,41 +98,7 @@ info/README.md: init $(DNF_LIST) $(OTP) luarocks
 	VER=$$($(RUN) luarocks --version | head -1 | cut -d' ' -f2)
 	SUM=$$(cat info/luarocks.md | grep -oP '^Summary\s+:\s+\K.+')
 	$(call tr,$${NAME},$${VER},$${SUM},$@)
-	printf "\n$(HEADING2) %s\n\n" "Erlang/OTP and run on the Beam languages" | tee $@
-	cat << EOF | tee -a $@
-	Included in this toolbox are the latest releases of the Erlang, Elixir and Gleam programming languages.
-	The Erlang programming language is a general-purpose, concurrent, functional programming language
-	and **runtime** system. It is used to build massively scalable soft real-time systems with high availability.
-	The BEAM is the virtual machine at the core of the Erlang Open Telecom Platform (OTP).
-	The included Elixir and Gleam programming languages also run on the BEAM.
-	BEAM tooling included is the latest versions of the Rebar3 and the Mix build tools.
-	EOF
-	echo "" | tee -a $@
-	$(call tr,"Name","Version","Summary", $@)
-	$(call tr,"----","-------","----------------------------", $@)
-	# ## erlang otp
-	NAME=$$(cat info/erlang.md | grep -oP '^Name\s+:\s+\K.+')
-	VER=$$(jq -r '.name' latest/erlang.json | cut -d' ' -f2)
-	SUM=$$(cat info/erlang.md | grep -oP '^Summary\s+:\s+\K.+')
-	$(call tr,$${NAME},$${VER},$${SUM},$@)
-	# erlang-rebar3
-	NAME=$$(cat info/erlang-rebar3.md | grep -oP '^Name\s+:\s+\K.+')
-	VER=$$(jq -r '.tag_name' latest/erlang-rebar3.json | cut -d'v' -f2)
-	SUM=$$(cat info/erlang-rebar3.md | grep -oP '^Summary\s+:\s+\K.+')
-	$(call tr,$${NAME},$${VER},$${SUM},$@)
-	# elixir
-	NAME=$$(cat info/elixir.md | grep -oP '^Name\s+:\s+\K.+')
-	VER=$$(jq -r '.tag_name' latest/elixir.json | cut -d'v' -f2)
-	SUM=$$(cat info/elixir.md | grep -oP '^Summary\s+:\s+\K.+')
-	$(call tr,$${NAME},$${VER},$${SUM},$@)
-	# gleam
-	LINE=$$($(RUN) gleam --version)
-	NAME=$$(echo $$LINE | cut -d' ' -f1)
-	VER=$$(echo $$LINE | cut -d' ' -f2)
-	SUM="Gleam programming language"
-	$(call tr,$${NAME},$${VER},$${SUM},$@)
-	# TODO:  mix
-	# $(call tr,Mix,$${VER},Elixir build tool, $@)
+
 
 init:
 	buildah pull ghcr.io/grantmacken/tbx-build-tools &>/dev/null
