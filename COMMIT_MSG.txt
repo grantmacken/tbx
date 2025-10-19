@@ -1,0 +1,7 @@
+Refactor Makefile: improve formatting and documentation
+
+- Align variable assignments for better readability
+- Remove unnecessary blank lines
+- Inline neovim download URL for cleaner code
+- Add preamble to README.md describing the toolbox purpose
+- Update heading structure in generated documentation

@@ -29,21 +29,20 @@ INSTALL := $(RUN) dnf install --allowerasing --skip-unavailable --skip-broken --
 INFO    := $(RUN) dnf info
 SH      := $(RUN) sh -c
 # LINK    := $(RUN) ln -s $(shell which host-spawn)
-ADD     := buildah add --chmod 755 $(WORKING_CONTAINER)
+ADD    := buildah add --chmod 755 $(WORKING_CONTAINER)
 RW_ADD := buildah add --chmod  644 $(WORKING_CONTAINER)
-WGET    := wget -q --no-check-certificate --timeout=10 --tries=3
-
+WGET   := wget -q --no-check-certificate --timeout=10 --tries=3
 # everything is site dir
 DIR_SITE   := /usr/share/nvim/site
 DIR_BIN    := /usr/local/bin
 DIR_MASON  := /usr/local/share/mason
 
-URL_LSPCONFIG := https://raw.githubusercontent.com/neovim/nvim-lspconfig/refs/heads/master/lsp/
-TAR          := tar xz --strip-components=1 -C
+# URL_LSPCONFIG := https://raw.githubusercontent.com/neovim/nvim-lspconfig/refs/heads/master/lsp/
+TAR           := tar xz --strip-components=1 -C
 # TAR_NO_STRIP := tar xz -C
 
 NPM      := $(RUN) npm install --global
-NPM_LIST := $(RUN) npm list -g --depth=0 --json
+# NPM_LIST := $(RUN) npm list -g --depth=0 --json
 
 tr = printf "| %-14s | %-8s | %-83s |\n" "$(1)" "$(2)" "$(3)" | tee -a $(4)
 bdu = jq -r ".assets[] | select(.browser_download_url | contains(\"$1\")) | .browser_download_url" $2
@@ -58,6 +57,9 @@ HEADING1 := \#
 HEADING2 := $(HEADING1)$(HEADING1)
 HEADING3 := $(HEADING2)$(HEADING1)
 
+DNF_LIST := google-cloud-cli
+NPM_LIST := tree-sitter-cli # @github/copilot # @mistweaverco/kulala-ls 
+
 default: info/README.md
 
 rem:
@@ -66,13 +68,23 @@ rem:
 	buildah push ghcr.io/grantmacken/tbx-coding:latest
 	echo '✅ ghcr.io/grantmacken/tbx-coding:latest built and pushed'
 
-info/README.md: init neovim
+info/README.md: init $(DNF_LIST) $(NPM_LIST) neovim
 	echo '##[ $@ ]##'
 	mkdir -p $(dir $@)
 	# create or overwrite README.md
-	printf "\n$(HEADING2) %s\n\n" "Erlang/OTP and run on the Beam languages" | tee $@
+	# preamble
+	printf "# %s\n\n" "tbx-coding: a toolbox for coding" | tee $@
+	printf "A toolbox container image with cli tools, neovim, lsp servers, linters and formaters.\n\n" | tee -a $@
+	printf "## %s\n\n" "Installed applications" | tee -a $@
 	$(call tr,"Name","Version","Summary", $@)
 	$(call tr,"----","-------","----------------------------", $@)
+	for pkg in $(DNF_LIST)
+	do
+	NAME=$$(cat info/$${pkg}.md | grep -oP '^Name\s+:\s+\K.+')
+	VER=$$(cat info/$${pkg}.md | grep -oP '^Version\s+:\s+\K.+')
+	SUM=$$(cat info/$${pkg}.md | grep -oP '^Summary\s+:\s+\K.+')
+	$(call tr,$${NAME},$${VER},$${SUM},$@)
+	done
 	# Write to file - extract 'name', 'version', 'summary' into a table row
 	# If app is available via dnf repo, then extract table row from info/*.md file
 	# If app is not installed via dnf, then use info/*.md for name and summary but extract version from installed
@@ -124,8 +136,8 @@ info/neovim.md:
 	mkdir -p $(dir $@)
 	TARGET=files/neovim/usr/local
 	mkdir -p $${TARGET}
-	SRC="https://github.com/neovim/neovim/releases/download/nightly/nvim-linux-x86_64.tar.gz"
-	$(WGET) $${SRC} -O- $(TAR) $${TARGET}
+	$(WGET) 'https://github.com/neovim/neovim/releases/download/nightly/nvim-linux-x86_64.tar.gz' -O- |
+	tar xz --strip-components=1 -C $${TARGET}
 	$(ADD) files/neovim &> /dev/null
 	$(RUN) ls /usr/local/bin &> /dev/null
 	# success|failure check
@@ -163,27 +175,28 @@ mason: mason_registry
 	# $(RUN) ls -l /usr/local/bin
 	echo '✅ selected mason lsp	 servers, linters and formaters installed'
 
-npm: ## install some npm packages globally
-	echo '##[ $@ ]##'
-	# dep for treesitter
-	$(NPM) tree-sitter-cli || true
-	# also install lsp server not on mason registry
-	$(NPM) @mistweaverco/kulala-ls || true
-	# install github copilot cli
-	$(NPM) @github/copilot || true
+tree-sitter-cli: info/tree-sitter-cli.md
+info/tree-sitter-cli.md:
+	echo '##[ $(basename $(notdir $@)) ]##'
+	NAME=$(basename $(notdir $@))
+	$(NPM) $${NAME} &> /dev/null
+	# # also install lsp server not on mason registry
+	# $(NPM) @mistweaverco/kulala-ls || true
+	# # install github copilot cli
+	# $(NPM) @github/copilot || true
 	# check it is installed
 	$(RUN) which tree-sitter || true
-	$(RUN) which kulala-ls || true
-	$(RUN) which copilot || true
+	# $(RUN) which kulala-ls || true
+	# $(RUN) which copilot || true
 	# Write to file
-	$(NPM_LIST) | jq -r '.dependencies' || true
+	# $(NPM_LIST) | jq -r '.dependencies' || true
 	# $(NPM_LIST) | tail -n +2 | while read line
 	# do
 	# NAME=$$(echo $$line | awk -F@ '{print $$1}' | xargs)
 	# VER=$$(echo $$line | awk -F@ '{print $$2}' | xargs)
 	# [ -n "$$NAME" ] && printf "| %-10s | %-13s | %-83s |\n" "$$NAME" "$$VER" "Node.js package" | tee -a info/neovim.md;
 	# done
-	echo '✅ selected npm packages installed' | tee -a info/$@.md
+	# echo '✅ selected npm packages installed' | tee -a info/$@.md
 
 uv_tool: ## uv tool is a cli to install and manage universal-variant tools
 	mkdir -p info
@@ -200,8 +213,9 @@ uv_tool: ## uv tool is a cli to install and manage universal-variant tools
 	printf "| %-10s | %-13s | %-83s |\n" "$$NAME" "$$VER" "$$SUM" | tee info/uv_tool.md
 	echo '✅ uv_tool installed'
 
-google-cloud-cli: ## install google-cloud-cli
-	echo '##[ $@ ]##'
+google-cloud-cli: info/google-cloud-cli.md ## install google-cloud-cli
+info/google-cloud-cli.md:
+	echo '##[ $(basename $(notdir $@)) ]##'
 	mkdir -p $(dir $@)
 	# add the repo
 	$(RUN) mkdir -p /etc/yum.repos.d/
@@ -209,12 +223,12 @@ google-cloud-cli: ## install google-cloud-cli
 	$(INSTALL) libxcrypt-compat google-cloud-sdk &> /dev/null
 	# verify installation
 	$(RUN) which gcloud &> /dev/null
-	# Write to file
-	NAME=$@
-	VERSION=$$($(RUN) gcloud --version | head -n 1 | awk '{print $$4}')
-	SUM='Google Cloud SDK: gcloud, gsutil, bq command line tools'
-	printf "| %-10s | %-13s | %-83s |\n" "$${NAME}" "$${VERSION}" "$${SUM}" | tee info/google-cloud-cli.md
-	echo '✅ google-cloud-cli installed'
+	$(INFO) --installed google-cloud-cli > $@
+	# NAME=$@
+	# VER=$$($(RUN) gcloud --version | head -n 1 | awk '{print $$4}')
+	# SUM='Google Cloud SDK: gcloud, gsutil, bq command line tools'
+	# printf "| %-10s | %-13s | %-83s |\n" "$${NAME}" "$${VER}" "$${SUM}" | tee info/google-cloud-cli.md
+	# echo '✅ google-cloud-cli installed'
 
 
 luarocks:## install busted and nlua
