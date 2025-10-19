@@ -64,7 +64,7 @@ default: info/README.md
 
 rem:
 	echo '##[ $@ ]##'
-	buildah commit $(WORKING_CONTAINER) ghcr.io/grantmacken/tbx-coding
+	buildah commt $(WORKING_CONTAINER) ghcr.io/grantmacken/tbx-coding
 	buildah push ghcr.io/grantmacken/tbx-coding:latest
 	echo '✅ ghcr.io/grantmacken/tbx-coding:latest built and pushed'
 
@@ -146,7 +146,7 @@ info/neovim.md:
 	# use sed to replace 'Version     : ' line with actual version
 	pattern='^Version\s\+:\s\+.*$$'
 	VER=$$($(RUN) nvim -v | grep -oP 'NVIM \K.+' | cut -d'-' -f1 )
-	$(SH) "sed -i 's/$$pattern/Version     : $$VER/' $@"
+	sed -i 's/$$pattern/Version     : $$VER/' $@
 	echo '✅ neovim installed'
 
 mason_registry:
