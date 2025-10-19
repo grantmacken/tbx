@@ -42,6 +42,7 @@ TAR           := tar xz --strip-components=1 -C
 # TAR_NO_STRIP := tar xz -C
 
 NPM      := $(RUN) npm install --global
+LUAROCKS := $(RUN) luarocks install --global
 # NPM_LIST := $(RUN) npm list -g --depth=0 --json
 
 tr = printf "| %-14s | %-8s | %-83s |\n" "$(1)" "$(2)" "$(3)" | tee -a $(4)
@@ -57,8 +58,9 @@ HEADING1 := \#
 HEADING2 := $(HEADING1)$(HEADING1)
 HEADING3 := $(HEADING2)$(HEADING1)
 
-DNF_LIST := neovim # google-cloud-cli
+DNF_LIST := neovim google-cloud-cli
 NPM_LIST := tree-sitter-cli # @github/copilot # @mistweaverco/kulala-ls 
+ROCKS_LIST := busted
 
 default: info/README.md
 
@@ -68,7 +70,7 @@ rem:
 	buildah push ghcr.io/grantmacken/tbx-coding:latest
 	echo '✅ ghcr.io/grantmacken/tbx-coding:latest built and pushed'
 
-info/README.md: init $(DNF_LIST) # $(NPM_LIST)
+info/README.md: init $(ROCKS_LIST) #  DNF_LIST$(NPM_LIST)
 	echo '##[ $@ ]##'
 	mkdir -p $(dir $@)
 	# create or overwrite README.md
@@ -76,6 +78,8 @@ info/README.md: init $(DNF_LIST) # $(NPM_LIST)
 	printf "# %s\n\n" "tbx-coding: a toolbox for coding" | tee $@
 	printf "A toolbox container image with cli tools, neovim, lsp servers, linters and formaters.\n\n" | tee -a $@
 	printf "## %s\n\n" "Installed applications" | tee -a $@
+
+sdsdsds:
 	$(call tr,"Name","Version","Summary", $@)
 	$(call tr,"----","-------","----------------------------", $@)
 	for pkg in $(DNF_LIST)
@@ -236,12 +240,23 @@ info/google-cloud-cli.md:
 	$(RUN) which gcloud &> /dev/null
 	$(INFO) --installed google-cloud-cli > $@
 
+busted: info/busted.md
+info/busted.md:
+	echo '##[ $(basename $(notdir $@)) ]##'
+	NAME=$(basename $(notdir $@))
+	mkdir -p $(dir $@)
+	$(LUAROCKS) $${NAME} &> /dev/null
+	# verify installation
+	$(RUN) which $${NAME} &> /dev/null
+	$(RUN) whereis busted
+	# Write to file
 
+## luarocks is a package manager for lua modules
 luarocks:## install busted and nlua
 	echo '##[ $@ ]##'
 	mkdir -p $(dir $@)
 	# install busted testing framework
-	$(RUN) luarocks install busted
+	$(RUN) luarocks install --global busted  &>/dev/null
 	# install nlua neovim lua interpreter
 	# $(RUN) luarocks install --global nlua &>/dev/null
 	# # link installed packages to $(DIR_BIN)
