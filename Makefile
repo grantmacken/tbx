@@ -23,7 +23,6 @@ WHITE=\033[0;37m
 NC=\033[0m # No Color
 
 WORKING_CONTAINER := tbx-runtimes-working-container
-TBX_IMAGE :=  ghcr.io/grantmacken/tbx-coding
 # actions
 RUN     := buildah run $(WORKING_CONTAINER)
 INSTALL := $(RUN) dnf install --allowerasing --skip-unavailable --skip-broken --no-allow-downgrade -y
@@ -58,7 +57,33 @@ HEADING1 := \#
 HEADING2 := $(HEADING1)$(HEADING1)
 HEADING3 := $(HEADING2)$(HEADING1)
 
-default: init nvim mason google-cloud-cli uv_tool luarocks npm
+default: info/README.md
+
+rem:
+	echo '##[ $@ ]##'
+	buildah commit $(WORKING_CONTAINER) ghcr.io/grantmacken/tbx-coding
+	buildah push ghcr.io/grantmacken/tbx-coding:latest
+	echo '✅ ghcr.io/grantmacken/tbx-coding:latest built and pushed'
+
+info/README.md: init neovim
+	echo '##[ $@ ]##'
+	mkdir -p $(dir $@)
+	# create or overwrite README.md
+	printf "\n$(HEADING2) %s\n\n" "Erlang/OTP and run on the Beam languages" | tee $@
+	$(call tr,"Name","Version","Summary", $@)
+	$(call tr,"----","-------","----------------------------", $@)
+	# Write to file - extract 'name', 'version', 'summary' into a table row
+	# If app is available via dnf repo, then extract table row from info/*.md file
+	# If app is not installed via dnf, then use info/*.md for name and summary but extract version from installed
+	# binary `--version` output
+	# Otherwise ... use hacks
+	# neovim
+	SUM=$$(cat info/neovim.md | grep -oP '^Name\s+:\s+\K.+')
+	VER=$$($(RUN) nvim -v | grep -oP 'NVIM \K.+' | cut -d'-' -f1 )
+	SUM=$$(cat info/neovim.md | grep -oP '^Summary\s+:\s+\K.+')
+	$(call tr,$${NAME},$${VER},$${SUM},$@)
+
+xxdefault: init nvim mason google-cloud-cli uv_tool luarocks npm
 	buildah commit $(WORKING_CONTAINER) $(TBX_IMAGE)
 	buildah push $(TBX_IMAGE):latest
 	echo '✅ ghcr.io/grantmacken/tbx-coding:latest built and pushed'
@@ -78,13 +103,7 @@ default: init nvim mason google-cloud-cli uv_tool luarocks npm
 init:
 	echo '##[ $@ ]##'
 	buildah pull ghcr.io/grantmacken/tbx-runtimes &>/dev/null
-	buildah from ghcr.io/grantmacken/tbx-runtimes
-	# the runtime should have
-	$(RUN) which make &> /dev/null
-	$(RUN) which npm &> /dev/null
-	$(RUN) which git &> /dev/null
-	$(RUN) which luarocks &> /dev/null
-	$(RUN) mkdir -p $(DIR_SITE)
+	buildah from ghcr.io/grantmacken/tbx-runtimes &>/dev/null
 	$(ADD) scripts/ $(DIR_BIN)/
 	buildah config \
 	--label summary='a toolbox with cli tools, neovim' \
@@ -95,9 +114,10 @@ init:
 	--env UV_TOOL_BIN_DIR=/usr/local/bin \
 	--env UV_TOOL_DIR=/var/lib/uv_tools \
 	$(WORKING_CONTAINER)
+	mkdir -p info
+	$(RUN) dnf update -y &>/dev/null
 
-nvim: info/neovim.md
-	echo '✅ latest pre-release neovim installed'
+neovim: info/neovim.md
 
 files/nvim.tar.gz:
 	# echo '##[ $@ ]##'
@@ -105,21 +125,17 @@ files/nvim.tar.gz:
 	$(WGET) "https://github.com/neovim/neovim/releases/download/nightly/nvim-linux-x86_64.tar.gz" -O $@
 
 info/neovim.md: files/nvim.tar.gz
-	# echo '##[ $@ ]##'
+	echo '##[ $@ ]##'
 	mkdir -p $(dir $@)
 	NAME=$(basename $(notdir $@))
 	TARGET=files/$${NAME}/usr/local
 	mkdir -p $${TARGET}
 	$(TAR) $${TARGET} -f $<
 	$(ADD) files/$${NAME} &> /dev/null
-	# CHECKS silent:
+	# success|failure check
 	$(RUN) nvim -v &> /dev/null
-	$(RUN) whereis nvim &> /dev/null
-	$(RUN) which nvim &> /dev/null
-	# Write to file
-	VERSION=$$($(RUN) nvim -v | grep -oP 'NVIM \K.+' | cut -d'-' -f1 )
-	SUM='The text editor with a focus on extensibility and usability'
-	printf "| %-10s | %-13s | %-83s |\n" "$${NAME}" "$${VERSION}" "$${SUM}" | tee -a $@
+	$(INFO) neovim > $@
+
 
 mason_registry:
 	echo '##[ $@ ]##'
@@ -231,7 +247,11 @@ commit: ## use gopilot to add commit message since last commit
 view:
 	gh repo view --branch tbx-coding
 
-watch: ## use gh to watch the  workflow in GitHub Actions
+push: ## use gh to watch the  workflow in GitHub Actions
+	echo '##[ $@ ]##'
+	git push -f origin tbx-coding
+	# wait a few seconds for the run to be registered
+	sleep 20
 	echo -e "$(CYAN)Watch the workflow in GitHub Actions...$(NC)"
 	# get the last run id
 	# gh run list --branch tbx-coding --limit 1 | awk '{print $$1}'
