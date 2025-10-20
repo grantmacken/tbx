@@ -63,13 +63,13 @@ RELEASE_BINARY_LIST := harper-ls lua-language-server
 DNF_LIST := neovim google-cloud-cli  ShellCheck shfmt
 UV_TOOL_LIST := specify-cli tombi mbake
 # @mistweaverco/kulala-ls
-NPM_LIST := \
-			bash-language-server \
-			copilot \
-			copilot-language-server \
-			tree-sitter-cli \
-			vscode-langservers-extracted \
-			yaml-language-server
+NPM_LIST := bash-language-server \
+			# copilot \
+			# copilot-language-server \
+			# tree-sitter-cli \
+			# vscode-langservers-extracted \
+			# yaml-language-server
+
 
 ROCKS_LIST := busted nlua
 
@@ -216,10 +216,15 @@ bash-language-server: info/bash-language-server.md
 info/bash-language-server.md:
 	echo '##[ $(basename $(notdir $@)) ]##'
 	NAME=$(basename $(notdir $@))
-	$(NPM) $${NAME} &> /dev/null
+	$(RUN) npm view --json  bash-language-server | jq '.' | tee $@
+	jq -r '.name' $@
 	# check it is installed
-	$(RUN) $${NAME} --version
-	$(RUN) npm list --global --depth=0 --long  $${NAME} | tee $@
+# 	printf "Package: %s\n" "$${NAME}" | tee $@
+# 	printf "Version: %s\n" "$$($(RUN) $${NAME} --version)" | tee $@
+# 	printf "Version: %s\n" "$$($(RUN) $${NAME} --version)" | tee $@
+# $(RUN) npm list --global --depth=0 --long  $${NAME} | tee $@
+# 	$(RUN) $${NAME} --version
+# 	$(RUN) npm list --global --depth=0 --long  $${NAME} | tee $@
 
 
 copilot: info/copilot.md
@@ -237,7 +242,7 @@ info/copilot-language-server.md:
 	NAME=$(basename $(notdir $@))
 	$(NPM) @github/copilot-language-server &> /dev/null
 	# check it is installed
-	$(RUN) $${NAME} --version || true
+	# $(RUN) $${NAME} --version || true
 	# $(RUN) npm list --global --depth=0 --long  $${NAME} | tee $@
 
 tree-sitter-cli: info/tree-sitter-cli.md
