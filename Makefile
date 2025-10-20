@@ -89,15 +89,13 @@ info/README.md: init $(NPM_LIST) #$(ROCKS_LIST) #  DNF_LIST$
 	printf "# %s\n\n" "tbx-coding: a toolbox for coding" | tee $@
 	printf "A toolbox container image with cli tools, neovim, lsp servers, linters and formaters.\n\n" | tee -a $@
 	printf "## %s\n\n" "Installed applications" | tee -a $@
-
-npm_table:
 	$(call tr,"Name","Version","Summary", $@)
 	$(call tr,"----","-------","----------------------------", $@)
 	for pkg in $(NPM_LIST)
 	do
-	NAME=$$(cat info/$${pkg}.md | grep -oP '^package\s+\K.+')
-	VER=$$(cat info/$${pkg}.md | grep -oP '^version\s+\K.+')
-	SUM=$$(cat info/$${pkg}.md | grep -oP '^summary\s+\K.+')
+	NAME=$$(cat info/$${pkg}.md | grep -oP '^package:\s+\K.+')
+	VER=$$(cat info/$${pkg}.md | grep -oP '^version:\s+\K.+')
+	SUM=$$(cat info/$${pkg}.md | grep -oP '^summary:\s+\K.+')
 	$(call tr,$${NAME},$${VER},$${SUM},$@)
 	done
 
@@ -221,17 +219,13 @@ info/bash-language-server.md:
 	NAME=$$(echo $$JSON | jq -r '.name')
 	VER=$$(echo $$JSON | jq -r '."dist-tags".latest')
 	SUM=$$(echo $$JSON | jq -r '.description')
-	$(NPM) $${NAME}@$${VER} 
+	$(NPM) $${NAME}@$${VER}
+	# success|failure check
+	$(RUN) $${NAME} --version &>/dev/null
+	# Write to file
 	printf "package: %s\n" "$${NAME}" | tee $@
 	printf "version: %s\n" "$${VER}" | tee -a $@@
 	printf "summary: %s\n" "$${SUM}" | tee -a $@
-	# check it is installed
-# 	printf "Package: %s\n" "$${NAME}" | tee $@
-# 	printf "Version: %s\n" "$$($(RUN) $${NAME} --version)" | tee $@
-# 	printf "Version: %s\n" "$$($(RUN) $${NAME} --version)" | tee $@
-# $(RUN) npm list --global --depth=0 --long  $${NAME} | tee $@
-# 	$(RUN) $${NAME} --version
-# 	$(RUN) npm list --global --depth=0 --long  $${NAME} | tee $@
 
 
 copilot: info/copilot.md
