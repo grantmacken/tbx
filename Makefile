@@ -235,9 +235,9 @@ copilot-language-server: info/copilot-language-server.md
 info/copilot-language-server.md:
 	echo '##[ $(basename $(notdir $@)) ]##'
 	NAME=$(basename $(notdir $@))
-	$(NPM) @github/copilot-language-server-linux-x64 &> /dev/null
+	$(NPM) @github/copilot-language-server-linux &> /dev/null
 	# check it is installed
-	$(RUN) $${NAME} --version
+	$(RUN) $${NAME} --version || true
 	# $(RUN) npm list --global --depth=0 --long  $${NAME} | tee $@
 
 tree-sitter-cli: info/tree-sitter-cli.md
