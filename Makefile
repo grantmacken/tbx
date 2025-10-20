@@ -93,9 +93,9 @@ info/README.md: init $(NPM_LIST) #$(ROCKS_LIST) #  DNF_LIST$
 	$(call tr,"----","-------","----------------------------", $@)
 	for pkg in $(NPM_LIST)
 	do
-	NAME=$$(cat info/$${pkg}.md | grep -oP '^package:\s+\K.+')
-	VER=$$(cat info/$${pkg}.md | grep -oP '^version:\s+\K.+')
-	SUM=$$(cat info/$${pkg}.md | grep -oP '^summary:\s+\K.+')
+	NAME=$$(cat info/$${pkg}.md | grep -oP '^package:\s\K.+' || true)
+	VER=$$(cat info/$${pkg}.md | grep -oP '^version:\s\K.+' || true)
+	SUM=$$(cat info/$${pkg}.md | grep -oP '^summary:\s\K.+' || true)
 	$(call tr,$${NAME},$${VER},$${SUM},$@)
 	done
 
@@ -214,12 +214,11 @@ bash-language-server: info/bash-language-server.md
 info/bash-language-server.md:
 	echo '##[ $(basename $(notdir $@)) ]##'
 	JSON=$$($(RUN) npm view --json bash-language-server | jq '.')
-	echo $${JSON} | jq '.'
 	# extract 'name', 'version', 'description' into to a table row
 	NAME=$$(echo $$JSON | jq -r '.name')
 	VER=$$(echo $$JSON | jq -r '."dist-tags".latest')
 	SUM=$$(echo $$JSON | jq -r '.description')
-	$(NPM) $${NAME}@$${VER}
+	$(NPM) $${NAME}@$${VER} &> /dev/null
 	# success|failure check
 	$(RUN) $${NAME} --version &>/dev/null
 	# Write to file
