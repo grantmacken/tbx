@@ -215,11 +215,15 @@ mason: mason_registry
 bash-language-server: info/bash-language-server.md
 info/bash-language-server.md:
 	echo '##[ $(basename $(notdir $@)) ]##'
-	NAME=$(basename $(notdir $@))
-	$(RUN) npm view --json  bash-language-server | jq '.' | tee $@
-	jq -r '.name' $@
-	jq -r jq '."dist-tags".latest' $@
-	jq -r jq '.description' $@
+	JSON=$$($(RUN) npm view --json bash-language-server | jq '.')
+	# extract 'name', 'version', 'description' into to a table row
+	NAME=$$(echo $$JSON | jq -r '.name')
+	VER=$$(echo $$JSON | jq -r '."dist-tags".latest')
+	SUM=$$(echo $$JSON | jq -r '.description')
+	$(NPM) $${NAME}@$${VER} &> /dev/null
+	printf "package: %s\n" "$${NAME}" | tee $@
+	printf "version: %s\n" "$${VER}" | tee -a $@@
+	printf "summary: %s\n" "$${SUM}" | tee -a $@
 	# check it is installed
 # 	printf "Package: %s\n" "$${NAME}" | tee $@
 # 	printf "Version: %s\n" "$$($(RUN) $${NAME} --version)" | tee $@
