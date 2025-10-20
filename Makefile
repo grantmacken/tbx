@@ -58,8 +58,19 @@ HEADING1 := \#
 HEADING2 := $(HEADING1)$(HEADING1)
 HEADING3 := $(HEADING2)$(HEADING1)
 
-DNF_LIST := neovim google-cloud-cli
-NPM_LIST := tree-sitter-cli copilot # copilot-language-server # @mistweaverco/kulala-ls
+# BASH_LIST := nodejs-bash-language-server ShellCheck shfmt
+RELEASE_BINARY_LIST := harper-ls lua-language-server
+DNF_LIST := neovim google-cloud-cli  ShellCheck shfmt
+UV_TOOL_LIST := specify-cli tombi
+# @mistweaverco/kulala-ls
+NPM_LIST := \
+			bash-language-server \
+			copilot \
+			copilot-language-server \
+			tree-sitter-cli \
+			vscode-langservers-extracted \
+			yaml-language-server
+
 ROCKS_LIST := busted nlua
 
 default: info/README.md
@@ -201,6 +212,16 @@ mason: mason_registry
 	# $(RUN) ls -l /usr/local/bin
 	echo '✅ selected mason lsp	 servers, linters and formaters installed'
 
+bash-language-server: info/bash-language-server.md
+info/bash-language-server.md:
+	echo '##[ $(basename $(notdir $@)) ]##'
+	NAME=$(basename $(notdir $@))
+	$(NPM) $${NAME} &> /dev/null
+	# check it is installed
+	$(RUN) $${NAME} --version
+	$(RUN) npm list --global --depth=0 --long  $${NAME} | tee $@
+
+
 copilot: info/copilot.md
 info/copilot.md:
 	echo '##[ $(basename $(notdir $@)) ]##'
@@ -208,7 +229,16 @@ info/copilot.md:
 	$(NPM) @github/copilot &> /dev/null
 	# check it is installed
 	$(RUN) $${NAME} --version
-	$(RUN) npm list --global --depth=0 --long  $${NAME} > $@
+	$(RUN) npm list --global --depth=0 --long  $${NAME} | tee $@
+
+copilot-language-server: info/copilot-language-server.md
+info/copilot-language-server.md:
+	echo '##[ $(basename $(notdir $@)) ]##'
+	NAME=$(basename $(notdir $@))
+	$(NPM) @github/copilot-language-server-linux-x64 &> /dev/null
+	# check it is installed
+	$(RUN) $${NAME} --version
+	$(RUN) npm list --global --depth=0 --long  $${NAME} | tee $@
 
 tree-sitter-cli: info/tree-sitter-cli.md
 info/tree-sitter-cli.md:
@@ -217,7 +247,26 @@ info/tree-sitter-cli.md:
 	$(NPM) $${NAME} &> /dev/null
 	# success|failure check
 	$(RUN) tree-sitter --version || true
-	$(RUN) npm list --global --depth=0 --long  $${NAME} > $@
+	$(RUN) npm list --global --depth=0 --long  $${NAME} | tee $@
+
+vscode-langservers-extracted: info/vscode-langservers-extracted.md
+info/vscode-langservers-extracted.md:
+	echo '##[ $(basename $(notdir $@)) ]##'
+	NAME=$(basename $(notdir $@))
+	$(NPM) $${NAME} &> /dev/null
+	# success|failure check
+	# TODO: no --version flag, so just check if installed
+	$(RUN) which vscode-langservers-extracted || true
+$(RUN) npm list --global --depth=0 --long  $${NAME} | tee $@
+
+yaml-language-server: info/yaml-language-server.md
+info/yaml-language-server.md:
+	echo '##[ $(basename $(notdir $@)) ]##'
+	NAME=$(basename $(notdir $@))
+	$(NPM) $${NAME} &> /dev/null
+	# success|failure check
+	$(RUN) $${NAME} --version || true
+	$(RUN) npm list --global --depth=0 --long  $${NAME} | tee $@
 
 aasassss:
 	# $(RUN) which kulala-ls || true
