@@ -221,7 +221,8 @@ info/tree-sitter-cli.md:
 	# check it is installed
 	$(RUN) whereis tree-sitter || true
 	$(RUN) tree-sitter --version || true
-	$(RUN) npm list -g $${NAME} --json --depth=0 --long | jq '.'
+	LINES=$$( $(RUN) npm list -g $${NAME} --depth=0 --long | tail -n +2 )
+	echo "$${LINES}"
 	# $(RUN) npm view -g $${NAME} | tee $@
 	# extract 'name', 'version', 'summary' of exec into to a table row
 
