@@ -93,13 +93,13 @@ info/README.md: init $(NPM_LIST) #$(ROCKS_LIST) #  DNF_LIST$
 	$(call tr,"----","-------","----------------------------", $@)
 	for pkg in $(NPM_LIST)
 	do
-	NAME=$$(cat info/$${pkg}.md | grep -oP '^package:\s\K.+' || true)
-	VER=$$(cat info/$${pkg}.md | grep -oP '^version:\s\K.+' || true)
-	SUM=$$(cat info/$${pkg}.md | grep -oP '^summary:\s\K.+' || true)
+	NAME=$$(cat info/$${pkg}.md | grep -oP '^Name:\s\K.+' || true)
+	VER=$$(cat info/$${pkg}.md | grep -oP '^Version:\s\K.+' || true)
+	SUM=$$(cat info/$${pkg}.md | grep -oP '^Summary:\s\K.+' || true)
 	$(call tr,$${NAME},$${VER},$${SUM},$@)
 	done
 
-rocks_table: 
+rocks_table:
 	for rock in $(ROCKS_LIST)
 	do
 	NAME=$$(cat info/$${rock}.md | grep -oP '^package\s+\K.+')
@@ -222,9 +222,9 @@ info/bash-language-server.md:
 	# success|failure check
 	$(RUN) $${NAME} --version &>/dev/null
 	# Write to file
-	printf "package: %s\n" "$${NAME}" | tee $@
-	printf "version: %s\n" "$${VER}" | tee -a $@@
-	printf "summary: %s\n" "$${SUM}" | tee -a $@
+	printf "Name: %s\n" "$${NAME}" | tee $@
+	printf "Version: %s\n" "$${VER}" | tee -a $@@
+	printf "Summary: %s\n" "$${SUM}" | tee -a $@
 
 
 copilot: info/copilot.md
