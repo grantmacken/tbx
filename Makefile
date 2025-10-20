@@ -257,7 +257,7 @@ info/vscode-langservers-extracted.md:
 	# success|failure check
 	# TODO: no --version flag, so just check if installed
 	$(RUN) which vscode-langservers-extracted || true
-$(RUN) npm list --global --depth=0 --long  $${NAME} | tee $@
+	$(RUN) npm list --global --depth=0 --long  $${NAME} | tee $@
 
 yaml-language-server: info/yaml-language-server.md
 info/yaml-language-server.md:
