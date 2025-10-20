@@ -218,6 +218,8 @@ info/bash-language-server.md:
 	NAME=$(basename $(notdir $@))
 	$(RUN) npm view --json  bash-language-server | jq '.' | tee $@
 	jq -r '.name' $@
+	jq -r jq '."dist-tags".latest' $@
+	jq -r jq '.description' $@
 	# check it is installed
 # 	printf "Package: %s\n" "$${NAME}" | tee $@
 # 	printf "Version: %s\n" "$$($(RUN) $${NAME} --version)" | tee $@
