@@ -214,15 +214,9 @@ info/tree-sitter-cli.md:
 	echo '##[ $(basename $(notdir $@)) ]##'
 	NAME=$(basename $(notdir $@))
 	$(NPM) $${NAME} &> /dev/null
-	# # also install lsp server not on mason registry
-	# $(NPM) @mistweaverco/kulala-ls || true
-	# # install github copilot cli
-	# $(NPM) @github/copilot || true
-	# check it is installed
-	$(RUN) whereis tree-sitter || true
+	# success|failure check
 	$(RUN) tree-sitter --version || true
-	LINES=$$( $(RUN) npm list -g  --depth=0 --json $${NAME}
-	echo "$${LINES}"
+	$(RUN) npm list --global --depth=0 --json $${NAME}
 	# $(RUN) npm view -g $${NAME} | tee $@
 	# extract 'name', 'version', 'summary' of exec into to a table row
 
