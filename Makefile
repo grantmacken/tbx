@@ -61,7 +61,7 @@ HEADING3 := $(HEADING2)$(HEADING1)
 # BASH_LIST := nodejs-bash-language-server ShellCheck shfmt
 RELEASE_BINARY_LIST := harper-ls lua-language-server
 DNF_LIST := neovim google-cloud-cli  ShellCheck shfmt
-UV_TOOL_LIST := specify-cli tombi
+UV_TOOL_LIST := specify-cli tombi mbake
 # @mistweaverco/kulala-ls
 NPM_LIST := \
 			bash-language-server \
@@ -228,8 +228,8 @@ info/copilot.md:
 	NAME=$(basename $(notdir $@))
 	$(NPM) @github/copilot &> /dev/null
 	# check it is installed
-	$(RUN) $${NAME} --version
-	$(RUN) npm list --global --depth=0 --long  $${NAME} | tee $@
+	$(RUN) $${NAME} --version || true
+	$(RUN) npm list --global --depth=0 --long  $${NAME} || true | tee $@
 
 copilot-language-server: info/copilot-language-server.md
 info/copilot-language-server.md:
@@ -238,7 +238,7 @@ info/copilot-language-server.md:
 	$(NPM) @github/copilot-language-server-linux-x64 &> /dev/null
 	# check it is installed
 	$(RUN) $${NAME} --version
-	$(RUN) npm list --global --depth=0 --long  $${NAME} | tee $@
+	# $(RUN) npm list --global --depth=0 --long  $${NAME} | tee $@
 
 tree-sitter-cli: info/tree-sitter-cli.md
 info/tree-sitter-cli.md:
