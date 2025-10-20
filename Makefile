@@ -216,7 +216,12 @@ info/tree-sitter-cli.md:
 	$(NPM) $${NAME} &> /dev/null
 	# success|failure check
 	$(RUN) tree-sitter --version || true
-	$(RUN) npm list --global --depth=0 --json $${NAME}
+	$(RUN) npm list --global --depth=0 --long --json $${NAME}
+	npm list --global --depth=0 --long --json "$NAME" |
+	jq -r --arg name "$$NAME" ' (.dependencies // {})[$$name] as $$pkg |\
+		if $$pkg then "name: ($$name)\nversion: ($pkg.version)\ndescription: ($pkg.description // "")" \
+		elif .name == $name then "name: (.name)\nversion: (.version)\ndescription: (.description // "")" \
+		else "package ($name) not found" end '
 	# $(RUN) npm view -g $${NAME} | tee $@
 	# extract 'name', 'version', 'summary' of exec into to a table row
 
