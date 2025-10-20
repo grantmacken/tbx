@@ -235,7 +235,7 @@ copilot-language-server: info/copilot-language-server.md
 info/copilot-language-server.md:
 	echo '##[ $(basename $(notdir $@)) ]##'
 	NAME=$(basename $(notdir $@))
-	$(NPM) @github/copilot-language-server-linux &> /dev/null
+	$(NPM) @github/copilot-language-server &> /dev/null
 	# check it is installed
 	$(RUN) $${NAME} --version || true
 	# $(RUN) npm list --global --depth=0 --long  $${NAME} | tee $@
