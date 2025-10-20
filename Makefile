@@ -59,7 +59,7 @@ HEADING2 := $(HEADING1)$(HEADING1)
 HEADING3 := $(HEADING2)$(HEADING1)
 
 DNF_LIST := neovim google-cloud-cli
-NPM_LIST := tree-sitter-cli # copilot copilot-language-server # @mistweaverco/kulala-ls
+NPM_LIST := tree-sitter-cli copilot # copilot-language-server # @mistweaverco/kulala-ls
 ROCKS_LIST := busted nlua
 
 default: info/README.md
@@ -208,6 +208,7 @@ info/copilot.md:
 	$(NPM) @github/copilot &> /dev/null
 	# check it is installed
 	$(RUN) $${NAME} --version
+	$(RUN) npm list --global --depth=0 --long  $${NAME} > $@
 
 tree-sitter-cli: info/tree-sitter-cli.md
 info/tree-sitter-cli.md:
@@ -216,8 +217,7 @@ info/tree-sitter-cli.md:
 	$(NPM) $${NAME} &> /dev/null
 	# success|failure check
 	$(RUN) tree-sitter --version || true
-	$(RUN) npm list --global --depth=0 --long --json $${NAME}
-	$(RUN) npm list --global --depth=0 --long  "$NAME"  | jq -r --arg name "$$NAME" '(.dependencies // {})[$$name] as $$pkg | if $$pkg then "name: \($$name)\nversion: \($$pkg.version)\ndescription: \($$pkg.description // \"\")" elif .name == $$name then "name: \(.name)\nversion: \(.version)\ndescription: \(.description // \"\")" else "package (\($$name)) not found" end'
+	$(RUN) npm list --global --depth=0 --long  $${NAME} > $@
 
 aasassss:
 	# $(RUN) which kulala-ls || true
@@ -226,7 +226,7 @@ aasassss:
 	# $(NPM_LIST) | jq -r '.dependencies' || true
 	# $(NPM_LIST) | tail -n +2 | while read line
 	# do
-	# NAME=$$(echo $$line | awk -F@ '{print $$1}' | xargs)
+	# NAME=$$(echo $$line | awk -f@ '{print $$1}' | xargs)
 	# VER=$$(echo $$line | awk -F@ '{print $$2}' | xargs)
 	# [ -n "$$NAME" ] && printf "| %-10s | %-13s | %-83s |\n" "$$NAME" "$$VER" "Node.js package" | tee -a info/neovim.md;
 	# done
