@@ -64,7 +64,7 @@ DNF_LIST := neovim google-cloud-cli  ShellCheck shfmt
 UV_TOOL_LIST := specify-cli tombi mbake
 # @mistweaverco/kulala-ls
 NPM_LIST := bash-language-server \
-			# copilot \
+			 copilot \
 			# copilot-language-server \
 			# tree-sitter-cli \
 			# vscode-langservers-extracted \
@@ -223,18 +223,27 @@ info/bash-language-server.md:
 	$(RUN) $${NAME} --version &>/dev/null
 	# Write to file
 	printf "Name: %s\n" "$${NAME}" | tee $@
-	printf "Version: %s\n" "$${VER}" | tee -a $@@
+	printf "Version: %s\n" "$${VER}" | tee -a $@
 	printf "Summary: %s\n" "$${SUM}" | tee -a $@
 
 
 copilot: info/copilot.md
 info/copilot.md:
 	echo '##[ $(basename $(notdir $@)) ]##'
-	NAME=$(basename $(notdir $@))
-	$(NPM) @github/copilot &> /dev/null
-	# check it is installed
-	$(RUN) $${NAME} --version || true
-	$(RUN) npm list --global --depth=0 --long  $${NAME} || true | tee $@
+	JSON=$$($(RUN) npm view --json @github/copilot | jq '.')
+	# success|failure check
+	# extract 'name', 'version', 'description' into to a table row
+	NAME=$$(echo $$JSON | jq -r '.name')
+	VER=$$(echo $$JSON | jq -r '."dist-tags".latest')
+	SUM=$$(echo $$JSON | jq -r '.description')
+	$(NPM) $${NAME}@$${VER} &> /dev/null
+	# success|failure check
+	$(RUN) copilot --version
+	# Write to file
+	printf "Name: %s\n" "$${NAME}" | tee $@
+	printf "Version: %s\n" "$${VER}" | tee -a $@
+	printf "Summary: %s\n" "$${SUM}" | tee -a $@
+
 
 copilot-language-server: info/copilot-language-server.md
 info/copilot-language-server.md:
