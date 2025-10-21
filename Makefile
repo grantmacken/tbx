@@ -39,7 +39,7 @@ DIR_MASON  := /usr/local/share/mason
 
 # URL_LSPCONFIG := https://raw.githubusercontent.com/neovim/nvim-lspconfig/refs/heads/master/lsp/
 TAR           := tar xz --strip-components=1 -C
-# TAR_NO_STRIP := tar xz -C
+TAR_NO_STRIP := tar xz -C
 
 NPM      := $(RUN) npm install --global
 LUAROCKS := $(RUN) luarocks install --global
@@ -59,7 +59,7 @@ HEADING2 := $(HEADING1)$(HEADING1)
 HEADING3 := $(HEADING2)$(HEADING1)
 
 # BASH_LIST := nodejs-bash-language-server ShellCheck shfmt
-RELEASE_BINARY_LIST := harper-ls lua-language-server
+RELEASE_BINARY_LIST :=  lua-language-server # harper-ls
 DNF_LIST := neovim google-cloud-cli  ShellCheck shfmt
 UV_TOOL_LIST := specify-cli tombi mbake
 # @mistweaverco/kulala-ls
@@ -81,7 +81,7 @@ rem:
 	buildah push ghcr.io/grantmacken/tbx-coding:latest
 	echo '✅ ghcr.io/grantmacken/tbx-coding:latest built and pushed'
 
-info/README.md: init $(NPM_LIST) #$(ROCKS_LIST) #  DNF_LIST$
+info/README.md: init $(RELEASE_BINARY_LIST) # $(NPM_LIST) #$(ROCKS_LIST) #  DNF_LIST$
 	echo '##[ $@ ]##'
 	mkdir -p $(dir $@)
 	# create or overwrite README.md
@@ -178,6 +178,26 @@ info/neovim.md:
 	echo "Updating neovim version to $$VER in $@"
 	$(INFO) neovim | sed "s/^Version.*$$/Version : $${VER}/" >  $@
 	echo '✅ neovim installed'
+
+lua-language-server: info/lua-language-server.md
+latest/lua-language-server.json:
+	echo '##[ $@ ]##'
+	mkdir -p $(dir $@) 
+	$(WGET) https://api.github.com/repos/LuaLS/lua-language-server/releases/latest -O $@
+
+info/lua-language-server.md: latest/lua-language-server.json
+	echo '##[ $(basename $(notdir $@)) ]##'
+	SRC=$(shell $(call bdu,linux-x64.tar.gz,$<))
+	TARGET=files/lua-language-server/usr/local/lua-language-server
+	mkdir -p $${TARGET}
+	$(WGET) $${SRC} -O- | $(TAR_NO_STRIP) $${TARGET}
+	# note the lua-language-server binary is in bin/ subdir
+	# the exec script in /usr/local/bin/lua-language-server will point to it 
+	# these scripts are added in init target
+	# success|failure check
+	$(RUN) which lua-language-server
+	$(RUN) lua-language-server --version
+
 
 mason_registry:
 	echo '##[ $@ ]##'
