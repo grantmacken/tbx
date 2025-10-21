@@ -137,6 +137,8 @@ init:
 	mkdir -p info
 	$(RUN) dnf update -y &>/dev/null
 
+# release binaries: neovim lua-language-server
+
 neovim: info/neovim.md
 info/neovim.md:
 	echo '##[ $@ ]##'
@@ -230,7 +232,7 @@ info/specify-cli.md:
 mbake: info/mbake.md
 info/mbake.md:
 	echo '##[ $(basename $(notdir $@)) ]##'
-	$(RUN) uv tool install mbake
+	$(RUN) uv tool install mbake &> /dev/null
 	# success|failure check
 	$(RUN) which mbake || true
 	$(RUN) mbake --version || true
@@ -244,52 +246,44 @@ info/mbake.md:
 	printf "Summary: %s\n" "$${SUM}" >> $@
 	echo '✅ mbake installed'
 
-uv_tool: ## uv tool is a cli to install and manage universal-variant tools
-	mkdir -p info
-	echo '##[ $@ ]##'
-	$(RUN) uv tool install specify-cli --from git+https://github.com/github/spec-kit.git &> /dev/null
-	# check it is installed
-	$(RUN) which specify || true
-	$(RUN) whereis specify || true
-	$(RUN) uv tool list | grep specify || true
-
-	SUM='A tool to help you specify your software projects'
-	printf "| %-10s | %-13s | %-83s |\n" "$$NAME" "$$VER" "$$SUM" | tee info/uv_tool.md
-	echo '✅ uv_tool installed'
-
-
-
-
-mason_registry:
-	echo '##[ $@ ]##'
-	# create the dir mason uses to store packages
-	$(RUN) mkdir -p $(DIR_MASON)
-	$(RUN) nvim_mason_registry &>/dev/null
-	echo '✅ mason registry loaded'
-
-mason: mason_registry
-	echo '##[ $@ ]##'
-	# run the script that install mason packages
-	$(RUN) nvim_mason &>/dev/null #  2>&1 >/dev/null
-	# take a look at what is installed
-	# $(RUN) ls $(DIR_MASON)/bin
-	# get version of each binary
-	BINS=$$($(RUN) ls $(DIR_MASON)/bin)
-	for bin in $$BINS
-	do
-	echo "$$bin:"
-	VER=$(shell $(RUN) $$bin --version 2>/dev/null || $$bin -v 2>/dev/null || echo "unknown")
-	# some version strings are long, so just get the first line
-	VER=$$(echo "$$VER" | head -n 1)
-	# print the version
-	echo "$$VER"
-	done
-	# link installed packages to $(DIR_BIN)
-	# use SH here to allow for globbing
-	$(SH) 'ln -s $(DIR_MASON)/bin/* $(DIR_BIN)/'
-	# check bin dir
-	# $(RUN) ls -l /usr/local/bin
-	echo '✅ selected mason lsp	 servers, linters and formaters installed'
+# mason_registry:
+# 	echo '##[ $@ ]##'
+# 	# create the dir mason uses to store packages
+# 	$(RUN) mkdir -p $(DIR_MASON)
+# 	$(RUN) nvim_mason_registry &>/dev/null
+# 	echo '✅ mason registry loaded'
+#
+# mason: mason_registry
+# 	echo '##[ $@ ]##'
+# 	# run the script that install mason packages
+# 	$(RUN) nvim_mason &>/dev/null #  2>&1 >/dev/null
+# 	# take a look at what is installed
+# 	# $(RUN) ls $(DIR_MASON)/bin
+# 	# get version of each binary
+# 	BINS=$$($(RUN) ls $(DIR_MASON)/bin)
+# 	for bin in $$BINS
+# 	do
+# 	echo "$$bin:"
+# 	VER=$(shell $(RUN) $$bin --version 2>/dev/null || $$bin -v 2>/dev/null || echo "unknown")
+# 	# some version strings are long, so just get the first line
+# 	VER=$$(echo "$$VER" | head -n 1)
+# 	# print the version
+# 	echo "$$VER"
+# 	done
+# 	# link installed packages to $(DIR_BIN)
+# 	# use SH here to allow for globbing
+# 	$(SH) 'ln -s $(DIR_MASON)/bin/* $(DIR_BIN)/'
+# 	# check bin dir
+# 	# $(RUN) ls -l /usr/local/bin
+# 	echo '✅ selected mason lsp	 servers, linters and formaters installed'
+#
+# npm packages:
+# bash-language-server
+# copilot
+# copilot-language-server
+# tree-sitter-cli
+# vscode-langservers-extracted
+# yaml-language-server
 
 bash-language-server: info/bash-language-server.md
 info/bash-language-server.md:
@@ -322,7 +316,6 @@ info/copilot.md:
 	printf "Name: %s\n" "$${NAME}" > $@
 	printf "Version: %s\n" "$${VER}" >> $@
 	printf "Summary: %s\n" "$${SUM}" >> $@
-
 
 copilot-language-server: info/copilot-language-server.md
 info/copilot-language-server.md:
@@ -373,7 +366,6 @@ info/vscode-langservers-extracted.md:
 	printf "Version: %s\n" "$${VER}" >> $@
 	printf "Summary: %s\n" "$${SUM}" >> $@
 
-
 yaml-language-server: info/yaml-language-server.md
 info/yaml-language-server.md:
 	echo '##[ $(basename $(notdir $@)) ]##'
@@ -389,19 +381,10 @@ info/yaml-language-server.md:
 	printf "Version: %s\n" "$${VER}" | tee -a $@
 	printf "Summary: %s\n" "$${SUM}" | tee -a $
 
-aasassss:
-	# $(RUN) which kulala-ls || true
-	# $(RUN) which copilot || true
-	# Write to file
-	# $(NPM_LIST) | jq -r '.dependencies' || true
-	# $(NPM_LIST) | tail -n +2 | while read line
-	# do
-	# NAME=$$(echo $$line | awk -f@ '{print $$1}' | xargs)
-	# VER=$$(echo $$line | awk -F@ '{print $$2}' | xargs)
-	# [ -n "$$NAME" ] && printf "| %-10s | %-13s | %-83s |\n" "$$NAME" "$$VER" "Node.js package" | tee -a info/neovim.md;
-	# done
-	# echo '✅ selected npm packages installed' | tee -a info/$@.md
-
+# dnf packages:
+# google-cloud-cli
+# ShellCheck
+# shfmt
 
 google-cloud-cli: info/google-cloud-cli.md
 info/google-cloud-cli.md:
@@ -414,6 +397,33 @@ info/google-cloud-cli.md:
 	# verify installation
 	$(RUN) which gcloud &> /dev/null
 	$(INFO) --installed google-cloud-cli > $@
+
+ShellCheck: info/ShellCheck.md
+info/ShellCheck.md:
+	echo '##[ $(basename $(notdir $@)) ]##'
+	NAME=$(basename $(notdir $@))
+	mkdir -p $(dir $@)
+	$(INSTALL) $${NAME} &> /dev/null
+	# verify installation
+	$(RUN) which $${NAME} &> /dev/null
+	$(RUN) $${NAME} --version &> /dev/null
+	$(INFO) --installed $${NAME} > $@
+
+shfmt: info/shfmt.md
+info/shfmt.md:
+	echo '##[ $(basename $(notdir $@)) ]##'
+	NAME=$(basename $(notdir $@))
+	mkdir -p $(dir $@)
+	$(INSTALL) $${NAME} &> /dev/null
+	# verify installation
+	$(RUN) which $${NAME} &> /dev/null
+	$(RUN) $${NAME} --version &> /dev/null
+	$(INFO) --installed $${NAME} > $@
+
+
+# luarocks packages:
+# busted 
+# :nlua
 
 busted: info/busted.md
 info/busted.md:
