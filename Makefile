@@ -61,7 +61,7 @@ HEADING3 := $(HEADING2)$(HEADING1)
 # BASH_LIST := nodejs-bash-language-server ShellCheck shfmt
 RELEASE_BINARY_LIST :=  neovim lua-language-server # harper-ls
 DNF_LIST := neovim google-cloud-cli  ShellCheck shfmt
-UV_TOOL_LIST :=  tombi specify-cli # mbake 
+UV_TOOL_LIST :=  tombi specify-cli mbake
 # @mistweaverco/kulala-ls
 NPM_LIST := bash-language-server \
 			copilot \
@@ -227,7 +227,7 @@ info/tombi.md:
 	# success|failure check
 	$(RUN) which tombi &> /dev/null
 	$(RUN) tombi --version &> /dev/null
-	# extract 'name', 'version', 'summary' into to a table row
+	# extract 'name', 'version', 'summary'
 	NAME=tombi
 	VER=$$($(RUN) tombi --version | cut -d' ' -f2)
 	SUM='TOML Toolkit'
@@ -241,12 +241,11 @@ info/specify-cli.md:
 	echo '##[ $(basename $(notdir $@)) ]##'
 	$(RUN) uv tool install specify-cli --from git+https://github.com/github/spec-kit.git &> /dev/null
 	# success|failure check
-	$(RUN) which specify || true
-	$(RUN) where is specify || true
+	$(RUN) which specify &> /dev/null
+	$(RUN) whereis specify &> /dev/null
 	# extract 'name', 'version', 'summary'
-	# get version from the binary
 	LINE=$$($(RUN) uv tool list | grep specify-cli)
-	# extract 'name', 'version', 'summary' of exec into to a table row
+	# extract 'name', 'version', 'summary'
 	NAME=$$(echo $$LINE | cut -d' ' -f1)
 	VER=$$(echo $$LINE  | cut -d' ' -f2)
 	SUM='A tool to help you specify your software projects'
@@ -254,6 +253,18 @@ info/specify-cli.md:
 	printf "Version: %s\n" "$${VER}" >> $@
 	printf "Summary: %s\n" "$${SUM}" >> $@
 	echo '✅ specify-cli installed'
+
+mbake: info/mbake.md
+info/mbake.md:
+	echo '##[ $(basename $(notdir $@)) ]##'
+	$(RUN) uv tool install mbake
+	# success|failure check
+	$(RUN) which mbake || true
+	$(RUN) mbake --version || true
+	# extract 'name', 'version', 'summary'
+	LINE=$$($(RUN) uv tool list | grep mbake)
+	NAME=$$(echo $$LINE | cut -d' ' -f1)
+	VER=$$(echo $$LINE  | cut -d' ' -f2)
 
 uv_tool: ## uv tool is a cli to install and manage universal-variant tools
 	mkdir -p info
