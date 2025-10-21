@@ -59,7 +59,7 @@ HEADING2 := $(HEADING1)$(HEADING1)
 HEADING3 := $(HEADING2)$(HEADING1)
 
 # BASH_LIST := nodejs-bash-language-server ShellCheck shfmt
-RELEASE_BINARY_LIST :=  lua-language-server # harper-ls
+RELEASE_BINARY_LIST :=  neovim lua-language-server # harper-ls
 DNF_LIST := neovim google-cloud-cli  ShellCheck shfmt
 UV_TOOL_LIST := specify-cli tombi mbake
 # @mistweaverco/kulala-ls
@@ -170,14 +170,22 @@ info/neovim.md:
 	mkdir -p $(dir $@)
 	TARGET=files/neovim/usr/local
 	mkdir -p $${TARGET}
-	$(WGET) 'https://github.com/neovim/neovim/releases/download/nightly/nvim-linux-x86_64.tar.gz' -O- |
-	tar xz --strip-components=1 -C $${TARGET}
+	SRC='https://github.com/neovim/neovim/releases/download/nightly/nvim-linux-x86_64.tar.gz' 
+	$(WGET) $${SRC} -O- | $(TAR) $${TARGET}
 	$(ADD) files/neovim &> /dev/null
 	$(RUN) ls /usr/local/bin &> /dev/null
 	# success|failure check
+	$(RUN) nvim --version &> /dev/null
+	$(RUN) whereis nvim &> /dev/null
+	$(RUN) which nvim &> /dev/null
+	# extract 'name', 'version', 'summary'
+	NAME=neovim
+	# get version from the binary
 	VER=$$($(RUN) nvim -v | grep -oP 'NVIM v\K\d+\.\d+\.\d+' )
-	echo "Updating neovim version to $$VER in $@"
-	$(INFO) neovim | sed "s/^Version.*$$/Version : $${VER}/" >  $@
+	SUM='Neovim text editor'
+	printf "Name: %s\n"    "$${NAME}" > $@
+	printf "Version: %s\n" "$${VER}" >> $@
+	printf "Summary: %s\n" "$${SUM}" >> $@
 	echo '✅ neovim installed'
 
 lua-language-server: info/lua-language-server.md
