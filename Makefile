@@ -61,7 +61,7 @@ HEADING3 := $(HEADING2)$(HEADING1)
 # BASH_LIST := nodejs-bash-language-server ShellCheck shfmt
 RELEASE_BINARY_LIST :=  neovim lua-language-server # harper-ls
 DNF_LIST := neovim google-cloud-cli  ShellCheck shfmt
-UV_TOOL_LIST :=  tombi # mbake specify-cli
+UV_TOOL_LIST :=  tombi specify-cli # mbake 
 # @mistweaverco/kulala-ls
 NPM_LIST := bash-language-server \
 			copilot \
@@ -72,7 +72,7 @@ NPM_LIST := bash-language-server \
 
 
 ROCKS_LIST := busted nlua
-PKGS_LIST := $(RELEASE_BINARY_LIST) # $(NPM_LIST) $(ROCKS_LIST) $(DNF_LIST)
+PKGS_LIST := $(UV_TOOL_LIST) # $(NPM_LIST) $(ROCKS_LIST) $(DNF_LIST)
 
 default: info/README.md
 
@@ -92,13 +92,13 @@ info/README.md: init $(UV_TOOL_LIST)   # $(RELEASE_BINARY_LIST) # $(NPM_LIST) #$
 	printf "## %s\n\n" "Installed applications" | tee -a $@
 	$(call tr,"Name","Version","Summary", $@)
 	$(call tr,"----","-------","----------------------------", $@)
-	# for pkg in $(PKGS_LIST)
-	# do
-	# NAME=$$(cat info/$${pkg}.md | grep -oP '^Name:\s\K.+' || true)
-	# VER=$$(cat info/$${pkg}.md | grep -oP '^Version:\s\K.+' || true)
-	# SUM=$$(cat info/$${pkg}.md | grep -oP '^Summary:\s\K.+' || true)
-	# $(call tr,$${NAME},$${VER},$${SUM},$@)
-	# done
+	for pkg in $(PKGS_LIST)
+	do
+	NAME=$$(cat info/$${pkg}.md | grep -oP '^Name:\s\K.+' || true)
+	VER=$$(cat info/$${pkg}.md | grep -oP '^Version:\s\K.+' || true)
+	SUM=$$(cat info/$${pkg}.md | grep -oP '^Summary:\s\K.+' || true)
+	$(call tr,$${NAME},$${VER},$${SUM},$@)
+	done
 
 rocks_table:
 	for rock in $(ROCKS_LIST)
@@ -225,9 +225,48 @@ info/tombi.md:
 	echo '##[ $(basename $(notdir $@)) ]##'
 	$(RUN) uv tool install tombi
 	# success|failure check
-	$(RUN) which tombi || true
-	$(RUN) tombi --version || true
+	$(RUN) which tombi &> /dev/null
+	$(RUN) tombi --version &> /dev/null
+	# extract 'name', 'version', 'summary' into to a table row
+	NAME=tombi
+	VER=$$($(RUN) tombi --version | cut -d' ' -f2)
+	SUM='TOML Toolkit'
+	printf "Name: %s\n" "$${NAME}" > $@
+	printf "Version: %s\n" "$${VER}" >> $@
+	printf "Summary: %s\n" "$${SUM}" >> $@
+	echo '✅ tombi installed'
 
+specify-cli: info/specify-cli.md
+info/specify-cli.md:
+	echo '##[ $(basename $(notdir $@)) ]##'
+	$(RUN) uv tool install specify-cli --from git+https://github.com/github/spec-kit.git &> /dev/null
+	# success|failure check
+	$(RUN) which specify || true
+	$(RUN) where is specify || true
+	# extract 'name', 'version', 'summary'
+	# get version from the binary
+	LINE=$$($(RUN) uv tool list | grep specify-cli)
+	# extract 'name', 'version', 'summary' of exec into to a table row
+	NAME=$$(echo $$LINE | cut -d' ' -f1)
+	VER=$$(echo $$LINE  | cut -d' ' -f2)
+	SUM='A tool to help you specify your software projects'
+	printf "Name: %s\n" "$${NAME}" > $@
+	printf "Version: %s\n" "$${VER}" >> $@
+	printf "Summary: %s\n" "$${SUM}" >> $@
+	echo '✅ specify-cli installed'
+
+uv_tool: ## uv tool is a cli to install and manage universal-variant tools
+	mkdir -p info
+	echo '##[ $@ ]##'
+	$(RUN) uv tool install specify-cli --from git+https://github.com/github/spec-kit.git &> /dev/null
+	# check it is installed
+	$(RUN) which specify || true
+	$(RUN) whereis specify || true
+	$(RUN) uv tool list | grep specify || true
+
+	SUM='A tool to help you specify your software projects'
+	printf "| %-10s | %-13s | %-83s |\n" "$$NAME" "$$VER" "$$SUM" | tee info/uv_tool.md
+	echo '✅ uv_tool installed'
 
 
 
@@ -374,20 +413,6 @@ aasassss:
 	# done
 	# echo '✅ selected npm packages installed' | tee -a info/$@.md
 
-uv_tool: ## uv tool is a cli to install and manage universal-variant tools
-	mkdir -p info
-	echo '##[ $@ ]##'
-	$(RUN) uv tool install specify-cli --from git+https://github.com/github/spec-kit.git &> /dev/null
-	# check it is installed
-	$(RUN) which specify || true
-	$(RUN) whereis specify || true
-	$(RUN) uv tool list | grep specify || true
-	# extract 'name', 'version', 'summary' of exec into to a table row
-	NAME=specify
-	VER=$$($(RUN) uv tool list | grep -oP 'specify.+\K[\d\.]+')
-	SUM='A tool to help you specify your software projects'
-	printf "| %-10s | %-13s | %-83s |\n" "$$NAME" "$$VER" "$$SUM" | tee info/uv_tool.md
-	echo '✅ uv_tool installed'
 
 google-cloud-cli: info/google-cloud-cli.md
 info/google-cloud-cli.md:
