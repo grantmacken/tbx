@@ -65,10 +65,10 @@ UV_TOOL_LIST := specify-cli tombi mbake
 # @mistweaverco/kulala-ls
 NPM_LIST := bash-language-server \
 			 copilot \
+			tree-sitter-cli \
+			yaml-language-server \
 			# copilot-language-server \
-			# tree-sitter-cli \
 			# vscode-langservers-extracted \
-			# yaml-language-server
 
 
 ROCKS_LIST := busted nlua
@@ -257,11 +257,18 @@ info/copilot-language-server.md:
 tree-sitter-cli: info/tree-sitter-cli.md
 info/tree-sitter-cli.md:
 	echo '##[ $(basename $(notdir $@)) ]##'
-	NAME=$(basename $(notdir $@))
-	$(NPM) $${NAME} &> /dev/null
+	JSON=$$($(RUN) npm view --json tree-sitter-cli | jq '.')
+	NAME=$$(echo $$JSON | jq -r '.name')
+	VER=$$(echo $$JSON | jq -r '."dist-tags".latest')
+	SUM=$$(echo $$JSON | jq -r '.description')
+	$(NPM) $${NAME}@$${VER} &> /dev/null
 	# success|failure check
-	$(RUN) tree-sitter --version || true
-	$(RUN) npm list --global --depth=0 --long  $${NAME} | tee $@
+	$(RUN) tree-sitter --version
+	# Write to file
+	printf "Name: %s\n" "$${NAME}" | tee $@
+	printf "Version: %s\n" "$${VER}" | tee -a $@
+	printf "Summary: %s\n" "$${SUM}" | tee -a $@
+
 
 vscode-langservers-extracted: info/vscode-langservers-extracted.md
 info/vscode-langservers-extracted.md:
@@ -276,11 +283,17 @@ info/vscode-langservers-extracted.md:
 yaml-language-server: info/yaml-language-server.md
 info/yaml-language-server.md:
 	echo '##[ $(basename $(notdir $@)) ]##'
-	NAME=$(basename $(notdir $@))
-	$(NPM) $${NAME} &> /dev/null
+	JSON=$$($(RUN) npm view --json tree-sitter-cli | jq '.')
+	NAME=$$(echo $$JSON | jq -r '.name')
+	VER=$$(echo $$JSON | jq -r '."dist-tags".latest')
+	SUM=$$(echo $$JSON | jq -r '.description')
+	$(NPM) $${NAME}@$${VER} &> /dev/null
 	# success|failure check
-	$(RUN) $${NAME} --version || true
-	$(RUN) npm list --global --depth=0 --long  $${NAME} | tee $@
+	#$(RUN) tree-sitter --version
+	# Write to file
+	printf "Name: %s\n" "$${NAME}" | tee $@
+	printf "Version: %s\n" "$${VER}" | tee -a $@
+	printf "Summary: %s\n" "$${SUM}" | tee -a $
 
 aasassss:
 	# $(RUN) which kulala-ls || true
