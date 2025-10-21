@@ -61,7 +61,7 @@ HEADING3 := $(HEADING2)$(HEADING1)
 # BASH_LIST := nodejs-bash-language-server ShellCheck shfmt
 RELEASE_BINARY_LIST :=  neovim lua-language-server # harper-ls
 DNF_LIST := neovim google-cloud-cli  ShellCheck shfmt
-UV_TOOL_LIST := specify-cli tombi mbake
+UV_TOOL_LIST :=  tombi # mbake specify-cli
 # @mistweaverco/kulala-ls
 NPM_LIST := bash-language-server \
 			copilot \
@@ -82,7 +82,7 @@ rem:
 	buildah push ghcr.io/grantmacken/tbx-coding:latest
 	echo '✅ ghcr.io/grantmacken/tbx-coding:latest built and pushed'
 
-info/README.md: init $(RELEASE_BINARY_LIST) # $(NPM_LIST) #$(ROCKS_LIST) #  DNF_LIST$
+info/README.md: init $(UV_TOOL_LIST)   # $(RELEASE_BINARY_LIST) # $(NPM_LIST) #$(ROCKS_LIST) #  DNF_LIST$
 	echo '##[ $@ ]##'
 	mkdir -p $(dir $@)
 	# create or overwrite README.md
@@ -92,13 +92,13 @@ info/README.md: init $(RELEASE_BINARY_LIST) # $(NPM_LIST) #$(ROCKS_LIST) #  DNF_
 	printf "## %s\n\n" "Installed applications" | tee -a $@
 	$(call tr,"Name","Version","Summary", $@)
 	$(call tr,"----","-------","----------------------------", $@)
-	for pkg in $(PKGS_LIST)
-	do
-	NAME=$$(cat info/$${pkg}.md | grep -oP '^Name:\s\K.+' || true)
-	VER=$$(cat info/$${pkg}.md | grep -oP '^Version:\s\K.+' || true)
-	SUM=$$(cat info/$${pkg}.md | grep -oP '^Summary:\s\K.+' || true)
-	$(call tr,$${NAME},$${VER},$${SUM},$@)
-	done
+	# for pkg in $(PKGS_LIST)
+	# do
+	# NAME=$$(cat info/$${pkg}.md | grep -oP '^Name:\s\K.+' || true)
+	# VER=$$(cat info/$${pkg}.md | grep -oP '^Version:\s\K.+' || true)
+	# SUM=$$(cat info/$${pkg}.md | grep -oP '^Summary:\s\K.+' || true)
+	# $(call tr,$${NAME},$${VER},$${SUM},$@)
+	# done
 
 rocks_table:
 	for rock in $(ROCKS_LIST)
@@ -217,6 +217,19 @@ info/lua-language-server.md: latest/lua-language-server.json
 	printf "Version: %s\n" "$${VER}" >> $@
 	printf "Summary: %s\n" "$${SUM}" >> $@
 	echo '✅ lua-language-server installed'
+
+## uv tools:  tombi mbake specify-cli
+
+tombi: info/tombi.md
+info/tombi.md:
+	echo '##[ $(basename $(notdir $@)) ]##'
+	$(RUN) uv tool install tombi
+	# success|failure check
+	$(RUN) which tombi || true
+	$(RUN) tombi --version || true
+
+
+
 
 
 mason_registry:
