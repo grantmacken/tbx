@@ -72,6 +72,7 @@ NPM_LIST := bash-language-server \
 
 
 ROCKS_LIST := busted nlua
+PKGS_LIST := $(RELEASE_BINARY_LIST) # $(NPM_LIST) $(ROCKS_LIST) $(DNF_LIST)
 
 default: info/README.md
 
@@ -91,7 +92,7 @@ info/README.md: init $(RELEASE_BINARY_LIST) # $(NPM_LIST) #$(ROCKS_LIST) #  DNF_
 	printf "## %s\n\n" "Installed applications" | tee -a $@
 	$(call tr,"Name","Version","Summary", $@)
 	$(call tr,"----","-------","----------------------------", $@)
-	for pkg in $(NPM_LIST)
+	for pkg in $(PKGS_LIST)
 	do
 	NAME=$$(cat info/$${pkg}.md | grep -oP '^Name:\s\K.+' || true)
 	VER=$$(cat info/$${pkg}.md | grep -oP '^Version:\s\K.+' || true)
@@ -196,8 +197,8 @@ info/lua-language-server.md: latest/lua-language-server.json
 	# the exec script in /usr/local/bin/lua-language-server will point to it 
 	# these scripts are added in init target
 	# success|failure check
-	$(RUN) which lua-language-server
-	$(RUN) lua-language-server --version
+	$(RUN) which lua-language-server &> /dev/null
+	$(RUN) lua-language-server --version &> /dev/null
 	# extract 'name', 'version', 'summary' into to a table row
 	# get version from the binary
 	NAME=lua-language-server
