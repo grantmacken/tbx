@@ -70,9 +70,8 @@ NPM_LIST := bash-language-server \
 			vscode-langservers-extracted \
 			yaml-language-server
 
-
 ROCKS_LIST := busted nlua
-PKGS_LIST := $(RELEASE_BINARY_LIST) $(NPM_LIST) $(UV_TOOL_LIST) #  $(ROCKS_LIST) $(DNF_LIST)
+PKGS_LIST := $(RELEASE_BINARY_LIST) $(ROCKS_LIST) # $(NPM_LIST) $(UV_TOOL_LIST) #  $(ROCKS_LIST) $(DNF_LIST)
 
 default: info/README.md
 
@@ -82,7 +81,7 @@ rem:
 	buildah push ghcr.io/grantmacken/tbx-coding:latest
 	echo '✅ ghcr.io/grantmacken/tbx-coding:latest built and pushed'
 
-info/README.md: init $(UV_TOOL_LIST)   # $(RELEASE_BINARY_LIST) # $(NPM_LIST) #$(ROCKS_LIST) #  DNF_LIST$
+info/README.md: init $(PKGS_LIST)   # $(RELEASE_BINARY_LIST) # $(NPM_LIST) #$(ROCKS_LIST) #  DNF_LIST$
 	echo '##[ $@ ]##'
 	mkdir -p $(dir $@)
 	# create or overwrite README.md
@@ -421,9 +420,7 @@ info/shfmt.md:
 	$(INFO) --installed $${NAME} > $@
 
 
-# luarocks packages:
-# busted 
-# :nlua
+# luarocks packages: busted nlua
 
 busted: info/busted.md
 info/busted.md:
@@ -434,7 +431,13 @@ info/busted.md:
 	# verify installation
 	$(RUN) which $${NAME} &> /dev/null
 	$(RUN) whereis busted
-	$(RUN) luarocks show --porcelain $${NAME} > $@
+	SHOW=$$($(RUN) luarocks show --porcelain $${NAME})
+	NAME=$$(echo $${SHOW} | grep -oP '^package\s+\K.+') > $@
+	VER=$$(echo $${SHOW} | grep -oP '^version\s+\K.+') >> $@
+	SUM=$$(echo $${SHOW} | grep -oP '^summary\s+\K.+') >> $@
+	printf "Name: %s\n" "$${NAME}" > $@
+	printf "Version: %s\n" "$${VER}" >> $@
+	printf "Summary: %s\n" "$${SUM}" >> $@
 
 nlua: info/nlua.md
 info/nlua.md:
@@ -445,71 +448,13 @@ info/nlua.md:
 	# verify installation
 	$(RUN) which $${NAME} &> /dev/null
 	$(RUN) luarocks show --porcelain $${NAME} > $@
+	NAME=$$(echo $${SHOW} | grep -oP '^package\s+\K.+') > $@
+	VER=$$(echo $${SHOW} | grep -oP '^version\s+\K.+') >> $@
+	SUM=$$(echo $${SHOW} | grep -oP '^summary\s+\K.+') >> $@
+	printf "Name: %s\n" "$${NAME}" > $@
+	printf "Version: %s\n" "$${VER}" >> $@
+	printf "Summary: %s\n" "$${SUM}" >> $@
 
-	# Write to file
-
-## luarocks is a package manager for lua modules
-luarocks:## install busted and nlua
-	echo '##[ $@ ]##'
-	mkdir -p $(dir $@)
-	# install busted testing framework
-	$(RUN) luarocks install --global busted  &>/dev/null
-	# install nlua neovim lua interpreter
-	# $(RUN) luarocks install --global nlua &>/dev/null
-	# # link installed packages to $(DIR_BIN)
-	# $(SH) 'ln -sf /usr/local/lib/luarocks/bin/busted $(DIR_BIN)/busted'
-	# $(SH) 'ln -sf /usr/local/lib/luarocks/bin/nlua $(DIR_BIN)/nlua'
-	# # verify installation
-	# $(RUN) which busted &> /dev/null
-	# $(RUN) which nlua &> /dev/null
-	# # Write to file
-	# $(RUN) luarocks list --porcelain | while read name version summary
-	# do
-	# [ -n "$$name" ] && printf "| %-10s | %-13s | %-83s |\n" "$$name" "$$version" "$$summary" | tee -a info/luarocks.md
-	# done
-
-commit: ## use gopilot to add commit message since last commit
-	copilot -p "add commit message since last commit" --allow-all-tools --add-dir $(CURDIR)
-
-view:
-	gh repo view --branch tbx-coding
-
-push: ## use gh to watch the  workflow in GitHub Actions
-	echo '##[ $@ ]##'
-	git push -f origin tbx-coding
-	# wait a few seconds for the run to be registered
-	sleep 20
-	echo -e "$(CYAN)Watch the workflow in GitHub Actions...$(NC)"
-	# get the last run id
-	# gh run list --branch tbx-coding --limit 1 | awk '{print $$1}'
-	RUN_ID=$$(gh run list --branch tbx-coding --limit 1 --json databaseId | jq '.[0].databaseId')
-	# check if completed
-	STATUS=$$(gh run view $$RUN_ID --json status | jq -r '.status')
-	if [ "$$STATUS" = "completed" ]
-	then
-	# check if success
-	CONCLUSION=$$(gh run view $$RUN_ID --json conclusion | jq -r '.conclusion')
-	if [ "$$CONCLUSION" = "success" ]
-	then
-	echo -e "$(GREEN)The last run ($$RUN_ID) is already completed successfully! Exiting.$(NC)"
-	exit 0
-	else
-	echo -e "$(RED)The last run ($$RUN_ID) has completed but did not complete successfully. Status: $$CONCLUSION$(NC)"
-	# show the logs
-	gh run view $$RUN_ID --log | grep -oP '^.+Stop|^.+error.+$$'
-	exit 1
-	fi
-	fi
-	# if not completed, watch it
-	gh run watch $$RUN_ID
-	# confirm it is completed
-	STATUS=$$(gh run view $$RUN_ID --json conclusion | jq -r '.conclusion')
-	if [ "$$STATUS" = "success" ]; then
-		echo -e "$(GREEN)The run ($$RUN_ID) completed successfully!$(NC)"
-	else
-		echo -e "$(RED)The run ($$RUN_ID) did not complete successfully. Status: $$STATUS$(NC)"
-		exit 1
-	fi
 
 pull:
 	echo '##[ $@ ]##'
