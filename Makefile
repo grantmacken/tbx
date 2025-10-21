@@ -222,10 +222,9 @@ info/bash-language-server.md:
 	# success|failure check
 	$(RUN) $${NAME} --version &>/dev/null
 	# Write to file
-	printf "Name: %s\n" "$${NAME}" | tee $@
-	printf "Version: %s\n" "$${VER}" | tee -a $@
-	printf "Summary: %s\n" "$${SUM}" | tee -a $@
-
+	printf "Name: %s\n" "$${NAME}" > $@
+	printf "Version: %s\n" "$${VER}" >> $@
+	printf "Summary: %s\n" "$${SUM}" >> $@
 
 copilot: info/copilot.md
 info/copilot.md:
@@ -239,9 +238,9 @@ info/copilot.md:
 	# success|failure check
 	$(RUN) copilot --version
 	# Write to file
-	printf "Name: %s\n" "$${NAME}" | tee $@
-	printf "Version: %s\n" "$${VER}" | tee -a $@
-	printf "Summary: %s\n" "$${SUM}" | tee -a $@
+	printf "Name: %s\n" "$${NAME}" > $@
+	printf "Version: %s\n" "$${VER}" >> $@
+	printf "Summary: %s\n" "$${SUM}" >> $@
 
 
 copilot-language-server: info/copilot-language-server.md
@@ -255,9 +254,9 @@ info/copilot-language-server.md:
 	# success|failure check
 	# TODO
 	# Write to file
-	printf "Name: %s\n" "$${NAME}" | tee $@
-	printf "Version: %s\n" "$${VER}" | tee -a $@
-	printf "Summary: %s\n" "$${SUM}" | tee -a $@
+	printf "Name: %s\n" "$${NAME}" > $@
+	printf "Version: %s\n" "$${VER}" >> $@
+	printf "Summary: %s\n" "$${SUM}" >> $@
 
 tree-sitter-cli: info/tree-sitter-cli.md
 info/tree-sitter-cli.md:
@@ -270,9 +269,9 @@ info/tree-sitter-cli.md:
 	# success|failure check
 	$(RUN) tree-sitter --version
 	# Write to file
-	printf "Name: %s\n" "$${NAME}" | tee $@
-	printf "Version: %s\n" "$${VER}" | tee -a $@
-	printf "Summary: %s\n" "$${SUM}" | tee -a $@
+	printf "Name: %s\n" "$${NAME}" > $@
+	printf "Version: %s\n" "$${VER}" >> $@
+	printf "Summary: %s\n" "$${SUM}" >> $@
 
 vscode-langservers-extracted: info/vscode-langservers-extracted.md
 info/vscode-langservers-extracted.md:
@@ -289,9 +288,9 @@ info/vscode-langservers-extracted.md:
 	#  "vscode-json-language-server": "bin/vscode-json-language-server",
 	#  "vscode-markdown-language-server": "bin/vscode-markdown-language-server"
 	# Write to file
-	printf "Name: %s\n" "$${NAME}"   | tee $@
-	printf "Version: %s\n" "$${VER}" | tee -a $@
-	printf "Summary: %s\n" "$${SUM}" | tee -a $@
+	printf "Name: %s\n" "$${NAME}"   > $@
+	printf "Version: %s\n" "$${VER}" >> $@
+	printf "Summary: %s\n" "$${SUM}" >> $@
 
 
 yaml-language-server: info/yaml-language-server.md
