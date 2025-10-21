@@ -191,12 +191,23 @@ info/lua-language-server.md: latest/lua-language-server.json
 	TARGET=files/lua-language-server/usr/local/lua-language-server
 	mkdir -p $${TARGET}
 	$(WGET) $${SRC} -O- | $(TAR_NO_STRIP) $${TARGET}
+	$(ADD) files/lua-language-server &> /dev/null
 	# note the lua-language-server binary is in bin/ subdir
 	# the exec script in /usr/local/bin/lua-language-server will point to it 
 	# these scripts are added in init target
 	# success|failure check
 	$(RUN) which lua-language-server
 	$(RUN) lua-language-server --version
+	# extract 'name', 'version', 'summary' into to a table row
+	# get version from the binary
+	NAME=lua-language-server
+	# get version from the binary
+	VER=$$($(RUN) lua-language-server --version)
+	SUM='Lua language server'
+	printf "Name: %s\n" "$${NAME}" > $@
+	printf "Version: %s\n" "$${VER}" >> $@
+	printf "Summary: %s\n" "$${SUM}" >> $@
+	echo '✅ lua-language-server installed'
 
 
 mason_registry:
