@@ -60,7 +60,7 @@ HEADING3 := $(HEADING2)$(HEADING1)
 
 # BASH_LIST := nodejs-bash-language-server ShellCheck shfmt
 RELEASE_BINARY_LIST :=  neovim lua-language-server # harper-ls
-DNF_LIST := neovim google-cloud-cli  ShellCheck shfmt
+DNF_LIST :=  google-cloud-cli  ShellCheck shfmt
 UV_TOOL_LIST :=  tombi specify-cli mbake
 # @mistweaverco/kulala-ls
 NPM_LIST := bash-language-server \
@@ -72,7 +72,7 @@ NPM_LIST := bash-language-server \
 
 
 ROCKS_LIST := busted nlua
-PKGS_LIST := $(UV_TOOL_LIST) # $(NPM_LIST) $(ROCKS_LIST) $(DNF_LIST)
+PKGS_LIST := $(RELEASE_BINARY_LIST) $(NPM_LIST) $(UV_TOOL_LIST) #  $(ROCKS_LIST) $(DNF_LIST)
 
 default: info/README.md
 
@@ -119,33 +119,6 @@ dnf_table:
 	SUM=$$(cat info/$${pkg}.md | grep -oP '^Summary\s+:\s+\K.+')
 	$(call tr,$${NAME},$${VER},$${SUM},$@)
 	done
-	# Write to file - extract 'name', 'version', 'summary' into a table row
-	# If app is available via dnf repo, then extract table row from info/*.md file
-	# If app is not installed via dnf, then use info/*.md for name and summary but extract version from installed
-	# binary `--version` output
-	# Otherwise ... use hacks
-	# neovim
-	# SUM=$$(cat info/neovim.md | grep -oP '^Name\s+:\s+\K.+')
-	# VER=$$($(RUN) nvim -v | grep -oP 'NVIM \K.+' | cut -d'-' -f1 )
-	# SUM=$$(cat info/neovim.md | grep -oP '^Summary\s+:\s+\K.+')
-	# $(call tr,$${NAME},$${VER},$${SUM},$@)
-
-xxdefault: init nvim mason google-cloud-cli uv_tool luarocks npm
-	buildah commit $(WORKING_CONTAINER) $(TBX_IMAGE)
-	buildah push $(TBX_IMAGE):latest
-	echo '✅ ghcr.io/grantmacken/tbx-coding:latest built and pushed'
-	# neovim
-	cat info/neovim.md  | tee -a README.md || true
-	# uv_tool
-	cat info/uv_tool.md  | tee -a README.md || true
-	# mason lsp servers, linters and formaters
-	# npm packages
-	cat info/npm.md  | tee -a README.md  || true
-	# mason lsp servers, linters and formaters
-	cat info/luarocks.md  | tee -a README.md  || true
-	cat info/uv_tool.md   | tee -a README.md  || true
-	# google-cloud-cli
-	cat info/google-cloud-cli.md | tee -a README.md	 || true
 
 init:
 	echo '##[ $@ ]##'
@@ -265,6 +238,11 @@ info/mbake.md:
 	LINE=$$($(RUN) uv tool list | grep mbake)
 	NAME=$$(echo $$LINE | cut -d' ' -f1)
 	VER=$$(echo $$LINE  | cut -d' ' -f2)
+	SUM='Makefile formatter and linter'
+	printf "Name: %s\n" "$${NAME}" > $@
+	printf "Version: %s\n" "$${VER}" >> $@
+	printf "Summary: %s\n" "$${SUM}" >> $@
+	echo '✅ mbake installed'
 
 uv_tool: ## uv tool is a cli to install and manage universal-variant tools
 	mkdir -p info
