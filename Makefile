@@ -44,7 +44,7 @@ NPM      := $(RUN) npm install --global
 LUAROCKS := $(RUN) luarocks install --global
 # NPM_LIST := $(RUN) npm list -g --depth=0 --json
 
-tr = printf "| %-14s | %-8s | %-83s |\n" "$(1)" "$(2)" "$(3)" | tee -a $(4)
+tr = printf "| %-18s | %-8s | %-85s |\n" "$(1)" "$(2)" "$(3)" | tee -a $(4)
 bdu = jq -r ".assets[] | select(.browser_download_url | contains(\"$1\")) | .browser_download_url" $2
 
 lsp_confs := $(wildcard site/lsp/*.lua)
@@ -70,7 +70,7 @@ NPM_LIST := bash-language-server \
 			yaml-language-server
 
 ROCKS_LIST := busted nlua
-PKGS_LIST := $(DNF_LIST) # $(UV_TOOL_LIST)  $(RELEASE_BINARY_LIST) # $(ROCKS_LIST) $(NPM_LIST)
+PKGS_LIST := $(DNF_LIST) $(UV_TOOL_LIST) $(RELEASE_BINARY_LIST) # $(ROCKS_LIST) $(NPM_LIST)
 
 ## Helper to write info files in a consistent format
 define to_info
@@ -88,7 +88,7 @@ rem:
 	buildah push ghcr.io/grantmacken/tbx-coding:latest
 	echo '✅ ghcr.io/grantmacken/tbx-coding:latest built and pushed'
 
-info/README.md: init $(PKGS_LIST)   # $(RELEASE_BINARY_LIST) # $(NPM_LIST) #$(ROCKS_LIST) #  DNF_LIST$
+info/README.md: init $(PKGS_LIST) $(RELEASE_BINARY_LIST) # $(NPM_LIST) #$(ROCKS_LIST) #  DNF_LIST$
 	echo '##[ $@ ]##'
 	mkdir -p $(dir $@)
 	# create or overwrite README.md
@@ -96,8 +96,8 @@ info/README.md: init $(PKGS_LIST)   # $(RELEASE_BINARY_LIST) # $(NPM_LIST) #$(RO
 	printf "# %s\n\n" "tbx-coding: a toolbox for coding" | tee $@
 	printf "A toolbox container image with cli tools, neovim, lsp servers, linters and formaters.\n\n" | tee -a $@
 	printf "## %s\n\n" "Installed applications" | tee -a $@
-	$(call tr,"Name","Version","Summary", $@)
-	$(call tr,"----","-------","----------------------------", $@)
+	$(call tr,"    Name    "," Version ","  Summary                     ", $@)
+	$(call tr,"----------- ","---------","------------------------------", $@)
 	for pkg in $(PKGS_LIST)
 	do
 	NAME=$$(cat info/$${pkg}.md | grep -oP '^Name:\s\K.+' || true)
@@ -143,9 +143,8 @@ init:
 	mkdir -p info
 	$(RUN) dnf update -y &>/dev/null
 
-release binaries: neovim lua-language-server
-
-
+# release binaries:
+# neovim lua-language-server harper-ls
 
 neovim: info/neovim.md
 info/neovim.md:
@@ -160,13 +159,9 @@ info/neovim.md:
 	$(RUN) nvim --version &> /dev/null
 	$(RUN) whereis nvim &> /dev/null
 	$(RUN) which nvim &> /dev/null
-	# extract 'name', 'version', 'summary'
-	NAME=neovim
 	# get version from the binary
 	VER=$$($(RUN) nvim -v | grep -oP 'NVIM v\K\d+\.\d+\.\d+' )
-	SUM='Neovim text editor'
-	$(call to_info,$${NAME},$${VER},$${SUM})
-
+	$(call to_info,$${PKG},$${VER},Neovim text editor)
 
 lua-language-server: info/lua-language-server.md
 latest/lua-language-server.json:
@@ -183,16 +178,18 @@ info/lua-language-server.md: latest/lua-language-server.json
 	# note the lua-language-server binary is in bin/ subdir
 	# the exec script in /usr/local/bin/lua-language-server will point to it 
 	# these scripts are added in init target
-	# success|failure check
+	# success|failure caheck
 	$(RUN) which $${PKG}  &> /dev/null
 	$(RUN) $${PKG} --version &> /dev/null
 	# extract 'name', 'version', 'summary'
 	# get version from the binary
 	VER=$$($(RUN) lua-language-server --version)
-	SUM='Lua language server'
-	$(call to_info,$${PKG},$${VER},$${SUM})
+	$(call to_info,$${PKG},$${VER},'Lua language server')
 
-#uv tools:  tombi mbake specify-cli
+#uv tools: 
+# tombi 
+# mbake 
+# specify-cli
 
 define uv_tool
 # extract 'name', 'version', 'summary'
