@@ -429,7 +429,7 @@ info/busted.md:
 	$(LUAROCKS) $${NAME} &> /dev/null
 	# verify installation
 	$(RUN) which $${NAME} || true
-	$(RUN) busted --version || true
+	$(RUN) $${NAME} --version || true
 	# extract 'name', 'version', 'summary'
 	$(RUN) luarocks show --porcelain $${NAME} | grep -oP '^busted.+' || true
 	# LINE=$$($(RUN) luarocks show --porcelain $${NAME} | grep -oP '^busted.+')
