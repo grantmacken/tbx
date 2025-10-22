@@ -71,7 +71,7 @@ NPM_LIST := bash-language-server \
 			yaml-language-server
 
 ROCKS_LIST := busted nlua
-PKGS_LIST := $(RELEASE_BINARY_LIST) $(ROCKS_LIST) $(NPM_LIST) $(UV_TOOL_LIST)  $(DNF_LIST)
+PKGS_LIST := $(UV_TOOL_LIST) # $(RELEASE_BINARY_LIST) $(ROCKS_LIST) $(NPM_LIST)   $(DNF_LIST)
 
 default: info/README.md
 
@@ -137,6 +137,9 @@ init:
 	$(RUN) dnf update -y &>/dev/null
 
 # release binaries: neovim lua-language-server
+# define release_binary
+#  TODO
+# endef
 
 neovim: info/neovim.md
 info/neovim.md:
@@ -144,7 +147,7 @@ info/neovim.md:
 	mkdir -p $(dir $@)
 	TARGET=files/neovim/usr/local
 	mkdir -p $${TARGET}
-	SRC='https://github.com/neovim/neovim/releases/download/nightly/nvim-linux-x86_64.tar.gz' 
+	SRC='https://github.com/neovim/neovim/releases/download/nightly/nvim-linux-x86_64.tar.gz'
 	$(WGET) $${SRC} -O- | $(TAR) $${TARGET}
 	$(ADD) files/neovim &> /dev/null
 	$(RUN) ls /usr/local/bin &> /dev/null
@@ -194,6 +197,19 @@ info/lua-language-server.md: latest/lua-language-server.json
 
 ## uv tools:  tombi mbake specify-cli
 
+define uv_tool
+# extract 'name', 'version', 'summary'
+	LINE=$$($(RUN) uv tool list | grep $(1) )
+	# extract 'name', 'version', 'summary'
+	NAME=$$(echo $$LINE | cut -d' ' -f1)
+	VER=$$(echo $$LINE  | cut -d' ' -f2)
+	SUM='$(2)'
+	printf "Name: %s\n" "$${NAME}" > $@
+	printf "Version: %s\n" "$${VER}" >> $@
+	printf "Summary: %s\n" "$${SUM}" >> $@
+	echo '✅ specify-cli installed'
+endef
+
 tombi: info/tombi.md
 info/tombi.md:
 	echo '##[ $(basename $(notdir $@)) ]##'
@@ -213,20 +229,12 @@ info/tombi.md:
 specify-cli: info/specify-cli.md
 info/specify-cli.md:
 	echo '##[ $(basename $(notdir $@)) ]##'
-	$(RUN) uv tool install specify-cli --from git+https://github.com/github/spec-kit.git &> /dev/null
+	PKG=$(basename $(notdir $@)) 
+	$(RUN) uv tool install $${PKG} --from git+https://github.com/github/spec-kit.git &> /dev/null
 	# success|failure check
 	$(RUN) which specify &> /dev/null
 	$(RUN) whereis specify &> /dev/null
-	# extract 'name', 'version', 'summary'
-	LINE=$$($(RUN) uv tool list | grep specify-cli)
-	# extract 'name', 'version', 'summary'
-	NAME=$$(echo $$LINE | cut -d' ' -f1)
-	VER=$$(echo $$LINE  | cut -d' ' -f2)
-	SUM='A tool to help you specify your software projects'
-	printf "Name: %s\n" "$${NAME}" > $@
-	printf "Version: %s\n" "$${VER}" >> $@
-	printf "Summary: %s\n" "$${SUM}" >> $@
-	echo '✅ specify-cli installed'
+	$(call uv_tool,$${PKG},GitHub Spec Tool)
 
 mbake: info/mbake.md
 info/mbake.md:
@@ -299,6 +307,7 @@ info/bash-language-server.md:
 	printf "Name: %s\n" "$${NAME}" > $@
 	printf "Version: %s\n" "$${VER}" >> $@
 	printf "Summary: %s\n" "$${SUM}" >> $@
+	echo '✅ $(basename $(notdir $@)) installed'
 
 copilot: info/copilot.md
 info/copilot.md:
@@ -451,8 +460,6 @@ info/nlua.md:
 	LINES=$$($(RUN) luarocks show  --porcelain $${NAME} | head -n 3)
 	echo "$${LINES}"
 	# extract 'name', 'version', 'summary'
-	# $(RUN) luarocks show --porcelain  $${NAME} || true
-	LINES=$$($(RUN) luarocks show --porcelain  $${NAME})
 	NAME=$$(echo $${LINES} | grep -oP '^package\s+\K.+' || true)
 	VER=$$(echo $${LINES} | grep -oP '^version\s+\K.+' || true)
 	SUM=$$(echo $${LINES} | grep -oP '^summary\s+\K.+' || true)
