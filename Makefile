@@ -71,7 +71,7 @@ NPM_LIST := bash-language-server \
 			yaml-language-server
 
 ROCKS_LIST := busted nlua
-PKGS_LIST := $(UV_TOOL_LIST) # $(RELEASE_BINARY_LIST) $(ROCKS_LIST) $(NPM_LIST)   $(DNF_LIST)
+PKGS_LIST := $(UV_TOOL_LIST)  $(RELEASE_BINARY_LIST) # $(ROCKS_LIST) $(NPM_LIST)   $(DNF_LIST)
 
 default: info/README.md
 
@@ -136,21 +136,24 @@ init:
 	mkdir -p info
 	$(RUN) dnf update -y &>/dev/null
 
-# release binaries: neovim lua-language-server
-# define release_binary
-#  TODO
-# endef
+release binaries: neovim lua-language-server
+
+define to_info
+    printf "Name: %s\n"    "$(1)" > $@
+	printf "Version: %s\n" "$(2)" >> $@
+	printf "Summary: %s\n" "$(3)" >> $@
+	echo '✅ $(1) installed'
+endef
 
 neovim: info/neovim.md
 info/neovim.md:
-	echo '##[ $@ ]##'
-	mkdir -p $(dir $@)
-	TARGET=files/neovim/usr/local
+	echo '##[ $(basename $(notdir $@)) ]##'
+	PKG=$(basename $(notdir $@)) 
+	TARGET=files/$${PKG}/usr/local
 	mkdir -p $${TARGET}
 	SRC='https://github.com/neovim/neovim/releases/download/nightly/nvim-linux-x86_64.tar.gz'
 	$(WGET) $${SRC} -O- | $(TAR) $${TARGET}
-	$(ADD) files/neovim &> /dev/null
-	$(RUN) ls /usr/local/bin &> /dev/null
+	$(ADD) files/$${PKG} &> /dev/null
 	# success|failure check
 	$(RUN) nvim --version &> /dev/null
 	$(RUN) whereis nvim &> /dev/null
@@ -160,10 +163,8 @@ info/neovim.md:
 	# get version from the binary
 	VER=$$($(RUN) nvim -v | grep -oP 'NVIM v\K\d+\.\d+\.\d+' )
 	SUM='Neovim text editor'
-	printf "Name: %s\n"    "$${NAME}" > $@
-	printf "Version: %s\n" "$${VER}" >> $@
-	printf "Summary: %s\n" "$${SUM}" >> $@
-	echo '✅ neovim installed'
+	$(call to_info,$${NAME},$${VER},$${SUM})
+
 
 lua-language-server: info/lua-language-server.md
 latest/lua-language-server.json:
@@ -190,12 +191,9 @@ info/lua-language-server.md: latest/lua-language-server.json
 	# get version from the binary
 	VER=$$($(RUN) lua-language-server --version)
 	SUM='Lua language server'
-	printf "Name: %s\n" "$${NAME}" > $@
-	printf "Version: %s\n" "$${VER}" >> $@
-	printf "Summary: %s\n" "$${SUM}" >> $@
-	echo '✅ lua-language-server installed'
+	$(call to_info,$${NAME},$${VER},$${SUM})
 
-## uv tools:  tombi mbake specify-cli
+	## uv tools:  tombi mbake specify-cli
 
 define uv_tool
 # extract 'name', 'version', 'summary'
@@ -213,7 +211,8 @@ endef
 tombi: info/tombi.md
 info/tombi.md:
 	echo '##[ $(basename $(notdir $@)) ]##'
-	$(RUN) uv tool install tombi
+	PKG=$(basename $(notdir $@)) 
+	$(RUN) uv tool install $${PKG} &> /dev/null
 	# success|failure check
 	$(RUN) which tombi &> /dev/null
 	$(RUN) tombi --version &> /dev/null
@@ -221,10 +220,7 @@ info/tombi.md:
 	NAME=tombi
 	VER=$$($(RUN) tombi --version | cut -d' ' -f2)
 	SUM='TOML Toolkit'
-	printf "Name: %s\n" "$${NAME}" > $@
-	printf "Version: %s\n" "$${VER}" >> $@
-	printf "Summary: %s\n" "$${SUM}" >> $@
-	echo '✅ tombi installed'
+	$(call to_info,$${NAME},$${VER},$${SUM})
 
 specify-cli: info/specify-cli.md
 info/specify-cli.md:
@@ -239,19 +235,14 @@ info/specify-cli.md:
 mbake: info/mbake.md
 info/mbake.md:
 	echo '##[ $(basename $(notdir $@)) ]##'
-	$(RUN) uv tool install mbake &> /dev/null
+	PKG=$(basename $(notdir $@)) 
+	$(RUN) uv tool install $${PKG} &> /dev/null
 	# success|failure check
 	$(RUN) which mbake || true
 	$(RUN) mbake --version || true
 	# extract 'name', 'version', 'summary'
-	LINE=$$($(RUN) uv tool list | grep mbake)
-	NAME=$$(echo $$LINE | cut -d' ' -f1)
-	VER=$$(echo $$LINE  | cut -d' ' -f2)
-	SUM='Makefile formatter and linter'
-	printf "Name: %s\n" "$${NAME}" > $@
-	printf "Version: %s\n" "$${VER}" >> $@
-	printf "Summary: %s\n" "$${SUM}" >> $@
-	echo '✅ mbake installed'
+	$(call uv_tool,$${PKG},Makefile formatter and linter)
+
 
 # mason_registry:
 # 	echo '##[ $@ ]##'
