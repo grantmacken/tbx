@@ -70,14 +70,14 @@ NPM_LIST := bash-language-server \
 			yaml-language-server
 
 ROCKS_LIST := busted nlua
-PKGS_LIST := $(DNF_LIST) $(UV_TOOL_LIST) $(RELEASE_BINARY_LIST) # $(ROCKS_LIST) $(NPM_LIST)
+PKGS_LIST := $(DNF_LIST) # $(UV_TOOL_LIST) $(RELEASE_BINARY_LIST) $(ROCKS_LIST) #  $(NPM_LIST)
 
 ## Helper to write info files in a consistent format
 define to_info
     printf "Name: %s\n"    "$(1)" > $@
 	printf "Version: %s\n" "$(2)" >> $@
 	printf "Summary: %s\n" "$(3)" >> $@
-	echo '✅ $(1) installed'
+	echo "✅ $(1) installed"
 endef
 
 default: info/README.md
@@ -429,16 +429,6 @@ info/shfmt.md:
 # luarocks packages: 
 # busted 
 # nlua
-#
-define rock_installed_info
-	LINES=$$($(RUN) luarocks show  --porcelain $(1) | head -n 3)
-	echo "$${LINES}"
-	# extract 'name', 'version', 'summary'
-	NAME=$$(echo $${LINES} | grep -oP '^package\s+\K.+' || true)
-	VER=$$(echo $${LINES} | grep -oP '^version\s+\K.+' || true)
-	SUM=$$(echo $${LINES} | grep -oP '^summary\s+\K.+' || true)
-	$(call to_info,$${NAME},$${VER},$${SUM})
-endef
 
 busted: info/busted.md
 info/busted.md:
@@ -454,9 +444,7 @@ info/busted.md:
 	NAME=$$(echo $${LINE} | cut -d' ' -f1 || true)
 	VER=$$(echo $${LINE} | cut -d' ' -f2 || true)
 	SUM=$$(echo $${LINE} | cut -d'-' -f2 || true)
-	printf "Name: %s\n" "$${NAME}" | tee $@
-	printf "Version: %s\n" "$${VER}" >> $@
-	printf "Summary: %s\n" "$${SUM}" >> $@
+	$call to_info,$${NAME},$${VER},$${SUM}
 
 nlua: info/nlua.md
 info/nlua.md:
@@ -472,10 +460,7 @@ info/nlua.md:
 	NAME=$$(echo $${LINES} | grep -oP '^package\s+\K.+' || true)
 	VER=$$(echo $${LINES} | grep -oP '^version\s+\K.+' || true)
 	SUM=$$(echo $${LINES} | grep -oP '^summary\s+\K.+' || true)
-	printf "Name: %s\n" "$${NAME}" > $@
-	printf "Version: %s\n" "$${VER}" >> $@
-	printf "Summary: %s\n" "$${SUM}" >> $@
-
+	$(call to_info,$${NAME},$${VER},$${SUM})
 
 pull:
 	echo '##[ $@ ]##'
