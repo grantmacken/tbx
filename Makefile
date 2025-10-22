@@ -59,7 +59,7 @@ HEADING3 := $(HEADING2)$(HEADING1)
 
 # BASH_LIST := nodejs-bash-language-server ShellCheck shfmt
 RELEASE_BINARY_LIST :=  neovim lua-language-server # harper-ls
-DNF_LIST :=  google-cloud-cli  ShellCheck shfmt
+DNF_LIST :=  google-cloud-cli  # ShellCheck shfmt
 UV_TOOL_LIST :=  tombi specify-cli mbake
 # @mistweaverco/kulala-ls
 NPM_LIST := bash-language-server \
