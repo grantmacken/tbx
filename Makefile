@@ -447,7 +447,10 @@ info/nlua.md:
 	mkdir -p $(dir $@)
 	$(LUAROCKS) $${NAME} &> /dev/null
 	# verify installation
-	$(RUN) which $${NAME} ||
+	$(RUN) which $${NAME} || true
+	LINES=$$($(RUN) luarocks show  --porcelain $${NAME} | head -n 3)
+	echo "$${LINES}"
+	# extract 'name', 'version', 'summary'
 	# $(RUN) luarocks show --porcelain  $${NAME} || true
 	LINES=$$($(RUN) luarocks show --porcelain  $${NAME})
 	NAME=$$(echo $${LINES} | grep -oP '^package\s+\K.+' || true)
