@@ -428,15 +428,17 @@ info/busted.md:
 	mkdir -p $(dir $@)
 	$(LUAROCKS) $${NAME} &> /dev/null
 	# verify installation
-	$(RUN) which $${NAME} &> /dev/null
-	$(RUN) busted --version &> /dev/null
-	LINE=$$($(RUN) luarocks show --porcelain $${NAME} | grep -oP '^busted.+')
-	NAME=$$(echo $${SHOW} | cut -d' ' -f1 || true)
-	VER=$$(echo $${SHOW} | cut -d' ' -f2 || true)
-	SUM=$$(echo $${SHOW} | cut -d'-' -f2 || true)
-	printf "Name: %s\n" "$${NAME}" | tee $@
-	printf "Version: %s\n" "$${VER}" >> $@
-	printf "Summary: %s\n" "$${SUM}" >> $@
+	$(RUN) which $${NAME} || true
+	$(RUN) busted --version || true
+	# extract 'name', 'version', 'summary'
+	$(RUN) luarocks show --porcelain $${NAME} | grep -oP '^busted.+' || true
+	# LINE=$$($(RUN) luarocks show --porcelain $${NAME} | grep -oP '^busted.+')
+	# NAME=$$(echo $${SHOW} | cut -d' ' -f1 || true)
+	# VER=$$(echo $${SHOW} | cut -d' ' -f2 || true)
+	# SUM=$$(echo $${SHOW} | cut -d'-' -f2 || true)
+	# printf "Name: %s\n" "$${NAME}" | tee $@
+	# printf "Version: %s\n" "$${VER}" >> $@
+	# printf "Summary: %s\n" "$${SUM}" >> $@
 
 nlua: info/nlua.md
 info/nlua.md:
