@@ -26,7 +26,6 @@ WORKING_CONTAINER := tbx-runtimes-working-container
 # actions
 RUN     := buildah run $(WORKING_CONTAINER)
 INSTALL := $(RUN) dnf install --allowerasing --skip-unavailable --skip-broken --no-allow-downgrade -y
-INFO    := $(RUN) dnf info
 SH      := $(RUN) sh -c
 # LINK    := $(RUN) ln -s $(shell which host-spawn)
 ADD    := buildah add --chmod 755 $(WORKING_CONTAINER)
@@ -71,7 +70,7 @@ NPM_LIST := bash-language-server \
 			yaml-language-server
 
 ROCKS_LIST := busted nlua
-PKGS_LIST := $(UV_TOOL_LIST)  $(RELEASE_BINARY_LIST) # $(ROCKS_LIST) $(NPM_LIST)   $(DNF_LIST)
+PKGS_LIST := $(DNF_LIST) # $(UV_TOOL_LIST)  $(RELEASE_BINARY_LIST) # $(ROCKS_LIST) $(NPM_LIST)   
 
 default: info/README.md
 
@@ -380,18 +379,29 @@ info/yaml-language-server.md:
 # google-cloud-cli
 # ShellCheck
 # shfmt
+#
+define dnf_installed_info
+  	LINES=$$($(RUN) dnf info --installed $(1))
+	# extract 'name', 'version', 'summary'
+	NAME=$$(echo "$${LINES}" | grep -oP '^Name\s+:\s+\K.+' || true)
+	VER=$$(echo "$${LINES}" | grep -oP '^Version\s+:\s+\K.+' || true)
+	SUM=$$(echo "$${LINES}" | grep -oP '^Summary\s+:\s+\K.+' || true)
+	# consistent write to file format
+	$(call to_info,$${NAME},$${VER},$${SUM})
+endef
 
 google-cloud-cli: info/google-cloud-cli.md
 info/google-cloud-cli.md:
 	echo '##[ $(basename $(notdir $@)) ]##'
-	mkdir -p $(dir $@)
+	PKG=$(basename $(notdir $@))
 	# add the repo
-	$(RUN) mkdir -p /etc/yum.repos.d/
+	$(RUN) mkdir -p /etc/yum.repos.d
 	$(ADD) files/google-cloud-sdk.repo /etc/yum.repos.d/google-cloud-sdk.repo &> /dev/null
-	$(INSTALL) libxcrypt-compat google-cloud-sdk &> /dev/null
+	$(INSTALL) libxcrypt-compat $${PKG} &> /dev/null
 	# verify installation
+	# TODO: other checks?
 	$(RUN) which gcloud &> /dev/null
-	$(INFO) --installed google-cloud-cli > $@
+	$(call dnf_installed_info,$${PKG})
 
 ShellCheck: info/ShellCheck.md
 info/ShellCheck.md:
