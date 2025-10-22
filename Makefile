@@ -71,7 +71,7 @@ NPM_LIST := bash-language-server \
 			yaml-language-server
 
 ROCKS_LIST := busted nlua
-PKGS_LIST := $(RELEASE_BINARY_LIST) $(ROCKS_LIST) # $(NPM_LIST) $(UV_TOOL_LIST) #  $(ROCKS_LIST) $(DNF_LIST)
+PKGS_LIST := $(RELEASE_BINARY_LIST) $(ROCKS_LIST) $(NPM_LIST) $(UV_TOOL_LIST) #  $(ROCKS_LIST) $(DNF_LIST)
 
 default: info/README.md
 
@@ -419,7 +419,6 @@ info/shfmt.md:
 	$(RUN) $${NAME} --version &> /dev/null
 	$(INFO) --installed $${NAME} > $@
 
-
 # luarocks packages: busted nlua
 
 busted: info/busted.md
@@ -432,10 +431,10 @@ info/busted.md:
 	$(RUN) which $${NAME} &> /dev/null
 	$(RUN) whereis busted
 	SHOW=$$($(RUN) luarocks show --porcelain $${NAME})
-	NAME=$$(echo $${SHOW} | grep -oP '^package\s+\K.+') > $@
-	VER=$$(echo $${SHOW} | grep -oP '^version\s+\K.+') >> $@
-	SUM=$$(echo $${SHOW} | grep -oP '^summary\s+\K.+') >> $@
-	printf "Name: %s\n" "$${NAME}" > $@
+	NAME=$$(echo $${SHOW} | grep -oP '^package\s+\K.+')
+	VER=$$(echo $${SHOW} | grep -oP '^version\s+\K.+')
+	SUM=$$(echo $${SHOW} | grep -oP '^summary\s+\K.+')
+	printf "Name: %s\n" "$${NAME}" | tee $@
 	printf "Version: %s\n" "$${VER}" >> $@
 	printf "Summary: %s\n" "$${SUM}" >> $@
 
@@ -447,10 +446,10 @@ info/nlua.md:
 	$(LUAROCKS) $${NAME} &> /dev/null
 	# verify installation
 	$(RUN) which $${NAME} &> /dev/null
-	$(RUN) luarocks show --porcelain $${NAME} > $@
-	NAME=$$(echo $${SHOW} | grep -oP '^package\s+\K.+') > $@
-	VER=$$(echo $${SHOW} | grep -oP '^version\s+\K.+') >> $@
-	SUM=$$(echo $${SHOW} | grep -oP '^summary\s+\K.+') >> $@
+	SHOW=$$($(RUN) luarocks show --porcellain $${NAME})
+	NAME=$$(echo $${SHOW} | grep -oP '^package\s+\K.+')
+	VER=$$(echo $${SHOW} | grep -oP '^version\s+\K.+')
+	SUM=$$(echo $${SHOW} | grep -oP '^summary\s+\K.+')
 	printf "Name: %s\n" "$${NAME}" > $@
 	printf "Version: %s\n" "$${VER}" >> $@
 	printf "Summary: %s\n" "$${SUM}" >> $@
