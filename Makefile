@@ -78,7 +78,6 @@ define to_info
 	printf "Version: %s\n" "$(2)" >> $@
 	printf "Summary: %s\n" "$(3)" >> $@
 	printf "Summary: %s\n" "$(3)" >> $@
-	printf "✅ %s\n" "$(1)"
 endef
 
 default: info/README.md
@@ -97,8 +96,8 @@ info/README.md: init $(PKGS_LIST)
 	printf "# %s\n\n" "tbx-coding: a toolbox for coding" | tee $@
 	printf "A toolbox container image with cli tools, neovim, lsp servers, linters and formaters.\n\n" | tee -a $@
 	printf "## %s\n\n" "Installed applications" | tee -a $@
-	$(call tr,"    Name    "," Version ","  Summary                     ", $@)
-	$(call tr,"----------- ","---------","------------------------------", $@)
+	$(call tr,"Name","Version","Summary", $@)
+	$(call tr,"----","-------","-------", $@)
 	for pkg in $(PKGS_LIST)
 	do
 	NAME=$$(cat info/$${pkg}.md | grep -oP '^Name:\s\K.+' || true)
@@ -174,7 +173,7 @@ info/lua-language-server.md: latest/lua-language-server.json
 # mbake 
 # specify-cli
 
-define uv_tool
+define uv_tool_info
 # extract 'name', 'version', 'summary'
 	LINE=$$($(RUN) uv tool list | grep $(1) )
 	# extract 'name', 'version', 'summary'
@@ -197,7 +196,7 @@ info/tombi.md:
 	$(RUN) tombi --version &> /dev/null
 	# extract 'name', 'version', 'summary'
 	# VER=$$($(RUN) tombi --version | cut -d' ' -f2)
-	$(call uv_tool,$${PKG},TOML Toolkit)
+	$(call uv_tool_info,$${PKG},TOML Toolkit)
 	# $(call to_info,$${PKG},$${VER},'TOML Toolkit')
 
 specify-cli: info/specify-cli.md
@@ -208,7 +207,7 @@ info/specify-cli.md:
 	# success|failure check
 	$(RUN) which specify &> /dev/null
 	$(RUN) whereis specify &> /dev/null
-	$(call uv_tool,$${PKG},GitHub Spec Tool)
+	$(call uv_tool_info,$${PKG},GitHub Spec Tool)
 
 mbake: info/mbake.md
 info/mbake.md:
@@ -219,7 +218,7 @@ info/mbake.md:
 	$(RUN) which mbake || true
 	$(RUN) mbake --version || true
 	# extract 'name', 'version', 'summary'
-	$(call uv_tool,$${PKG},Makefile formatter and linter)
+	$(call uv_tool_info,$${PKG},Makefile formatter and linter)
 
 # npm packages:
 # bash-language-server
