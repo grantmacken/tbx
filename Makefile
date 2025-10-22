@@ -447,12 +447,12 @@ info/nlua.md:
 	mkdir -p $(dir $@)
 	$(LUAROCKS) $${NAME} &> /dev/null
 	# verify installation
-	$(RUN) which $${NAME} &> /dev/null
-	$(RUN) luarocks show --porcelain  $${NAME} || true
-	SHOW=$$($(RUN) luarocks show --porcelain  $${NAME})
-	NAME=$$(echo $${SHOW} | grep -oP '^package\s+\K.+')
-	VER=$$(echo $${SHOW} | grep -oP '^version\s+\K.+')
-	SUM=$$(echo $${SHOW} | grep -oP '^summary\s+\K.+')
+	$(RUN) which $${NAME} ||
+	# $(RUN) luarocks show --porcelain  $${NAME} || true
+	LINES=$$($(RUN) luarocks show --porcelain  $${NAME})
+	NAME=$$(echo $${LINES} | grep -oP '^package\s+\K.+' || true)
+	VER=$$(echo $${LINES} | grep -oP '^version\s+\K.+' || true)
+	SUM=$$(echo $${LINES} | grep -oP '^summary\s+\K.+' || true)
 	printf "Name: %s\n" "$${NAME}" > $@
 	printf "Version: %s\n" "$${VER}" >> $@
 	printf "Summary: %s\n" "$${SUM}" >> $@
