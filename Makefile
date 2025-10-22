@@ -59,7 +59,7 @@ HEADING3 := $(HEADING2)$(HEADING1)
 
 # BASH_LIST := nodejs-bash-language-server ShellCheck shfmt
 RELEASE_BINARY_LIST :=  neovim lua-language-server # harper-ls
-DNF_LIST :=  google-cloud-cli  # ShellCheck shfmt
+DNF_LIST :=  google-cloud-cli ShellCheck shfmt
 UV_TOOL_LIST :=  tombi specify-cli mbake
 # @mistweaverco/kulala-ls
 NPM_LIST := bash-language-server \
@@ -70,7 +70,15 @@ NPM_LIST := bash-language-server \
 			yaml-language-server
 
 ROCKS_LIST := busted nlua
-PKGS_LIST := $(DNF_LIST) # $(UV_TOOL_LIST)  $(RELEASE_BINARY_LIST) # $(ROCKS_LIST) $(NPM_LIST)   
+PKGS_LIST := $(DNF_LIST) # $(UV_TOOL_LIST)  $(RELEASE_BINARY_LIST) # $(ROCKS_LIST) $(NPM_LIST)
+
+## Helper to write info files in a consistent format
+define to_info
+    printf "Name: %s\n"    "$(1)" > $@
+	printf "Version: %s\n" "$(2)" >> $@
+	printf "Summary: %s\n" "$(3)" >> $@
+	echo '✅ $(1) installed'
+endef
 
 default: info/README.md
 
@@ -137,12 +145,7 @@ init:
 
 release binaries: neovim lua-language-server
 
-define to_info
-    printf "Name: %s\n"    "$(1)" > $@
-	printf "Version: %s\n" "$(2)" >> $@
-	printf "Summary: %s\n" "$(3)" >> $@
-	echo '✅ $(1) installed'
-endef
+
 
 neovim: info/neovim.md
 info/neovim.md:
@@ -383,11 +386,10 @@ info/yaml-language-server.md:
 define dnf_installed_info
   	LINES=$$($(RUN) dnf info --installed $(1))
 	# extract 'name', 'version', 'summary'
-	NAME=$$(echo "$${LINES}" | grep -oP '^Name\s+:\s+\K.+' || true)
 	VER=$$(echo "$${LINES}" | grep -oP '^Version\s+:\s+\K.+' || true)
 	SUM=$$(echo "$${LINES}" | grep -oP '^Summary\s+:\s+\K.+' || true)
 	# consistent write to file format
-	$(call to_info,$${NAME},$${VER},$${SUM})
+	$(call to_info,$(1),$${VER},$${SUM})
 endef
 
 google-cloud-cli: info/google-cloud-cli.md
@@ -398,32 +400,34 @@ info/google-cloud-cli.md:
 	$(RUN) mkdir -p /etc/yum.repos.d
 	$(ADD) files/google-cloud-sdk.repo /etc/yum.repos.d/google-cloud-sdk.repo &> /dev/null
 	$(INSTALL) libxcrypt-compat $${PKG} &> /dev/null
-	# verify installation
-	# TODO: other checks?
+	# success|failure check
+	# Note the binary is named 'gcloud'
+	$(RUN) gcloud --version &> /dev/null
+	$(RUN) whereis gcloud &> /dev/null
 	$(RUN) which gcloud &> /dev/null
 	$(call dnf_installed_info,$${PKG})
 
 ShellCheck: info/ShellCheck.md
 info/ShellCheck.md:
 	echo '##[ $(basename $(notdir $@)) ]##'
-	NAME=$(basename $(notdir $@))
-	mkdir -p $(dir $@)
-	$(INSTALL) $${NAME} &> /dev/null
-	# verify installation
-	$(RUN) which $${NAME} &> /dev/null
-	$(RUN) $${NAME} --version &> /dev/null
-	$(INFO) --installed $${NAME} > $@
+	PKG=$(basename $(notdir $@))
+	$(INSTALL) $${PKG} &> /dev/null
+	# success|failure check
+	# Note the binary is named 'sheckcheck'
+	$(RUN) which shellcheck &> /dev/null
+	$(RUN) shellcheck --version &> /dev/null
+	$(call dnf_installed_info,$${PKG})
 
 shfmt: info/shfmt.md
 info/shfmt.md:
 	echo '##[ $(basename $(notdir $@)) ]##'
-	NAME=$(basename $(notdir $@))
-	mkdir -p $(dir $@)
-	$(INSTALL) $${NAME} &> /dev/null
+	PKG=$(basename $(notdir $@))
+	$(INSTALL) $${PKG} &> /dev/null
 	# verify installation
-	$(RUN) which $${NAME} &> /dev/null
-	$(RUN) $${NAME} --version &> /dev/null
-	$(INFO) --installed $${NAME} > $@
+	$(RUN) whereis $${PKG} &> /dev/null
+	$(RUN) which $${PKG} &> /dev/null
+	$(RUN) $${PKG} --version &> /dev/null
+	$(call dnf_installed_info,$${PKG})
 
 # luarocks packages: busted nlua
 
