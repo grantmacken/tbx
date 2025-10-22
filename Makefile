@@ -426,17 +426,28 @@ info/shfmt.md:
 	$(RUN) $${PKG} --version &> /dev/null
 	$(call dnf_installed_info,$${PKG})
 
-# luarocks packages: busted nlua
+# luarocks packages: 
+# busted 
+# nlua
+#
+define rock_installed_info
+	LINES=$$($(RUN) luarocks show  --porcelain $(1) | head -n 3)
+	echo "$${LINES}"
+	# extract 'name', 'version', 'summary'
+	NAME=$$(echo $${LINES} | grep -oP '^package\s+\K.+' || true)
+	VER=$$(echo $${LINES} | grep -oP '^version\s+\K.+' || true)
+	SUM=$$(echo $${LINES} | grep -oP '^summary\s+\K.+' || true)
+	$(call to_info,$${NAME},$${VER},$${SUM})
+endef
 
 busted: info/busted.md
 info/busted.md:
 	echo '##[ $(basename $(notdir $@)) ]##'
-	NAME=$(basename $(notdir $@))
-	mkdir -p $(dir $@)
-	$(LUAROCKS) $${NAME} &> /dev/null
+	PKG=$(basename $(notdir $@))
+	$(LUAROCKS) $${PKG} &> /dev/null
 	# verify installation
-	$(RUN) which $${NAME} || true
-	$(RUN) $${NAME} --version || true
+	$(RUN) which $${PKG} || true
+	$(RUN) $${PKG} --version || true
 	# extract 'name', 'version', 'summary'
 	$(RUN) luarocks show --porcelain $${NAME} | grep -oP '^busted.+' || true
 	LINE=$$($(RUN) luarocks show  $${NAME} | grep -oP '^busted.+')
