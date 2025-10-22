@@ -448,7 +448,7 @@ info/nlua.md:
 	$(RUN) which $${NAME} &> /dev/null
 	$(RUN) luarocks show --porcellain $${NAME}
 
-xxx
+xxx:
 	SHOW=$$($(RUN) luarocks show --porcellain $${NAME})
 	NAME=$$(echo $${SHOW} | grep -oP '^package\s+\K.+')
 	VER=$$(echo $${SHOW} | grep -oP '^version\s+\K.+')
