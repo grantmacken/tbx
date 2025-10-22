@@ -70,7 +70,7 @@ NPM_LIST := bash-language-server \
 			yaml-language-server
 
 ROCKS_LIST := busted nlua
-PKGS_LIST := $(DNF_LIST) $(RELEASE_BINARY_LIST) # $(UV_TOOL_LIST)  $(ROCKS_LIST) #  $(NPM_LIST)
+PKGS_LIST := $(DNF_LIST) $(RELEASE_BINARY_LIST)  $(UV_TOOL_LIST) # $(ROCKS_LIST) #  $(NPM_LIST)
 
 ## Helper to write info files in a consistent format
 define to_info
