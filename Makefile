@@ -63,20 +63,19 @@ DNF_LIST     :=  google-cloud-cli # ShellCheck shfmt
 UV_TOOL_LIST :=  tombi specify-cli mbake
 # @mistweaverco/kulala-ls
 NPM_LIST := bash-language-server \
-			copilot \
-			copilot-language-server \
-			tree-sitter-cli \
-			vscode-langservers-extracted \
-			yaml-language-server
+			# copilot \
+			# copilot-language-server \
+			# tree-sitter-cli \
+			# vscode-langservers-extracted \
+			# yaml-language-server
 
 ROCKS_LIST := busted nlua
-PKGS_LIST := $(DNF_LIST) $(RELEASE_BINARY_LIST)  $(UV_TOOL_LIST) # $(ROCKS_LIST) #  $(NPM_LIST)
+PKGS_LIST := $(NPM_LIST) # $(DNF_LIST) $(RELEASE_BINARY_LIST) $(UV_TOOL_LIST) # $(ROCKS_LIST) #  
 
 ## Helper to write info files in a consistent format
 define to_info
     printf "Name: %s\n"    "$(1)" > $@
 	printf "Version: %s\n" "$(2)" >> $@
-	printf "Summary: %s\n" "$(3)" >> $@
 	printf "Summary: %s\n" "$(3)" >> $@
 endef
 
@@ -180,10 +179,7 @@ define uv_tool_info
 	NAME=$$(echo $$LINE | cut -d' ' -f1)
 	VER=$$(echo $$LINE  | cut -d' ' -f2)
 	SUM='$(2)'
-	printf "Name: %s\n" "$${NAME}" > $@
-	printf "Version: %s\n" "$${VER}" >> $@
-	printf "Summary: %s\n" "$${SUM}" >> $@
-	echo '✅ specify-cli installed'
+	$(call to_info,$${NAME},$${VER},$${SUM})
 endef
 
 tombi: info/tombi.md
@@ -227,22 +223,36 @@ info/mbake.md:
 # tree-sitter-cli
 # vscode-langservers-extracted
 # yaml-language-server
+define npm_install
+	JSON=$$($(RUN) npm view --json $(1) | jq '.')
+	# From the veiw extract 'name', 'version', 'description'
+	NAME=$$(echo $$JSON | jq -r '.name')
+	VER=$$(echo $$JSON | jq -r '."dist-tags".latest')
+	SUM=$$(echo $$JSON | jq -r '.description')
+	# install the package globally and use
+	$(RUN) npm install --global $${NAME}@$${VER} &> /dev/null
+	# success|failure check
+	$(RUN) $${NAME} --version &>/dev/null
+	$(call to_info,$${NAME},$${VER},$${SUM})
+endef
+
+define npm_install_info
+	JSON=$$($(RUN) npm view --json $(1) | jq '.')
+	# From the veiw extract 'name', 'version', 'description'
+	$(call to_info,
+	$$(echo $${JSON} | jq -r '.name'),
+	$$(echo $${JSON} | jq -r '."dist-tags".latest'),
+	$$(echo $${JSON} | jq -r '.description'))
+endef
 
 bash-language-server: info/bash-language-server.md
 info/bash-language-server.md:
 	echo '##[ $(basename $(notdir $@)) ]##'
-	JSON=$$($(RUN) npm view --json bash-language-server | jq '.')
-	# extract 'name', 'version', 'description' into to a table row
-	NAME=$$(echo $$JSON | jq -r '.name')
-	VER=$$(echo $$JSON | jq -r '."dist-tags".latest')
-	SUM=$$(echo $$JSON | jq -r '.description')
-	$(NPM) $${NAME}@$${VER} &> /dev/null
+	PKG=$(basename $(notdir $@))
+	$(call npm_installed,$${PKG})
 	# success|failure check
-	$(RUN) $${NAME} --version &>/dev/null
-	# Write to file
-	printf "Name: %s\n" "$${NAME}" > $@
-	printf "Version: %s\n" "$${VER}" >> $@
-	printf "Summary: %s\n" "$${SUM}" >> $@
+	$(RUN) bash-language-server --version &> /dev/null
+	$(call npm_install_info,$${PKG})
 	echo '✅ $(basename $(notdir $@)) installed'
 
 copilot: info/copilot.md
