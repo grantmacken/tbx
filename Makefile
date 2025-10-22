@@ -249,7 +249,7 @@ bash-language-server: info/bash-language-server.md
 info/bash-language-server.md:
 	echo '##[ $(basename $(notdir $@)) ]##'
 	PKG=$(basename $(notdir $@))
-	$(call npm_installed,$${PKG})
+	$(call npm_install,$${PKG})
 	# success|failure check
 	$(RUN) bash-language-server --version &> /dev/null
 	$(call npm_install_info,$${PKG})
