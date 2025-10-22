@@ -168,32 +168,29 @@ info/neovim.md:
 
 lua-language-server: info/lua-language-server.md
 latest/lua-language-server.json:
-	echo '##[ $@ ]##'
-	mkdir -p $(dir $@) 
 	$(WGET) https://api.github.com/repos/LuaLS/lua-language-server/releases/latest -O $@
 
 info/lua-language-server.md: latest/lua-language-server.json
 	echo '##[ $(basename $(notdir $@)) ]##'
+	PKG=$(basename $(notdir $@)) 
 	SRC=$(shell $(call bdu,linux-x64.tar.gz,$<))
-	TARGET=files/lua-language-server/usr/local/lua-language-server
+	TARGET=files/$${PKG}/usr/local/$${PKG}
 	mkdir -p $${TARGET}
 	$(WGET) $${SRC} -O- | $(TAR_NO_STRIP) $${TARGET}
-	$(ADD) files/lua-language-server &> /dev/null
+	$(ADD) files/$${PKG} &> /dev/null
 	# note the lua-language-server binary is in bin/ subdir
 	# the exec script in /usr/local/bin/lua-language-server will point to it 
 	# these scripts are added in init target
 	# success|failure check
-	$(RUN) which lua-language-server &> /dev/null
-	$(RUN) lua-language-server --version &> /dev/null
-	# extract 'name', 'version', 'summary' into to a table row
-	# get version from the binary
-	NAME=lua-language-server
+	$(RUN) which $${PKG}  &> /dev/null
+	$(RUN) $${PKG} --version &> /dev/null
+	# extract 'name', 'version', 'summary'
 	# get version from the binary
 	VER=$$($(RUN) lua-language-server --version)
 	SUM='Lua language server'
-	$(call to_info,$${NAME},$${VER},$${SUM})
+	$(call to_info,$${PKG},$${VER},$${SUM})
 
-	## uv tools:  tombi mbake specify-cli
+#uv tools:  tombi mbake specify-cli
 
 define uv_tool
 # extract 'name', 'version', 'summary'
