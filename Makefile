@@ -59,7 +59,7 @@ HEADING3 := $(HEADING2)$(HEADING1)
 
 # BASH_LIST := nodejs-bash-language-server ShellCheck shfmt
 RELEASE_BINARY_LIST :=  neovim lua-language-server # harper-ls
-DNF_LIST :=  google-cloud-cli ShellCheck shfmt
+DNF_LIST     :=  google-cloud-cli # ShellCheck shfmt
 UV_TOOL_LIST :=  tombi specify-cli mbake
 # @mistweaverco/kulala-ls
 NPM_LIST := bash-language-server \
@@ -77,7 +77,8 @@ define to_info
     printf "Name: %s\n"    "$(1)" > $@
 	printf "Version: %s\n" "$(2)" >> $@
 	printf "Summary: %s\n" "$(3)" >> $@
-	echo "✅ $(1) installed"
+	printf "Summary: %s\n" "$(3)" >> $@
+	printf "✅ %s\n" "$(1)"
 endef
 
 default: info/README.md
@@ -106,26 +107,6 @@ info/README.md: init $(PKGS_LIST) $(RELEASE_BINARY_LIST) # $(NPM_LIST) #$(ROCKS_
 	$(call tr,$${NAME},$${VER},$${SUM},$@)
 	done
 
-rocks_table:
-	for rock in $(ROCKS_LIST)
-	do
-	NAME=$$(cat info/$${rock}.md | grep -oP '^package\s+\K.+')
-	VER=$$(cat info/$${rock}.md | grep -oP '^version\s+\K.+')
-	SUM=$$(cat info/$${rock}.md | grep -oP '^summary\s+\K.+')
-	$(call tr,$${NAME},$${VER},$${SUM},$@)
-	done
-
-dnf_table:
-	$(call tr,"Name","Version","Summary", $@)
-	$(call tr,"----","-------","----------------------------", $@)
-	for pkg in $(DNF_LIST)
-	do
-	NAME=$$(cat info/$${pkg}.md | grep -oP '^Name\s+:\s+\K.+')
-	VER=$$(cat info/$${pkg}.md | grep -oP '^Version\s+:\s+\K.+')
-	SUM=$$(cat info/$${pkg}.md | grep -oP '^Summary\s+:\s+\K.+')
-	$(call tr,$${NAME},$${VER},$${SUM},$@)
-	done
-
 init:
 	echo '##[ $@ ]##'
 	buildah pull ghcr.io/grantmacken/tbx-runtimes &>/dev/null
@@ -141,6 +122,8 @@ init:
 	--env UV_TOOL_DIR=/var/lib/uv_tools \
 	$(WORKING_CONTAINER)
 	mkdir -p info
+	mkdir -p latest
+	# update dnf repos
 	$(RUN) dnf update -y &>/dev/null
 
 # release binaries:
@@ -165,7 +148,7 @@ info/neovim.md:
 
 lua-language-server: info/lua-language-server.md
 latest/lua-language-server.json:
-	$(WGET) https://api.github.com/repos/LuaLS/lua-language-server/releases/latest -O $@
+	$(WGET) https://api.github.com/repos/LuaLS/lua-language-server/releases/latest -O- | jq '.' > $@
 
 info/lua-language-server.md: latest/lua-language-server.json
 	echo '##[ $(basename $(notdir $@)) ]##'
@@ -238,38 +221,6 @@ info/mbake.md:
 	# extract 'name', 'version', 'summary'
 	$(call uv_tool,$${PKG},Makefile formatter and linter)
 
-
-# mason_registry:
-# 	echo '##[ $@ ]##'
-# 	# create the dir mason uses to store packages
-# 	$(RUN) mkdir -p $(DIR_MASON)
-# 	$(RUN) nvim_mason_registry &>/dev/null
-# 	echo '✅ mason registry loaded'
-#
-# mason: mason_registry
-# 	echo '##[ $@ ]##'
-# 	# run the script that install mason packages
-# 	$(RUN) nvim_mason &>/dev/null #  2>&1 >/dev/null
-# 	# take a look at what is installed
-# 	# $(RUN) ls $(DIR_MASON)/bin
-# 	# get version of each binary
-# 	BINS=$$($(RUN) ls $(DIR_MASON)/bin)
-# 	for bin in $$BINS
-# 	do
-# 	echo "$$bin:"
-# 	VER=$(shell $(RUN) $$bin --version 2>/dev/null || $$bin -v 2>/dev/null || echo "unknown")
-# 	# some version strings are long, so just get the first line
-# 	VER=$$(echo "$$VER" | head -n 1)
-# 	# print the version
-# 	echo "$$VER"
-# 	done
-# 	# link installed packages to $(DIR_BIN)
-# 	# use SH here to allow for globbing
-# 	$(SH) 'ln -s $(DIR_MASON)/bin/* $(DIR_BIN)/'
-# 	# check bin dir
-# 	# $(RUN) ls -l /usr/local/bin
-# 	echo '✅ selected mason lsp	 servers, linters and formaters installed'
-#
 # npm packages:
 # bash-language-server
 # copilot
