@@ -214,10 +214,9 @@ info/tombi.md:
 	$(RUN) which tombi &> /dev/null
 	$(RUN) tombi --version &> /dev/null
 	# extract 'name', 'version', 'summary'
-	NAME=tombi
-	VER=$$($(RUN) tombi --version | cut -d' ' -f2)
-	SUM='TOML Toolkit'
-	$(call to_info,$${NAME},$${VER},$${SUM})
+	# VER=$$($(RUN) tombi --version | cut -d' ' -f2)
+	$(call uv_tool,$${PKG},TOML Toolkit)
+	# $(call to_info,$${PKG},$${VER},'TOML Toolkit')
 
 specify-cli: info/specify-cli.md
 info/specify-cli.md:
