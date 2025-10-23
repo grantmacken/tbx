@@ -12,21 +12,11 @@ MAKEFLAGS += --no-builtin-rules
 MAKEFLAGS += --silent
 unexport MAKEFLAGS
 
-# Colors
-RED=\033[0;31m
-GREEN=\033[0;32m
-YELLOW=\033[0;33m
-BLUE=\033[0;34m
-PURPLE=\033[0;35m
-CYAN=\033[0;36m
-WHITE=\033[0;37m
-NC=\033[0m # No Color
-
 WORKING_CONTAINER := tbx-runtimes-working-container
 # actions
 RUN     := buildah run $(WORKING_CONTAINER)
-INSTALL := $(RUN) dnf install --allowerasing --skip-unavailable --skip-broken --no-allow-downgrade -y
 SH      := $(RUN) sh -c
+INSTALL := $(RUN) dnf install --allowerasing --skip-unavailable --skip-broken --no-allow-downgrade -y
 # LINK    := $(RUN) ln -s $(shell which host-spawn)
 ADD    := buildah add --chmod 755 $(WORKING_CONTAINER)
 RW_ADD := buildah add --chmod  644 $(WORKING_CONTAINER)
@@ -34,7 +24,7 @@ WGET   := wget -q --no-check-certificate --timeout=10 --tries=3
 # everything is site dir
 DIR_SITE   := /usr/share/nvim/site
 DIR_BIN    := /usr/local/bin
-DIR_MASON  := /usr/local/share/mason
+# DIR_MASON  := /usr/local/share/mason
 
 # URL_LSPCONFIG := https://raw.githubusercontent.com/neovim/nvim-lspconfig/refs/heads/master/lsp/
 TAR          := tar xz --strip-components=1 -C
@@ -66,7 +56,7 @@ NPM_LIST := bash-language-server \
 			yaml-language-server
 
 ROCKS_LIST := busted nlua
-PKGS_LIST := $(NPM_LIST) $(DNF_LIST) $(ROCKS_LIST) $(DNF_LIST) # $(RELEASE_BINARY_LIST) $(UV_TOOL_LIST) # $(ROCKS_LIST) #  
+PKGS_LIST := $(RELEASE_BINARY_LIST) $(NPM_LIST) $(DNF_LIST) # $(ROCKS_LIST) #  $(UV_TOOL_LIST) # $(ROCKS_LIST) #  
 
 ## Helper to write info files in a consistent format
 define to_info
@@ -122,7 +112,9 @@ init:
 	$(RUN) dnf update -y &>/dev/null
 
 # release binaries:
-# neovim lua-language-server harper-ls
+# neovim
+# lua-language-server
+# TODO harper-ls
 
 neovim: info/neovim.md
 info/neovim.md:
@@ -223,14 +215,14 @@ info/mbake.md:
 
 bash-language-server: info/bash-language-server.md
 info/bash-language-server.md:
-	echo '##[ $(basename $(notdir $@)) ]##'
+	# echo '##[ $(basename $(notdir $@)) ]##'
 	PKG=$(basename $(notdir $@))
 	JSON=$$($(RUN) npm view --json $${PKG} | jq '.')
 	# From the veiw extract 'name', 'version', 'description'
 	NAME=$$(echo $$JSON | jq -r '.name')
 	VER=$$(echo $$JSON | jq -r '."dist-tags".latest')
 	SUM=$$(echo $$JSON | jq -r '.description')
-	# install the package globally and use
+	# install the package globally and use the latest version
 	$(RUN) npm install --global $${NAME}@$${VER} &> /dev/null
 	# success|failure check
 	$(RUN) $${PKG} --version &> /dev/null
