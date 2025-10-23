@@ -77,6 +77,7 @@ define to_info
     printf "Name: %s\n"    "$(1)" > $@
 	printf "Version: %s\n" "$(2)" >> $@
 	printf "Summary: %s\n" "$(3)" >> $@
+	printf "✅ %s installed \n" "$(1)"
 endef
 
 default: info/README.md
@@ -224,13 +225,7 @@ info/mbake.md:
 # vscode-langservers-extracted
 # yaml-language-server
 define npm_install
-	JSON=$$($(RUN) npm view --json $(1) | jq '.')
-	# From the veiw extract 'name', 'version', 'description'
-	NAME=$$(echo $$JSON | jq -r '.name')
-	VER=$$(echo $$JSON | jq -r '."dist-tags".latest')
-	SUM=$$(echo $$JSON | jq -r '.description')
-	# install the package globally and use
-	$(RUN) npm install --global $${NAME}@$${VER} &> /dev/null
+
 endef
 
 define npm_install_info
@@ -246,11 +241,15 @@ bash-language-server: info/bash-language-server.md
 info/bash-language-server.md:
 	echo '##[ $(basename $(notdir $@)) ]##'
 	PKG=$(basename $(notdir $@))
-	$(call npm_install,$${PKG})
+	# From the veiw extract 'name', 'version', 'description'
+	NAME=$$(echo $$JSON | jq -r '.name')
+	VER=$$(echo $$JSON | jq -r '."dist-tags".latest')
+	SUM=$$(echo $$JSON | jq -r '.description')
+	# install the package globally and use
+	$(RUN) npm install --global $${NAME}@$${VER} &> /dev/null
 	# success|failure check
 	$(RUN) $${PKG} --version &> /dev/null
-	$(call npm_install_info,$${PKG})
-	echo '✅ $(basename $(notdir $@)) installed'
+	$(call to_info,$${NAME},$${VER},$${SUM})
 
 copilot: info/copilot.md
 info/copilot.md:
