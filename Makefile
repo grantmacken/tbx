@@ -181,10 +181,12 @@ info/tombi.md:
 	# success|failure check
 	$(RUN) which $${PKG} &> /dev/null
 	$(RUN) $${PKG} --version &> /dev/null
-	# extract 'name', 'version', 'summary'
-	# VER=$$($(RUN) tombi --version | cut -d' ' -f2)
-	$(call uv_tool_info,$${PKG},TOML Toolkit)
-	# $(call to_info,$${PKG},$${VER},'TOML Toolkit')
+	# $$($(RUN) uv tool list | grep $(1)
+	# LINES=$$($(RUN) uv tool list | grep $${PKG} )
+	# # extract 'name', 'version', 'summary'
+	# # VER=$$($(RUN) tombi --version | cut -d' ' -f2)
+	# # $(call uv_tool_info,$${PKG},TOML Toolkit)
+	# # # $(call to_info,$${PKG},$${VER},'TOML Toolkit')
 
 specify-cli: info/specify-cli.md
 info/specify-cli.md:
