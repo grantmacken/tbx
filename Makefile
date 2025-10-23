@@ -37,10 +37,9 @@ DIR_BIN    := /usr/local/bin
 DIR_MASON  := /usr/local/share/mason
 
 # URL_LSPCONFIG := https://raw.githubusercontent.com/neovim/nvim-lspconfig/refs/heads/master/lsp/
-TAR           := tar xz --strip-components=1 -C
+TAR          := tar xz --strip-components=1 -C
 TAR_NO_STRIP := tar xz -C
 
-NPM      := $(RUN) npm install --global
 LUAROCKS := $(RUN) luarocks install --global
 # NPM_LIST := $(RUN) npm list -g --depth=0 --json
 
@@ -64,13 +63,13 @@ UV_TOOL_LIST :=  tombi specify-cli mbake
 # @mistweaverco/kulala-ls
 NPM_LIST := bash-language-server \
 			copilot \
-			# copilot-language-server \
-			# tree-sitter-cli \
-			# vscode-langservers-extracted \
-			# yaml-language-server
+			copilot-language-server \
+			tree-sitter-cli \
+			vscode-langservers-extracted \
+			yaml-language-server
 
 ROCKS_LIST := busted nlua
-PKGS_LIST := $(NPM_LIST) $(ROCKS_LIST) # $(DNF_LIST) $(RELEASE_BINARY_LIST) $(UV_TOOL_LIST) # $(ROCKS_LIST) #  
+PKGS_LIST := $(NPM_LIST) # $(ROCKS_LIST) # $(DNF_LIST) $(RELEASE_BINARY_LIST) $(UV_TOOL_LIST) # $(ROCKS_LIST) #  
 
 ## Helper to write info files in a consistent format
 define to_info
@@ -248,7 +247,7 @@ info/copilot.md:
 	NAME=$$(echo $$JSON | jq -r '.name')
 	VER=$$(echo $$JSON | jq -r '."dist-tags".latest')
 	SUM=$$(echo $$JSON | jq -r '.description')
-	$(NPM) $${NAME}@$${VER} &> /dev/null
+	$(RUN) npm install --global  $${NAME}@$${VER} &> /dev/null
 	# success|failure check
 	$(RUN) copilot --version
 	$(call to_info,$${NAME},$${VER},$${SUM})
@@ -260,10 +259,9 @@ info/copilot-language-server.md:
 	NAME=$$(echo $$JSON | jq -r '.name')
 	VER=$$(echo $$JSON | jq -r '."dist-tags".latest')
 	SUM=$$(echo $$JSON | jq -r '.description')
-	$(NPM) $${NAME}@$${VER} &> /dev/null
+	$(RUN) npm install --global $${NAME}@$${VER} &> /dev/null
 	# success|failure check
 	# TODO
-	# Write to file
 	$(call to_info,$${NAME},$${VER},$${SUM})
 
 tree-sitter-cli: info/tree-sitter-cli.md
@@ -273,10 +271,10 @@ info/tree-sitter-cli.md:
 	NAME=$$(echo $$JSON | jq -r '.name')
 	VER=$$(echo $$JSON | jq -r '."dist-tags".latest')
 	SUM=$$(echo $$JSON | jq -r '.description')
-	$(NPM) $${NAME}@$${VER} &> /dev/null
+	$(RUN) npm install --global $${NAME}@$${VER} &> /dev/null
 	# success|failure check
 	$(RUN) tree-sitter --version
-	# Write to file
+	$(call to_info,$${NAME},$${VER},$${SUM})
 
 vscode-langservers-extracted: info/vscode-langservers-extracted.md
 info/vscode-langservers-extracted.md:
@@ -285,14 +283,13 @@ info/vscode-langservers-extracted.md:
 	NAME=$$(echo $$JSON | jq -r '.name')
 	VER=$$(echo $$JSON | jq -r '."dist-tags".latest')
 	SUM=$$(echo $$JSON | jq -r '.description')
-	$(NPM) $${NAME}@$${VER} &> /dev/null
+	$(RUN) npm install --global $${NAME}@$${VER} &> /dev/null
 	# success|failure check
 	#  "vscode-css-language-server": "bin/vscode-css-language-server",
 	#  "vscode-eslint-language-server": "bin/vscode-eslint-language-server",
 	#  "vscode-html-language-server": "bin/vscode-html-language-server",
 	#  "vscode-json-language-server": "bin/vscode-json-language-server",
 	#  "vscode-markdown-language-server": "bin/vscode-markdown-language-server"
-	# Write to file
 	$(call to_info,$${NAME},$${VER},$${SUM})
 
 yaml-language-server: info/yaml-language-server.md
@@ -302,7 +299,7 @@ info/yaml-language-server.md:
 	NAME=$$(echo $$JSON | jq -r '.name')
 	VER=$$(echo $$JSON | jq -r '."dist-tags".latest')
 	SUM=$$(echo $$JSON | jq -r '.description')
-	$(NPM) $${NAME}@$${VER} &> /dev/null
+	$(RUN) npm install --global $${NAME}@$${VER} &> /dev/null
 	# success|failure check
 	# Note: the binary is named `tree-sitter` not the package name
 	$(RUN) tree-sitter --version
@@ -367,7 +364,7 @@ busted: info/busted.md
 info/busted.md:
 	echo '##[ $(basename $(notdir $@)) ]##'
 	PKG=$(basename $(notdir $@))
-	$(LUAROCKS) $${PKG} &> /dev/null
+	$(RUN) luarocks install --global $${PKG} &> /dev/null
 	# verify installation
 	$(RUN) which $${PKG} || true
 	$(RUN) $${PKG} --version || true
@@ -384,7 +381,7 @@ info/nlua.md:
 	echo '##[ $(basename $(notdir $@)) ]##'
 	NAME=$(basename $(notdir $@))
 	mkdir -p $(dir $@)
-	$(LUAROCKS) $${NAME} &> /dev/null
+	$(RUN) luarocks install --global $${NAME} &> /dev/null
 	# verify installation
 	$(RUN) which $${NAME} || true
 	LINES=$$($(RUN) luarocks show  --porcelain $${NAME} | head -n 3)
