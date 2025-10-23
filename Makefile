@@ -231,9 +231,6 @@ define npm_install
 	SUM=$$(echo $$JSON | jq -r '.description')
 	# install the package globally and use
 	$(RUN) npm install --global $${NAME}@$${VER} &> /dev/null
-	# success|failure check
-	$(RUN) $${NAME} --version &>/dev/null
-	$(call to_info,$${NAME},$${VER},$${SUM})
 endef
 
 define npm_install_info
@@ -251,7 +248,7 @@ info/bash-language-server.md:
 	PKG=$(basename $(notdir $@))
 	$(call npm_install,$${PKG})
 	# success|failure check
-	$(RUN) bash-language-server --version &> /dev/null
+	$(RUN) $${PKG} --version &> /dev/null
 	$(call npm_install_info,$${PKG})
 	echo '✅ $(basename $(notdir $@)) installed'
 
