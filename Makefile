@@ -174,12 +174,12 @@ endef
 
 tombi: info/tombi.md
 info/tombi.md:
-	echo '##[ $(basename $(notdir $@)) ]##'
+	# echo '##[ $(basename $(notdir $@)) ]##'
 	PKG=$(basename $(notdir $@)) 
 	$(RUN) uv tool install $${PKG} &> /dev/null
 	# success|failure check
-	$(RUN) which tombi &> /dev/null
-	$(RUN) tombi --version &> /dev/null
+	$(RUN) which $${PKG} &> /dev/null
+	$(RUN) $${PKG} --version &> /dev/null
 	# extract 'name', 'version', 'summary'
 	# VER=$$($(RUN) tombi --version | cut -d' ' -f2)
 	$(call uv_tool_info,$${PKG},TOML Toolkit)
@@ -187,22 +187,23 @@ info/tombi.md:
 
 specify-cli: info/specify-cli.md
 info/specify-cli.md:
-	echo '##[ $(basename $(notdir $@)) ]##'
+	# echo '##[ $(basename $(notdir $@)) ]##'
 	PKG=$(basename $(notdir $@)) 
 	$(RUN) uv tool install $${PKG} --from git+https://github.com/github/spec-kit.git &> /dev/null
 	# success|failure check
+	# Note: the binary is named 'specify' not 'specify-cli'
 	$(RUN) which specify &> /dev/null
 	$(RUN) whereis specify &> /dev/null
 	$(call uv_tool_info,$${PKG},GitHub Spec Tool)
 
 mbake: info/mbake.md
 info/mbake.md:
-	echo '##[ $(basename $(notdir $@)) ]##'
+	# echo '##[ $(basename $(notdir $@)) ]##'
 	PKG=$(basename $(notdir $@)) 
 	$(RUN) uv tool install $${PKG} &> /dev/null
 	# success|failure check
-	$(RUN) which mbake || true
-	$(RUN) mbake --version || true
+	$(RUN) which $${PKG} || true
+	$(RUN) $${PKG} --version || true
 	# extract 'name', 'version', 'summary'
 	$(call uv_tool_info,$${PKG},Makefile formatter and linter)
 
