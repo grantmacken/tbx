@@ -56,7 +56,7 @@ NPM_LIST := bash-language-server \
 			yaml-language-server
 
 ROCKS_LIST := busted nlua
-PKGS_LIST := $(RELEASE_BINARY_LIST) $(NPM_LIST) $(DNF_LIST) # $(ROCKS_LIST) #  $(UV_TOOL_LIST) # $(ROCKS_LIST) #  
+PKGS_LIST :=  $(UV_TOOL_LIST) $(RELEASE_BINARY_LIST) $(NPM_LIST) $(DNF_LIST) # $(ROCKS_LIST) #  # $(ROCKS_LIST) #  
 
 ## Helper to write info files in a consistent format
 define to_info
@@ -118,7 +118,7 @@ init:
 
 neovim: info/neovim.md
 info/neovim.md:
-	echo '##[ $(basename $(notdir $@)) ]##'
+	# echo '##[ $(basename $(notdir $@)) ]##'
 	PKG=$(basename $(notdir $@)) 
 	TARGET=files/$${PKG}/usr/local
 	mkdir -p $${TARGET}
@@ -138,7 +138,7 @@ latest/lua-language-server.json:
 	$(WGET) https://api.github.com/repos/LuaLS/lua-language-server/releases/latest -O- | jq '.' > $@
 
 info/lua-language-server.md: latest/lua-language-server.json
-	echo '##[ $(basename $(notdir $@)) ]##'
+	# echo '##[ $(basename $(notdir $@)) ]##'
 	PKG=$(basename $(notdir $@)) 
 	SRC=$(shell $(call bdu,linux-x64.tar.gz,$<))
 	TARGET=files/$${PKG}/usr/local/$${PKG}
@@ -149,8 +149,9 @@ info/lua-language-server.md: latest/lua-language-server.json
 	# the exec script in /usr/local/bin/lua-language-server will point to it 
 	# these scripts are added in init target
 	# success|failure caheck
-	$(RUN) which $${PKG}  &> /dev/null
-	$(RUN) $${PKG} --version &> /dev/null
+	$(RUN) which $${PKG}
+	$(RUN) whereis $${PKG}
+	$(RUN) $${PKG} --version
 	# extract 'name', 'version', 'summary'
 	# get version from the binary
 	VER=$$($(RUN) lua-language-server --version)
@@ -239,7 +240,7 @@ info/copilot.md:
 	SUM=$$(echo $$JSON | jq -r '.description')
 	$(RUN) npm install --global  $${NAME}@$${VER} &> /dev/null
 	# success|failure check
-	$(RUN) $${PKG} --version
+	$(RUN) $${PKG} --version &> /dev/null
 	$(call to_info,$${PKG},$${VER},$${SUM})
 
 copilot-language-server: info/copilot-language-server.md
