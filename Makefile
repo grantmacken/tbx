@@ -58,7 +58,7 @@ HEADING3 := $(HEADING2)$(HEADING1)
 
 # BASH_LIST := nodejs-bash-language-server ShellCheck shfmt
 RELEASE_BINARY_LIST :=  neovim lua-language-server # harper-ls
-DNF_LIST     :=  google-cloud-cli # ShellCheck shfmt
+DNF_LIST     :=  google-cloud-cli ShellCheck shfmt
 UV_TOOL_LIST :=  tombi specify-cli mbake
 # @mistweaverco/kulala-ls
 NPM_LIST := bash-language-server \
@@ -69,7 +69,7 @@ NPM_LIST := bash-language-server \
 			yaml-language-server
 
 ROCKS_LIST := busted nlua
-PKGS_LIST := $(NPM_LIST) # $(ROCKS_LIST) # $(DNF_LIST) $(RELEASE_BINARY_LIST) $(UV_TOOL_LIST) # $(ROCKS_LIST) #  
+PKGS_LIST := $(NPM_LIST) $(DNF_LIST) # $(ROCKS_LIST) # $(DNF_LIST) $(RELEASE_BINARY_LIST) $(UV_TOOL_LIST) # $(ROCKS_LIST) #  
 
 ## Helper to write info files in a consistent format
 define to_info
@@ -326,7 +326,7 @@ endef
 
 google-cloud-cli: info/google-cloud-cli.md
 info/google-cloud-cli.md:
-	echo '##[ $(basename $(notdir $@)) ]##'
+	# echo '##[ $(basename $(notdir $@)) ]##'
 	PKG=$(basename $(notdir $@))
 	# add the repo
 	$(RUN) mkdir -p /etc/yum.repos.d
@@ -341,7 +341,7 @@ info/google-cloud-cli.md:
 
 ShellCheck: info/ShellCheck.md
 info/ShellCheck.md:
-	echo '##[ $(basename $(notdir $@)) ]##'
+	# echo '##[ $(basename $(notdir $@)) ]##'
 	PKG=$(basename $(notdir $@))
 	$(INSTALL) $${PKG} &> /dev/null
 	# success|failure check
@@ -352,7 +352,7 @@ info/ShellCheck.md:
 
 shfmt: info/shfmt.md
 info/shfmt.md:
-	echo '##[ $(basename $(notdir $@)) ]##'
+	# echo '##[ $(basename $(notdir $@)) ]##'
 	PKG=$(basename $(notdir $@))
 	$(INSTALL) $${PKG} &> /dev/null
 	# verify installation
