@@ -123,7 +123,7 @@ info/neovim.md:
 	TARGET=files/$${PKG}/usr/local
 	mkdir -p $${TARGET}
 	SRC='https://github.com/neovim/neovim/releases/download/nightly/nvim-linux-x86_64.tar.gz'
-	$(WGET) $${SRC} -O- | $(TAR) $${TARGET}
+	$(WGET) $${SRC} -O- | $(TAR) $${TARGET} &> /dev/null
 	$(ADD) files/$${PKG} &> /dev/null
 	# success|failure check
 	$(RUN) nvim --version &> /dev/null
@@ -143,15 +143,15 @@ info/lua-language-server.md: latest/lua-language-server.json
 	SRC=$(shell $(call bdu,linux-x64.tar.gz,$<))
 	TARGET=files/$${PKG}/usr/local/$${PKG}
 	mkdir -p $${TARGET}
-	$(WGET) $${SRC} -O- | $(TAR_NO_STRIP) $${TARGET}
+	$(WGET) $${SRC} -O- | $(TAR_NO_STRIP) $${TARGET} &> /dev/null
 	$(ADD) files/$${PKG} &> /dev/null
 	# note the lua-language-server binary is in bin/ subdir
 	# the exec script in /usr/local/bin/lua-language-server will point to it 
 	# these scripts are added in init target
 	# success|failure caheck
-	$(RUN) which $${PKG}
-	$(RUN) whereis $${PKG}
-	$(RUN) $${PKG} --version
+	$(RUN) which $${PKG} &> /dev/null
+	$(RUN) whereis $${PKG}	 &> /dev/null
+	$(RUN) $${PKG} --version &> /dev/null
 	# extract 'name', 'version', 'summary'
 	# get version from the binary
 	VER=$$($(RUN) lua-language-server --version)
@@ -202,8 +202,8 @@ info/mbake.md:
 	PKG=$(basename $(notdir $@)) 
 	$(RUN) uv tool install $${PKG} &> /dev/null
 	# success|failure check
-	$(RUN) which $${PKG} || true
-	$(RUN) $${PKG} --version || true
+	$(RUN) which $${PKG} &> /dev/null
+	$(RUN) $${PKG} --version &> /dev/null
 	# extract 'name', 'version', 'summary'
 	$(call uv_tool_info,$${PKG},Makefile formatter and linter)
 
