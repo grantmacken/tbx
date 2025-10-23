@@ -69,7 +69,7 @@ NPM_LIST := bash-language-server \
 			yaml-language-server
 
 ROCKS_LIST := busted nlua
-PKGS_LIST := $(NPM_LIST) $(DNF_LIST) # $(ROCKS_LIST) # $(DNF_LIST) $(RELEASE_BINARY_LIST) $(UV_TOOL_LIST) # $(ROCKS_LIST) #  
+PKGS_LIST := $(NPM_LIST) $(DNF_LIST) $(ROCKS_LIST) # $(DNF_LIST) $(RELEASE_BINARY_LIST) $(UV_TOOL_LIST) # $(ROCKS_LIST) #  
 
 ## Helper to write info files in a consistent format
 define to_info
@@ -277,7 +277,7 @@ info/tree-sitter-cli.md:
 	$(RUN) npm install --global $${NAME}@$${VER} &> /dev/null
 	# success|failure check
 	# Note: the binary is named `tree-sitter` not the package name
-	$(RUN) tree-sitter --version
+	$(RUN) tree-sitter --version &> /dev/null
 	$(call to_info,$${NAME},$${VER},$${SUM})
 
 vscode-langservers-extracted: info/vscode-langservers-extracted.md
@@ -295,7 +295,7 @@ info/vscode-langservers-extracted.md:
 	#  "vscode-html-language-server": "bin/vscode-html-language-server",
 	#  "vscode-json-language-server": "bin/vscode-json-language-server",
 	#  "vscode-markdown-language-server": "bin/vscode-markdown-language-server"
-	$(call to_info,$${NAME},$${VER},$${SUM})
+	$(call to_info,vscode-langservers,$${VER},$${SUM})
 
 yaml-language-server: info/yaml-language-server.md
 info/yaml-language-server.md:
@@ -367,7 +367,7 @@ info/shfmt.md:
 
 busted: info/busted.md
 info/busted.md:
-	echo '##[ $(basename $(notdir $@)) ]##'
+	# echo '##[ $(basename $(notdir $@)) ]##'
 	PKG=$(basename $(notdir $@))
 	$(RUN) luarocks install --global $${PKG} &> /dev/null
 	# verify installation
@@ -383,9 +383,8 @@ info/busted.md:
 
 nlua: info/nlua.md
 info/nlua.md:
-	echo '##[ $(basename $(notdir $@)) ]##'
+	# echo '##[ $(basename $(notdir $@)) ]##'
 	PKG=$(basename $(notdir $@))
-	mkdir -p $(dir $@)
 	$(RUN) luarocks install --global $${PKG} &> /dev/null
 	# verify installation
 	$(RUN) which $${PKG} || true
