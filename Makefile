@@ -241,7 +241,8 @@ info/bash-language-server.md:
 
 copilot: info/copilot.md
 info/copilot.md:
-	echo '##[ $(basename $(notdir $@)) ]##'
+	# echo '##[ $(basename $(notdir $@)) ]##'
+	PKG=$(basename $(notdir $@))
 	JSON=$$($(RUN) npm view --json @github/copilot | jq '.')
 	# extract 'name', 'version', 'description' into to a table row
 	NAME=$$(echo $$JSON | jq -r '.name')
@@ -249,12 +250,13 @@ info/copilot.md:
 	SUM=$$(echo $$JSON | jq -r '.description')
 	$(RUN) npm install --global  $${NAME}@$${VER} &> /dev/null
 	# success|failure check
-	$(RUN) copilot --version
-	$(call to_info,$${NAME},$${VER},$${SUM})
+	$(RUN) $${PKG} --version
+	$(call to_info,$${PKG},$${VER},$${SUM})
 
 copilot-language-server: info/copilot-language-server.md
 info/copilot-language-server.md:
-	echo '##[ $(basename $(notdir $@)) ]##'
+	# echo '##[ $(basename $(notdir $@)) ]##'
+	PKG=$(basename $(notdir $@))
 	JSON=$$($(RUN) npm view --json @github/copilot-language-server | jq '.')
 	NAME=$$(echo $$JSON | jq -r '.name')
 	VER=$$(echo $$JSON | jq -r '."dist-tags".latest')
@@ -262,24 +264,27 @@ info/copilot-language-server.md:
 	$(RUN) npm install --global $${NAME}@$${VER} &> /dev/null
 	# success|failure check
 	# TODO
-	$(call to_info,$${NAME},$${VER},$${SUM})
+	$(call to_info,$${PKG},$${VER},$${SUM})
 
 tree-sitter-cli: info/tree-sitter-cli.md
 info/tree-sitter-cli.md:
-	echo '##[ $(basename $(notdir $@)) ]##'
-	JSON=$$($(RUN) npm view --json tree-sitter-cli | jq '.')
+	# echo '##[ $(basename $(notdir $@)) ]##'
+	PKG=$(basename $(notdir $@))
+	JSON=$$($(RUN) npm view --json $${PKG} | jq '.')
 	NAME=$$(echo $$JSON | jq -r '.name')
 	VER=$$(echo $$JSON | jq -r '."dist-tags".latest')
 	SUM=$$(echo $$JSON | jq -r '.description')
 	$(RUN) npm install --global $${NAME}@$${VER} &> /dev/null
 	# success|failure check
+	# Note: the binary is named `tree-sitter` not the package name
 	$(RUN) tree-sitter --version
 	$(call to_info,$${NAME},$${VER},$${SUM})
 
 vscode-langservers-extracted: info/vscode-langservers-extracted.md
 info/vscode-langservers-extracted.md:
-	echo '##[ $(basename $(notdir $@)) ]##'
-	JSON=$$($(RUN) npm view --json vscode-langservers-extracted | jq '.')
+	# echo '##[ $(basename $(notdir $@)) ]##'
+	PKG=$(basename $(notdir $@))
+	JSON=$$($(RUN) npm view --json $${PKG} | jq '.')
 	NAME=$$(echo $$JSON | jq -r '.name')
 	VER=$$(echo $$JSON | jq -r '."dist-tags".latest')
 	SUM=$$(echo $$JSON | jq -r '.description')
@@ -294,15 +299,15 @@ info/vscode-langservers-extracted.md:
 
 yaml-language-server: info/yaml-language-server.md
 info/yaml-language-server.md:
-	echo '##[ $(basename $(notdir $@)) ]##'
-	JSON=$$($(RUN) npm view --json tree-sitter-cli | jq '.')
+	# echo '##[ $(basename $(notdir $@)) ]##'
+	PKG=$(basename $(notdir $@))
+	JSON=$$($(RUN) npm view --json $${PKG} | jq '.')
 	NAME=$$(echo $$JSON | jq -r '.name')
 	VER=$$(echo $$JSON | jq -r '."dist-tags".latest')
 	SUM=$$(echo $$JSON | jq -r '.description')
 	$(RUN) npm install --global $${NAME}@$${VER} &> /dev/null
 	# success|failure check
-	# Note: the binary is named `tree-sitter` not the package name
-	$(RUN) tree-sitter --version
+	# TODO
 	$(call to_info,$${NAME},$${VER},$${SUM})
 
 # dnf packages:
@@ -356,8 +361,8 @@ info/shfmt.md:
 	$(RUN) $${PKG} --version &> /dev/null
 	$(call dnf_installed_info,$${PKG})
 
-# luarocks packages: 
-# busted 
+# luarocks packages:
+# busted
 # nlua
 
 busted: info/busted.md
@@ -369,8 +374,8 @@ info/busted.md:
 	$(RUN) which $${PKG} || true
 	$(RUN) $${PKG} --version || true
 	# extract 'name', 'version', 'summary'
-	$(RUN) luarocks show --porcelain $${NAME} | grep -oP '^busted.+' || true
-	LINE=$$($(RUN) luarocks show  $${NAME} | grep -oP '^busted.+')
+	# $(RUN) luarocks show --porcelain $${NAME} | grep -oP '^busted.+' || true
+	LINE=$$($(RUN) luarocks show --porcelain $${PKG} | grep -oP '^busted.+')
 	NAME=$$(echo $${LINE} | cut -d' ' -f1 || true)
 	VER=$$(echo $${LINE} | cut -d' ' -f2 || true)
 	SUM=$$(echo $${LINE} | cut -d'-' -f2 || true)
@@ -379,12 +384,12 @@ info/busted.md:
 nlua: info/nlua.md
 info/nlua.md:
 	echo '##[ $(basename $(notdir $@)) ]##'
-	NAME=$(basename $(notdir $@))
+	PKG=$(basename $(notdir $@))
 	mkdir -p $(dir $@)
-	$(RUN) luarocks install --global $${NAME} &> /dev/null
+	$(RUN) luarocks install --global $${PKG} &> /dev/null
 	# verify installation
-	$(RUN) which $${NAME} || true
-	LINES=$$($(RUN) luarocks show  --porcelain $${NAME} | head -n 3)
+	$(RUN) which $${PKG} || true
+	LINES=$$($(RUN) luarocks show  --porcelain $${PKG} | head -n 3)
 	# echo "$${LINES}"
 	# extract 'name', 'version', 'summary'
 	NAME=$$(echo $${LINES} | grep -oP '^package\s+\K.+' || true)
