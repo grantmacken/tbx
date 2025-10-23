@@ -30,7 +30,8 @@ DIR_BIN    := /usr/local/bin
 TAR          := tar xz --strip-components=1 -C
 TAR_NO_STRIP := tar xz -C
 
-tr = printf "| %-18s | %-8s | %-85s |\n" "$(1)" "$(2)" "$(3)" | tee -a $(4)
+max_field := $(shell echo -n 'copilot-language-server' | wc -c)
+tr = printf "| %-$(max_field)s | %-8s | %-85s |\n" "$(1)" "$(2)" "$(3)" | tee -a $(4)
 bdu = jq -r ".assets[] | select(.browser_download_url | contains(\"$1\")) | .browser_download_url" $2
 
 lsp_confs := $(wildcard site/lsp/*.lua)
@@ -56,7 +57,7 @@ NPM_LIST := bash-language-server \
 			yaml-language-server
 
 ROCKS_LIST := busted nlua
-PKGS_LIST :=  $(UV_TOOL_LIST) $(RELEASE_BINARY_LIST) $(NPM_LIST) $(DNF_LIST) # $(ROCKS_LIST) #  # $(ROCKS_LIST) #  
+PKGS_LIST :=  $(UV_TOOL_LIST) $(RELEASE_BINARY_LIST) $(NPM_LIST) $(DNF_LIST) # $(ROCKS_LIST)
 
 ## Helper to write info files in a consistent format
 define to_info
