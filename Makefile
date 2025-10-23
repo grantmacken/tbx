@@ -63,14 +63,14 @@ DNF_LIST     :=  google-cloud-cli # ShellCheck shfmt
 UV_TOOL_LIST :=  tombi specify-cli mbake
 # @mistweaverco/kulala-ls
 NPM_LIST := bash-language-server \
-			# copilot \
+			copilot \
 			# copilot-language-server \
 			# tree-sitter-cli \
 			# vscode-langservers-extracted \
 			# yaml-language-server
 
 ROCKS_LIST := busted nlua
-PKGS_LIST := $(NPM_LIST) # $(DNF_LIST) $(RELEASE_BINARY_LIST) $(UV_TOOL_LIST) # $(ROCKS_LIST) #  
+PKGS_LIST := $(NPM_LIST) $(ROCKS_LIST) # $(DNF_LIST) $(RELEASE_BINARY_LIST) $(UV_TOOL_LIST) # $(ROCKS_LIST) #  
 
 ## Helper to write info files in a consistent format
 define to_info
@@ -224,23 +224,12 @@ info/mbake.md:
 # tree-sitter-cli
 # vscode-langservers-extracted
 # yaml-language-server
-define npm_install
-
-endef
-
-define npm_install_info
-	JSON=$$($(RUN) npm view --json $(1) | jq '.')
-	# From the veiw extract 'name', 'version', 'description'
-	$(call to_info,
-	$$(echo $${JSON} | jq -r '.name'),
-	$$(echo $${JSON} | jq -r '."dist-tags".latest'),
-	$$(echo $${JSON} | jq -r '.description'))
-endef
 
 bash-language-server: info/bash-language-server.md
 info/bash-language-server.md:
 	echo '##[ $(basename $(notdir $@)) ]##'
 	PKG=$(basename $(notdir $@))
+	JSON=$$($(RUN) npm view --json $${PKG} | jq '.')
 	# From the veiw extract 'name', 'version', 'description'
 	NAME=$$(echo $$JSON | jq -r '.name')
 	VER=$$(echo $$JSON | jq -r '."dist-tags".latest')
@@ -411,7 +400,7 @@ info/nlua.md:
 	# verify installation
 	$(RUN) which $${NAME} || true
 	LINES=$$($(RUN) luarocks show  --porcelain $${NAME} | head -n 3)
-	echo "$${LINES}"
+	# echo "$${LINES}"
 	# extract 'name', 'version', 'summary'
 	NAME=$$(echo $${LINES} | grep -oP '^package\s+\K.+' || true)
 	VER=$$(echo $${LINES} | grep -oP '^version\s+\K.+' || true)
