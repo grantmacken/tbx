@@ -181,7 +181,7 @@ info/tombi.md:
 	# success|failure check
 	$(RUN) which $${PKG} &> /dev/null
 	$(RUN) $${PKG} --version &> /dev/null
-	# $$($(RUN) uv tool list | grep $(1)
+	$(RUN) uv tool list | grep $${PKG}
 	# LINES=$$($(RUN) uv tool list | grep $${PKG} )
 	# # extract 'name', 'version', 'summary'
 	# # VER=$$($(RUN) tombi --version | cut -d' ' -f2)
