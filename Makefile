@@ -95,7 +95,7 @@ endef
 info/README.md: init $(PKGS_LIST)
 	echo '##[ $@ ]##'
 	mkdir -p $(dir $@)
-	cat > $@ <<'README' +$(call readme_preamble) +README
+	cat > $@ <<'README' $(call readme_preamble) README
 	$(call tr,"Name","Version","Summary", $@)
 	$(call tr,"----","-------","-------", $@)
 	for pkg in $(PKGS_LIST)
