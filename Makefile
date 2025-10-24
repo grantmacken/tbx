@@ -181,7 +181,7 @@ info/tombi.md:
 	$(RUN) which $${PKG} &> /dev/null
 	$(RUN) $${PKG} --version &> /dev/null
 	# $(RUN) uv tool list | grep $${PKG}
-	$(call uv_tool_info,$${PKG},TOML Toolkit)
+	$(call uv_tool_info,$${PKG},TOML Formatter, Linter, and Language Server)
 
 specify-cli: info/specify-cli.md
 info/specify-cli.md:
@@ -353,14 +353,6 @@ info/shfmt.md:
 # luarocks packages:
 # busted
 # nlua
-define rock_installed_info
-  	LINES=$$($(RUN) luarocks show --porcelain $(1))
-	# extract 'name', 'version', 'summary'
-	VER=$$(echo "$${LINES}" | grep -oP '^version \K.+' || true)
-	SUM=$$(echo "$${LINES}" | grep -oP '^summary \K.+' || true)
-	# consistent write to file format
-	$(call to_info,$(1),$${VER},$${SUM})
-endef
 
 busted: info/busted.md
 info/busted.md:
@@ -370,7 +362,11 @@ info/busted.md:
 	# verify installation
 	$(RUN) which $${PKG} || true
 	$(RUN) $${PKG} --version || true
-	$(call rock_installed_info,$${PKG})
+	LINES=$$($(RUN) luarocks show --porcelain $${PKG})
+	# extract 'name', 'version', 'summary'
+	VER=$$(echo "$${LINES}" | grep -oP '^version\s\K.+')
+	SUM=$$(echo "$${LINES}" | grep -oP '^summary\s\K.+')
+	$(call to_info,$${PKG},$${VER},$${SUM})
 
 nlua: info/nlua.md
 info/nlua.md:
@@ -379,7 +375,12 @@ info/nlua.md:
 	$(RUN) luarocks install --global $${PKG} &> /dev/null
 	# verify installation
 	$(RUN) which $${PKG} || true
-	$(call rock_installed_info,$${PKG})
+	$(RUN) $${PKG} --version || true
+	LINES=$$($(RUN) luarocks show --porcelain $${PKG})
+	# extract 'name', 'version', 'summary'
+	VER=$$(echo "$${LINES}" | grep -oP '^version\s\K.+')
+	SUM=$$(echo "$${LINES}" | grep -oP '^summary\s\K.+')
+	$(call to_info,$${PKG},$${VER},$${SUM})
 
 pull:
 	echo '##[ $@ ]##'
