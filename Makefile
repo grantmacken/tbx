@@ -360,8 +360,8 @@ info/busted.md:
 	PKG=$(basename $(notdir $@))
 	$(RUN) luarocks install --global $${PKG} &> /dev/null
 	# verify installation
-	$(RUN) which $${PKG} || true
-	$(RUN) $${PKG} --version || true
+	$(RUN) which $${PKG} &> /dev/null
+	$(RUN) $${PKG} --version &> /dev/null
 	LINES=$$($(RUN) luarocks show --porcelain $${PKG})
 	# extract 'name', 'version', 'summary'
 	VER=$$(echo "$${LINES}" | grep -oP '^version\s\K.+')
@@ -374,8 +374,8 @@ info/nlua.md:
 	PKG=$(basename $(notdir $@))
 	$(RUN) luarocks install --global $${PKG} &> /dev/null
 	# verify installation
-	$(RUN) which $${PKG} || true
-	$(RUN) $${PKG} --version || true
+	$(RUN) which $${PKG} &> /dev/null
+	# $(RUN) $${PKG} --version || true
 	LINES=$$($(RUN) luarocks show --porcelain $${PKG})
 	# extract 'name', 'version', 'summary'
 	VER=$$(echo "$${LINES}" | grep -oP '^version\s\K.+')
