@@ -67,8 +67,6 @@ define to_info
 endef
 
 default: info/README.md
-
-rem:
 	echo '##[ $@ ]##'
 	buildah commt $(WORKING_CONTAINER) ghcr.io/grantmacken/tbx-coding
 	buildah push ghcr.io/grantmacken/tbx-coding:latest
@@ -181,7 +179,7 @@ info/tombi.md:
 	$(RUN) which $${PKG} &> /dev/null
 	$(RUN) $${PKG} --version &> /dev/null
 	# $(RUN) uv tool list | grep $${PKG}
-	$(call uv_tool_info,$${PKG},TOML Formatter, Linter, and Language Server)
+	$(call uv_tool_info,$${PKG},"TOML Formatter, Linter, and Language Server")
 
 specify-cli: info/specify-cli.md
 info/specify-cli.md:
