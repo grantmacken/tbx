@@ -45,19 +45,18 @@ HEADING2 := $(HEADING1)$(HEADING1)
 HEADING3 := $(HEADING2)$(HEADING1)
 
 # BASH_LIST := nodejs-bash-language-server ShellCheck shfmt
-RELEASE_BINARY_LIST :=  neovim lua-language-server # harper-ls
 DNF_LIST     :=  google-cloud-cli ShellCheck shfmt
 UV_TOOL_LIST :=  tombi specify-cli mbake
-# @mistweaverco/kulala-ls
 NPM_LIST := bash-language-server \
 			copilot \
 			copilot-language-server \
 			tree-sitter-cli \
 			vscode-langservers-extracted \
 			yaml-language-server
+RELEASE_BINARY_LIST :=  neovim lua-language-server # harper-ls
 
 ROCKS_LIST := busted nlua
-PKGS_LIST :=  $(UV_TOOL_LIST) $(RELEASE_BINARY_LIST) $(NPM_LIST) $(DNF_LIST) # $(ROCKS_LIST)
+PKGS_LIST := $(ROCKS_LIST) $(UV_TOOL_LIST) $(RELEASE_BINARY_LIST) $(NPM_LIST) $(DNF_LIST)
 
 ## Helper to write info files in a consistent format
 define to_info
