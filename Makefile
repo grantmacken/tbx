@@ -354,6 +354,14 @@ info/shfmt.md:
 # luarocks packages:
 # busted
 # nlua
+define rock_installed_info
+  	LINES=$$($(RUN) luarocks show --porcelain $(1))
+	# extract 'name', 'version', 'summary'
+	VER=$$(echo "$${LINES}" | grep -oP '^version \K.+' || true)
+	SUM=$$(echo "$${LINES}" | grep -oP '^summary \K.+' || true)
+	# consistent write to file format
+	$(call to_info,$(1),$${VER},$${SUM})
+endef
 
 busted: info/busted.md
 info/busted.md:
@@ -363,13 +371,7 @@ info/busted.md:
 	# verify installation
 	$(RUN) which $${PKG} || true
 	$(RUN) $${PKG} --version || true
-	# extract 'name', 'version', 'summary'
-	# $(RUN) luarocks show --porcelain $${NAME} | grep -oP '^busted.+' || true
-	LINE=$$($(RUN) luarocks show --porcelain $${PKG} | grep -oP '^busted.+')
-	NAME=$$(echo $${LINE} | cut -d' ' -f1 || true)
-	VER=$$(echo $${LINE} | cut -d' ' -f2 || true)
-	SUM=$$(echo $${LINE} | cut -d'-' -f2 || true)
-	$(call to_info,$${NAME},$${VER},$${SUM})
+	$(call rock_installed_info,$${PKG})
 
 nlua: info/nlua.md
 info/nlua.md:
@@ -378,13 +380,7 @@ info/nlua.md:
 	$(RUN) luarocks install --global $${PKG} &> /dev/null
 	# verify installation
 	$(RUN) which $${PKG} || true
-	LINES=$$($(RUN) luarocks show  --porcelain $${PKG} | head -n 3)
-	# echo "$${LINES}"
-	# extract 'name', 'version', 'summary'
-	NAME=$$(echo $${LINES} | grep -oP '^package\s+\K.+' || true)
-	VER=$$(echo $${LINES} | grep -oP '^version\s+\K.+' || true)
-	SUM=$$(echo $${LINES} | grep -oP '^summary\s+\K.+' || true)
-	$(call to_info,$${NAME},$${VER},$${SUM})
+	$(call rock_installed_info,$${PKG})
 
 pull:
 	echo '##[ $@ ]##'
