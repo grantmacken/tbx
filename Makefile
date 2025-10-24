@@ -22,11 +22,8 @@ ADD    := buildah add --chmod 755 $(WORKING_CONTAINER)
 RW_ADD := buildah add --chmod  644 $(WORKING_CONTAINER)
 WGET   := wget -q --no-check-certificate --timeout=10 --tries=3
 # everything is site dir
-DIR_SITE   := /usr/share/nvim/site
+# DIR_SITE   := /usr/share/nvim/site
 DIR_BIN    := /usr/local/bin
-# DIR_MASON  := /usr/local/share/mason
-
-# URL_LSPCONFIG := https://raw.githubusercontent.com/neovim/nvim-lspconfig/refs/heads/master/lsp/
 TAR          := tar xz --strip-components=1 -C
 TAR_NO_STRIP := tar xz -C
 
@@ -68,25 +65,45 @@ endef
 
 default: info/README.md
 	echo '##[ $@ ]##'
-	buildah commt $(WORKING_CONTAINER) ghcr.io/grantmacken/tbx-coding
+	buildah commit $(WORKING_CONTAINER) ghcr.io/grantmacken/tbx-coding
 	buildah push ghcr.io/grantmacken/tbx-coding:latest
 	echo '✅ ghcr.io/grantmacken/tbx-coding:latest built and pushed'
+
+define readme_preamble
+'
+# tbx-coding: a toolbox for coding
+This tbx-coding toolbox container image is built **from** -->
+ - the tbx-runtimes toolbox image which is is built **from** -->
+ - the tbx-build-tools toolbox image which is is built **from** -->
+ - the fedora toolbox container image.
+This tbx-coding toolbox includes a selection of development tools focused on coding, including neovim, language servers, linters, and formatters.
+## Features
+- Neovim: A modern and extensible text editor.
+- Language Servers: Support for various programming languages to provide features like auto-completion, go-to-definition, and real-time error checking.
+- Linters and Formatters: Tools to help maintain code quality and consistency.
+## Usage
+To install the toolbox container image, use the following command:
+```bash
+podman pull ghcr.io/grantmacken/tbx-coding:latest
+toolbox create --image ghcr.io/grantmacken/tbx-coding:latest coding
+toolbox enter coding
+```
+Once inside the toolbox, you can start using neovim and other installed tools for your coding projects.
+## Installed Applications
+The following applications are included in this toolbox:
+endef
 
 info/README.md: init $(PKGS_LIST)
 	echo '##[ $@ ]##'
 	mkdir -p $(dir $@)
-	# create or overwrite README.md
-	# preamble
-	printf "# %s\n\n" "tbx-coding: a toolbox for coding" | tee $@
-	printf "A toolbox container image with cli tools, neovim, lsp servers, linters and formaters.\n\n" | tee -a $@
-	printf "## %s\n\n" "Installed applications" | tee -a $@
+	$(call readme_preamble) | tee $@
 	$(call tr,"Name","Version","Summary", $@)
 	$(call tr,"----","-------","-------", $@)
 	for pkg in $(PKGS_LIST)
 	do
-	NAME=$$(cat info/$${pkg}.md | grep -oP '^Name:\s\K.+' || true)
-	VER=$$(cat info/$${pkg}.md | grep -oP '^Version:\s\K.+' || true)
-	SUM=$$(cat info/$${pkg}.md | grep -oP '^Summary:\s\K.+' || true)
+	NAME=$$(cat info/$${pkg}.md | grep -oP '^Name:\s\K.+')
+	VER=$$(cat info/$${pkg}.md | grep -oP '^Version:\s\K.+')
+	SUM=$$(cat info/$${pkg}.md | grep -oP '^Summary:\s\K.+')
 	$(call tr,$${NAME},$${VER},$${SUM},$@)
 	done
 
