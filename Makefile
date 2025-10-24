@@ -70,7 +70,6 @@ default: info/README.md
 	echo '✅ ghcr.io/grantmacken/tbx-coding:latest built and pushed'
 
 define readme_preamble
-'
 # tbx-coding: a toolbox for coding
 This tbx-coding toolbox container image is built **from** -->
  - the tbx-runtimes toolbox image which is is built **from** -->
@@ -96,7 +95,7 @@ endef
 info/README.md: init $(PKGS_LIST)
 	echo '##[ $@ ]##'
 	mkdir -p $(dir $@)
-	$(call readme_preamble) | tee $@
+	cat > $@ <<'README' +$(call readme_preamble) +README
 	$(call tr,"Name","Version","Summary", $@)
 	$(call tr,"----","-------","-------", $@)
 	for pkg in $(PKGS_LIST)
