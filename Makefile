@@ -56,7 +56,7 @@ NPM_LIST := bash-language-server \
 RELEASE_BINARY_LIST :=  neovim lua-language-server # harper-ls
 
 ROCKS_LIST := busted nlua
-PKGS_LIST := $(ROCKS_LIST) $(UV_TOOL_LIST) $(RELEASE_BINARY_LIST) $(NPM_LIST) $(DNF_LIST)
+PKGS_LIST := $(RELEASE_BINARY_LIST) $(ROCKS_LIST) $(UV_TOOL_LIST)  $(NPM_LIST) $(DNF_LIST)
 
 ## Helper to write info files in a consistent format
 define to_info
