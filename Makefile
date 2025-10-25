@@ -47,9 +47,11 @@ UV_TOOL_LIST :=  tombi specify-cli mbake
 NPM_LIST := bash-language-server \
 			copilot \
 			copilot-language-server \
+			fuacet \
 			tree-sitter-cli \
 			vscode-langservers-extracted \
 			yaml-language-server
+
 RELEASE_BINARY_LIST :=  neovim lua-language-server harper-ls
 
 ROCKS_LIST := busted nlua
