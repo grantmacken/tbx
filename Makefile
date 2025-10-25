@@ -50,7 +50,7 @@ NPM_LIST := bash-language-server \
 			tree-sitter-cli \
 			vscode-langservers-extracted \
 			yaml-language-server
-RELEASE_BINARY_LIST :=  neovim lua-language-server # harper-ls
+RELEASE_BINARY_LIST :=  neovim lua-language-server harper-ls
 
 ROCKS_LIST := busted nlua
 PKGS_LIST := $(RELEASE_BINARY_LIST) $(ROCKS_LIST) $(UV_TOOL_LIST)  $(NPM_LIST) $(DNF_LIST)
@@ -149,6 +149,33 @@ info/lua-language-server.md: latest/lua-language-server.json
 	# get version from the binary
 	VER=$$($(RUN) lua-language-server --version)
 	$(call to_info,$${PKG},$${VER},'Lua language server')
+
+# harper-ls
+harper-ls: info/harper-ls.md
+
+latest/harper-ls.json:
+	echo ' - fetching latest release info: ##[  $(basename $(notdir $@)) ]##'
+	$(WGET) https://api.github.com/repos/Automattic/harper/releases/latest -O- | jq '.' > $@
+
+info/harper-ls.md: latest/harper-ls.json
+	echo ' - installing  latest version: ##[ $(basename $(notdir $@)) ]##'
+	PKG=$(basename $(notdir $@))
+	SRC=$(shell $(call bdu,"harper-ls-x86_64-unknown-linux-gnu",$<))
+	echo " - download url: $${SRC}"
+	TARGET="files/$${PKG}/usr/local/bin"
+	mkdir -p $${TARGET}
+	$(WGET) $${SRC} -O- | $(TAR_NO_STRIP) $${TARGET} &> /dev/null
+	$(ADD) files/$${PKG} &> /dev/null
+	# success|failure caheck
+	$(RUN) which $${PKG} &> /dev/null
+	$(RUN) whereis $${PKG}	 &> /dev/null
+	$(RUN) $${PKG} --version
+	# extract 'name', 'version', 'summary'
+	# get version from the binary
+	VER=$$($(RUN) harper-ls --version)
+	$(call to_info,$${PKG},$${VER},'Harper Language Server Grammar Checker')
+
+
 
 #uv tools: 
 # tombi 
