@@ -138,8 +138,8 @@ info/lua-language-server.md: latest/lua-language-server.json
 	mkdir -p $${TARGET}
 	$(WGET) $${SRC} -O- | $(TAR_NO_STRIP) $${TARGET} &> /dev/null
 	$(ADD) files/$${PKG} &> /dev/null
-	# note the lua-language-server binary is in bin/ subdir
-	# the exec script in /usr/local/bin/lua-language-server will point to it 
+	# note the lua-language-server binary is in /usr/local/$${PKG}/bin/ subdir
+	# the exec script in /usr/local/bin/lua-language-server will point to it
 	# these scripts are added in init target
 	# success|failure caheck
 	$(RUN) which $${PKG} &> /dev/null
@@ -158,28 +158,26 @@ latest/harper-ls.json:
 	$(WGET) https://api.github.com/repos/Automattic/harper/releases/latest -O- | jq '.' > $@
 
 info/harper-ls.md: latest/harper-ls.json
-	echo ' - installing  latest version: ##[ $(basename $(notdir $@)) ]##'
+	# echo ' - installing  latest version: ##[ $(basename $(notdir $@)) ]##'
 	PKG=$(basename $(notdir $@))
 	SRC=$(shell $(call bdu,"harper-ls-x86_64-unknown-linux-gnu",$<))
-	echo " - download url: $${SRC}"
+	# echo " - download url: $${SRC}"
 	TARGET="files/$${PKG}/usr/local/bin"
 	mkdir -p $${TARGET}
 	$(WGET) $${SRC} -O- | $(TAR_NO_STRIP) $${TARGET} &> /dev/null
 	$(ADD) files/$${PKG} &> /dev/null
 	# success|failure caheck
 	$(RUN) which $${PKG} &> /dev/null
-	$(RUN) whereis $${PKG}	 &> /dev/null
-	$(RUN) $${PKG} --version
+	$(RUN) whereis $${PKG} &> /dev/null
+	$(RUN) $${PKG} --version &> /dev/null
 	# extract 'name', 'version', 'summary'
 	# get version from the binary
-	VER=$$($(RUN) harper-ls --version)
+	VER=$$($(RUN) harper-ls --version | cut -d' ' -f2)
 	$(call to_info,$${PKG},$${VER},'Harper Language Server Grammar Checker')
 
-
-
-#uv tools: 
-# tombi 
-# mbake 
+#uv tools:
+# tombi
+# mbake
 # specify-cli
 
 define uv_tool_info
