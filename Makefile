@@ -47,7 +47,7 @@ UV_TOOL_LIST :=  tombi specify-cli mbake
 NPM_LIST := bash-language-server \
 			copilot \
 			copilot-language-server \
-			fuacet \
+			faucet \
 			tree-sitter-cli \
 			vscode-langservers-extracted \
 			yaml-language-server
