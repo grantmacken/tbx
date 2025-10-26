@@ -48,6 +48,7 @@ NPM_LIST := bash-language-server \
 			copilot \
 			copilot-language-server \
 			faucet \
+			tape \
 			tree-sitter-cli \
 			vscode-langservers-extracted \
 			yaml-language-server
@@ -230,6 +231,7 @@ info/mbake.md:
 # copilot
 # copilot-language-server
 # faucet
+# tape
 # tree-sitter-cli
 # vscode-langservers-extracted
 # yaml-language-server
@@ -287,6 +289,19 @@ info/faucet.md:
 	$(RUN) npm install --global $${NAME}@$${VER} &> /dev/null
 	# success|failure check
 	# TODO
+	$(call to_info,$${NAME},$${VER},$${SUM})
+
+tape: info/tape.md
+info/tape.md:
+	# echo '##[ $(basename $(notdir $@)) ]##'
+	PKG=$(basename $(notdir $@))
+	JSON=$$($(RUN) npm view --json $${PKG} | jq '.')
+	NAME=$$(echo $$JSON | jq -r '.name')
+	VER=$$(echo $$JSON | jq -r '."dist-tags".latest')
+	SUM=$$(echo $$JSON | jq -r '.description')
+	$(RUN) npm install --global $${NAME}@$${VER} &> /dev/null
+	# success|failure check
+	$(RUN) tape --version &> /dev/null
 	$(call to_info,$${NAME},$${VER},$${SUM})
 
 tree-sitter-cli: info/tree-sitter-cli.md
