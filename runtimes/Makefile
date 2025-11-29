@@ -26,9 +26,8 @@ tr = printf "| %-14s | %-8s | %-83s |\n" "$(1)" "$(2)" "$(3)" | tee -a $(4)
 bdu = jq -r ".assets[] | select(.browser_download_url | contains(\"$1\")) | .browser_download_url" $2
 tarball = jq -r '.tarball_url' $1
 
-DNF_LIST := golang luajit nodejs uv
+DNF_LIST := golang nodejs uv # luajit 
 OTP := erlang erlang-rebar3 elixir gleam
-LUA := luajit luarocks
 
 HEADING1 := \#
 HEADING2 := $(HEADING1)$(HEADING1)
@@ -39,7 +38,7 @@ default:  info/README.md
 	buildah push ghcr.io/grantmacken/tbx-runtimes:latest
 	echo '✅ ghcr.io/grantmacken/tbx-runtimes:latest built and pushed'
 
-info/README.md: init $(DNF_LIST) $(OTP) luarocks
+info/README.md: init $(DNF_LIST) $(OTP) # luarocks
 	echo '##[ $@ ]##'
 	mkdir -p $(dir $@)
 	# create or overwrite README.md
