@@ -43,7 +43,7 @@ HEADING3 := $(HEADING2)$(HEADING1)
 
 # BASH_LIST := nodejs-bash-language-server ShellCheck shfmt
 DNF_LIST     :=  google-cloud-cli ShellCheck shfmt
-UV_TOOL_LIST :=  tombi specify-cli mbake
+UV_TOOL_LIST :=  tombi  mbake # specify-cli
 NPM_LIST := bash-language-server \
 			copilot \
 			copilot-language-server \
@@ -55,8 +55,9 @@ NPM_LIST := bash-language-server \
 
 RELEASE_BINARY_LIST :=  neovim lua-language-server harper-ls
 
-ROCKS_LIST := busted nlua
-PKGS_LIST := $(RELEASE_BINARY_LIST) $(ROCKS_LIST) $(UV_TOOL_LIST)  $(NPM_LIST) $(DNF_LIST)
+# ROCKS_LIST := busted nlua
+# $(ROCKS_LIST)
+PKGS_LIST := $(RELEASE_BINARY_LIST)  $(UV_TOOL_LIST)  $(NPM_LIST) $(DNF_LIST)
 
 ## Helper to write info files in a consistent format
 define to_info
@@ -204,16 +205,16 @@ info/tombi.md:
 	# $(RUN) uv tool list | grep $${PKG}
 	$(call uv_tool_info,$${PKG},"TOML Formatter, Linter, and Language Server")
 
-specify-cli: info/specify-cli.md
-info/specify-cli.md:
-	# echo '##[ $(basename $(notdir $@)) ]##'
-	PKG=$(basename $(notdir $@)) 
-	$(RUN) uv tool install $${PKG} --from git+https://github.com/github/spec-kit.git &> /dev/null
-	# success|failure check
-	# Note: the binary is named 'specify' not 'specify-cli'
-	$(RUN) which specify &> /dev/null
-	$(RUN) whereis specify &> /dev/null
-	$(call uv_tool_info,$${PKG},GitHub Spec Tool)
+# specify-cli: info/specify-cli.md
+# info/specify-cli.md:
+# 	# echo '##[ $(basename $(notdir $@)) ]##'
+# 	PKG=$(basename $(notdir $@)) 
+# 	$(RUN) uv tool install $${PKG} --from git+https://github.com/github/spec-kit.git &> /dev/null
+# 	# success|failure check
+# 	# Note: the binary is named 'specify' not 'specify-cli'
+# 	$(RUN) which specify &> /dev/null
+# 	$(RUN) whereis specify &> /dev/null
+# 	$(call uv_tool_info,$${PKG},GitHub Spec Tool)
 
 mbake: info/mbake.md
 info/mbake.md:
@@ -403,33 +404,33 @@ info/shfmt.md:
 # busted
 # nlua
 
-busted: info/busted.md
-info/busted.md:
-	# echo '##[ $(basename $(notdir $@)) ]##'
-	PKG=$(basename $(notdir $@))
-	$(RUN) luarocks install --global $${PKG} &> /dev/null
-	# verify installation
-	$(RUN) which $${PKG} &> /dev/null
-	$(RUN) $${PKG} --version &> /dev/null
-	LINES=$$($(RUN) luarocks show --porcelain $${PKG})
-	# extract 'name', 'version', 'summary'
-	VER=$$(echo "$${LINES}" | grep -oP '^version\s\K.+')
-	SUM=$$(echo "$${LINES}" | grep -oP '^summary\s\K.+')
-	$(call to_info,$${PKG},$${VER},$${SUM})
-
-nlua: info/nlua.md
-info/nlua.md:
-	# echo '##[ $(basename $(notdir $@)) ]##'
-	PKG=$(basename $(notdir $@))
-	$(RUN) luarocks install --global $${PKG} &> /dev/null
-	# verify installation
-	$(RUN) which $${PKG} &> /dev/null
-	# $(RUN) $${PKG} --version || true
-	LINES=$$($(RUN) luarocks show --porcelain $${PKG})
-	# extract 'name', 'version', 'summary'
-	VER=$$(echo "$${LINES}" | grep -oP '^version\s\K.+')
-	SUM=$$(echo "$${LINES}" | grep -oP '^summary\s\K.+')
-	$(call to_info,$${PKG},$${VER},$${SUM})
+# busted: info/busted.md
+# info/busted.md:
+# 	# echo '##[ $(basename $(notdir $@)) ]##'
+# 	PKG=$(basename $(notdir $@))
+# 	$(RUN) luarocks install --global $${PKG} &> /dev/null
+# 	# verify installation
+# 	$(RUN) which $${PKG} &> /dev/null
+# 	$(RUN) $${PKG} --version &> /dev/null
+# 	LINES=$$($(RUN) luarocks show --porcelain $${PKG})
+# 	# extract 'name', 'version', 'summary'
+# 	VER=$$(echo "$${LINES}" | grep -oP '^version\s\K.+')
+# 	SUM=$$(echo "$${LINES}" | grep -oP '^summary\s\K.+')
+# 	$(call to_info,$${PKG},$${VER},$${SUM})
+#
+# nlua: info/nlua.md
+# info/nlua.md:
+# 	# echo '##[ $(basename $(notdir $@)) ]##'
+# 	PKG=$(basename $(notdir $@))
+# 	$(RUN) luarocks install --global $${PKG} &> /dev/null
+# 	# verify installation
+# 	$(RUN) which $${PKG} &> /dev/null
+# 	# $(RUN) $${PKG} --version || true
+# 	LINES=$$($(RUN) luarocks show --porcelain $${PKG})
+# 	# extract 'name', 'version', 'summary'
+# 	VER=$$(echo "$${LINES}" | grep -oP '^version\s\K.+')
+# 	SUM=$$(echo "$${LINES}" | grep -oP '^summary\s\K.+')
+# 	$(call to_info,$${PKG},$${VER},$${SUM})
 
 pull:
 	echo '##[ $@ ]##'
