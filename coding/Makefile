@@ -1,0 +1,441 @@
+SHELL=/usr/bin/bash
+.SHELLFLAGS := -euo pipefail -c
+# -e Exit immediately if a pipeline fails
+# -u Error if there are unset variables and parameters
+# -o option-name Set the option corresponding to option-name
+.ONESHELL:
+.DELETE_ON_ERROR:
+.SECONDARY:
+
+MAKEFLAGS += --warn-undefined-variables
+MAKEFLAGS += --no-builtin-rules
+MAKEFLAGS += --silent
+unexport MAKEFLAGS
+
+WORKING_CONTAINER := tbx-runtimes-working-container
+# actions
+RUN     := buildah run $(WORKING_CONTAINER)
+SH      := $(RUN) sh -c
+INSTALL := $(RUN) dnf install --allowerasing --skip-unavailable --skip-broken --no-allow-downgrade -y
+# LINK    := $(RUN) ln -s $(shell which host-spawn)
+ADD    := buildah add --chmod 755 $(WORKING_CONTAINER)
+RW_ADD := buildah add --chmod  644 $(WORKING_CONTAINER)
+WGET   := wget -q --no-check-certificate --timeout=10 --tries=3
+# everything is site dir
+# DIR_SITE   := /usr/share/nvim/site
+DIR_BIN    := /usr/local/bin
+TAR          := tar xz --strip-components=1 -C
+TAR_NO_STRIP := tar xz -C
+
+max_field := $(shell echo -n 'copilot-language-server' | wc -c)
+tr = printf "| %-$(max_field)s | %-8s | %-85s |\n" "$(1)" "$(2)" "$(3)" | tee -a $(4)
+bdu = jq -r ".assets[] | select(.browser_download_url | contains(\"$1\")) | .browser_download_url" $2
+
+lsp_confs := $(wildcard site/lsp/*.lua)
+lsp_targs := $(patsubst site/lsp/%.lua,info/site/lsp/%.md,$(lsp_confs))
+
+ft_confs  := $(wildcard site/after/filetype/*.lua)
+ft_targs := $(patsubst  site/after/ftplugin/*.lua, info/after/ftplugin/%.md,$(ft_confs))
+
+HEADING1 := \#
+HEADING2 := $(HEADING1)$(HEADING1)
+HEADING3 := $(HEADING2)$(HEADING1)
+
+# BASH_LIST := nodejs-bash-language-server ShellCheck shfmt
+DNF_LIST     :=  google-cloud-cli ShellCheck shfmt
+UV_TOOL_LIST :=  tombi specify-cli mbake
+NPM_LIST := bash-language-server \
+			copilot \
+			copilot-language-server \
+			faucet \
+			tape \
+			tree-sitter-cli \
+			vscode-langservers-extracted \
+			yaml-language-server
+
+RELEASE_BINARY_LIST :=  neovim lua-language-server harper-ls
+
+ROCKS_LIST := busted nlua
+PKGS_LIST := $(RELEASE_BINARY_LIST) $(ROCKS_LIST) $(UV_TOOL_LIST)  $(NPM_LIST) $(DNF_LIST)
+
+## Helper to write info files in a consistent format
+define to_info
+    printf "Name: %s\n"    "$(1)" > $@
+	printf "Version: %s\n" "$(2)" >> $@
+	printf "Summary: %s\n" "$(3)" >> $@
+	printf "✅ %s installed \n" "$(1)"
+endef
+
+default: info/README.md
+	echo '##[ $@ ]##'
+	buildah commit $(WORKING_CONTAINER) ghcr.io/grantmacken/tbx-coding
+	buildah push ghcr.io/grantmacken/tbx-coding:latest
+	echo '✅ ghcr.io/grantmacken/tbx-coding:latest built and pushed'
+
+info/README.md: init $(PKGS_LIST)
+	echo '##[ $@ ]##'
+	mkdir -p $(dir $@)
+	cat info/readme/preamble.md > $@
+	echo $@
+	$(file >> $@,the following applications are included in this toolbox: )
+	$(call tr,"Name","Version","Summary", $@)
+	$(call tr,"----","-------","-------", $@)
+	for pkg in $(PKGS_LIST)
+	do
+	NAME=$$(cat info/$${pkg}.md | grep -oP '^Name:\s\K.+')
+	VER=$$(cat info/$${pkg}.md | grep -oP '^Version:\s\K.+')
+	SUM=$$(cat info/$${pkg}.md | grep -oP '^Summary:\s\K.+')
+	$(call tr,$${NAME},$${VER},$${SUM},$@)
+	done
+
+init:
+	echo '##[ $@ ]##'
+	buildah pull ghcr.io/grantmacken/tbx-runtimes &>/dev/null
+	buildah from ghcr.io/grantmacken/tbx-runtimes &>/dev/null
+	$(ADD) scripts/ $(DIR_BIN)/ &>/dev/null
+	buildah config \
+	--label summary='a toolbox with cli tools, neovim' \
+	--label description='a toolbox with cli tools, neovim, lsp servers, linters and formaters' \
+	--label org.opencontainers.image.source='https://github.com/grantmacken/tbx-coding' \
+	--label maintainer='Grant MacKenzie <grantmacken@gmail.com>' \
+	--env lang=C.UTF-8 \
+	--env UV_TOOL_BIN_DIR=/usr/local/bin \
+	--env UV_TOOL_DIR=/var/lib/uv_tools \
+	$(WORKING_CONTAINER)
+	mkdir -p info
+	mkdir -p latest
+	# update dnf repos
+	$(RUN) dnf update -y &>/dev/null
+
+# release binaries:
+# neovim
+# lua-language-server
+# TODO harper-ls
+
+neovim: info/neovim.md
+info/neovim.md:
+	# echo '##[ $(basename $(notdir $@)) ]##'
+	PKG=$(basename $(notdir $@)) 
+	TARGET=files/$${PKG}/usr/local
+	mkdir -p $${TARGET}
+	SRC='https://github.com/neovim/neovim/releases/download/nightly/nvim-linux-x86_64.tar.gz'
+	$(WGET) $${SRC} -O- | $(TAR) $${TARGET} &> /dev/null
+	$(ADD) files/$${PKG} &> /dev/null
+	# success|failure check
+	$(RUN) nvim --version &> /dev/null
+	$(RUN) whereis nvim &> /dev/null
+	$(RUN) which nvim &> /dev/null
+	# get version from the binary
+	VER=$$($(RUN) nvim -v | grep -oP 'NVIM v\K\d+\.\d+\.\d+' )
+	$(call to_info,$${PKG},$${VER},Neovim text editor)
+
+lua-language-server: info/lua-language-server.md
+latest/lua-language-server.json:
+	$(WGET) https://api.github.com/repos/LuaLS/lua-language-server/releases/latest -O- | jq '.' > $@
+
+info/lua-language-server.md: latest/lua-language-server.json
+	# echo '##[ $(basename $(notdir $@)) ]##'
+	PKG=$(basename $(notdir $@)) 
+	SRC=$(shell $(call bdu,linux-x64.tar.gz,$<))
+	TARGET=files/$${PKG}/usr/local/$${PKG}
+	mkdir -p $${TARGET}
+	$(WGET) $${SRC} -O- | $(TAR_NO_STRIP) $${TARGET} &> /dev/null
+	$(ADD) files/$${PKG} &> /dev/null
+	# note the lua-language-server binary is in /usr/local/$${PKG}/bin/ subdir
+	# the exec script in /usr/local/bin/lua-language-server will point to it
+	# these scripts are added in init target
+	# success|failure caheck
+	$(RUN) which $${PKG} &> /dev/null
+	$(RUN) whereis $${PKG}	 &> /dev/null
+	$(RUN) $${PKG} --version &> /dev/null
+	# extract 'name', 'version', 'summary'
+	# get version from the binary
+	VER=$$($(RUN) lua-language-server --version)
+	$(call to_info,$${PKG},$${VER},'Lua language server')
+
+# harper-ls
+harper-ls: info/harper-ls.md
+
+latest/harper-ls.json:
+	echo ' - fetching latest release info: ##[  $(basename $(notdir $@)) ]##'
+	$(WGET) https://api.github.com/repos/Automattic/harper/releases/latest -O- | jq '.' > $@
+
+info/harper-ls.md: latest/harper-ls.json
+	# echo ' - installing  latest version: ##[ $(basename $(notdir $@)) ]##'
+	PKG=$(basename $(notdir $@))
+	SRC=$(shell $(call bdu,"harper-ls-x86_64-unknown-linux-gnu",$<))
+	# echo " - download url: $${SRC}"
+	TARGET="files/$${PKG}/usr/local/bin"
+	mkdir -p $${TARGET}
+	$(WGET) $${SRC} -O- | $(TAR_NO_STRIP) $${TARGET} &> /dev/null
+	$(ADD) files/$${PKG} &> /dev/null
+	# success|failure caheck
+	$(RUN) which $${PKG} &> /dev/null
+	$(RUN) whereis $${PKG} &> /dev/null
+	$(RUN) $${PKG} --version &> /dev/null
+	# extract 'name', 'version', 'summary'
+	# get version from the binary
+	VER=$$($(RUN) harper-ls --version | cut -d' ' -f2)
+	$(call to_info,$${PKG},$${VER},'Harper Language Server Grammar Checker')
+
+#uv tools:
+# tombi
+# mbake
+# specify-cli
+
+define uv_tool_info
+# extract 'name', 'version', 'summary'
+	LINE=$$($(RUN) uv tool list | grep $(1) )
+	# extract 'name', 'version', 'summary'
+	NAME=$$(echo $$LINE | cut -d' ' -f1)
+	VER=$$(echo $$LINE  | cut -d' ' -f2)
+	SUM='$(2)'
+	$(call to_info,$${NAME},$${VER},$${SUM})
+endef
+
+tombi: info/tombi.md
+info/tombi.md:
+	# echo '##[ $(basename $(notdir $@)) ]##'
+	PKG=$(basename $(notdir $@)) 
+	$(RUN) uv tool install $${PKG} &> /dev/null
+	# success|failure check
+	$(RUN) which $${PKG} &> /dev/null
+	$(RUN) $${PKG} --version &> /dev/null
+	# $(RUN) uv tool list | grep $${PKG}
+	$(call uv_tool_info,$${PKG},"TOML Formatter, Linter, and Language Server")
+
+specify-cli: info/specify-cli.md
+info/specify-cli.md:
+	# echo '##[ $(basename $(notdir $@)) ]##'
+	PKG=$(basename $(notdir $@)) 
+	$(RUN) uv tool install $${PKG} --from git+https://github.com/github/spec-kit.git &> /dev/null
+	# success|failure check
+	# Note: the binary is named 'specify' not 'specify-cli'
+	$(RUN) which specify &> /dev/null
+	$(RUN) whereis specify &> /dev/null
+	$(call uv_tool_info,$${PKG},GitHub Spec Tool)
+
+mbake: info/mbake.md
+info/mbake.md:
+	# echo '##[ $(basename $(notdir $@)) ]##'
+	PKG=$(basename $(notdir $@)) 
+	$(RUN) uv tool install $${PKG} &> /dev/null
+	# success|failure check
+	$(RUN) which $${PKG} &> /dev/null
+	$(RUN) $${PKG} --version &> /dev/null
+	# extract 'name', 'version', 'summary'
+	$(call uv_tool_info,$${PKG},Makefile formatter and linter)
+
+# npm packages:
+# bash-language-server
+# copilot
+# copilot-language-server
+# faucet
+# tape
+# tree-sitter-cli
+# vscode-langservers-extracted
+# yaml-language-server
+
+bash-language-server: info/bash-language-server.md
+info/bash-language-server.md:
+	# echo '##[ $(basename $(notdir $@)) ]##'
+	PKG=$(basename $(notdir $@))
+	JSON=$$($(RUN) npm view --json $${PKG} | jq '.')
+	# From the veiw extract 'name', 'version', 'description'
+	NAME=$$(echo $$JSON | jq -r '.name')
+	VER=$$(echo $$JSON | jq -r '."dist-tags".latest')
+	SUM=$$(echo $$JSON | jq -r '.description')
+	# install the package globally and use the latest version
+	$(RUN) npm install --global $${NAME}@$${VER} &> /dev/null
+	# success|failure check
+	$(RUN) $${PKG} --version &> /dev/null
+	$(call to_info,$${NAME},$${VER},$${SUM})
+
+copilot: info/copilot.md
+info/copilot.md:
+	# echo '##[ $(basename $(notdir $@)) ]##'
+	PKG=$(basename $(notdir $@))
+	JSON=$$($(RUN) npm view --json @github/copilot | jq '.')
+	# extract 'name', 'version', 'description' into to a table row
+	NAME=$$(echo $$JSON | jq -r '.name')
+	VER=$$(echo $$JSON | jq -r '."dist-tags".latest')
+	SUM=$$(echo $$JSON | jq -r '.description')
+	$(RUN) npm install --global  $${NAME}@$${VER} &> /dev/null
+	# success|failure check
+	$(RUN) $${PKG} --version &> /dev/null
+	$(call to_info,$${PKG},$${VER},$${SUM})
+
+copilot-language-server: info/copilot-language-server.md
+info/copilot-language-server.md:
+	# echo '##[ $(basename $(notdir $@)) ]##'
+	PKG=$(basename $(notdir $@))
+	JSON=$$($(RUN) npm view --json @github/copilot-language-server | jq '.')
+	NAME=$$(echo $$JSON | jq -r '.name')
+	VER=$$(echo $$JSON | jq -r '."dist-tags".latest')
+	SUM=$$(echo $$JSON | jq -r '.description')
+	$(RUN) npm install --global $${NAME}@$${VER} &> /dev/null
+	# success|failure check
+	# TODO
+	$(call to_info,$${PKG},$${VER},$${SUM})
+
+faucet: info/faucet.md
+info/faucet.md:
+	# echo '##[ $(basename $(notdir $@)) ]##'
+	PKG=$(basename $(notdir $@))
+	JSON=$$($(RUN) npm view --json $${PKG} | jq '.')
+	NAME=$$(echo $$JSON | jq -r '.name')
+	VER=$$(echo $$JSON | jq -r '."dist-tags".latest')
+	SUM=$$(echo $$JSON | jq -r '.description')
+	$(RUN) npm install --global $${NAME}@$${VER} &> /dev/null
+	# success|failure check
+	# TODO
+	$(call to_info,$${NAME},$${VER},$${SUM})
+
+tape: info/tape.md
+info/tape.md:
+	# echo '##[ $(basename $(notdir $@)) ]##'
+	PKG=$(basename $(notdir $@))
+	JSON=$$($(RUN) npm view --json $${PKG} | jq '.')
+	NAME=$$(echo $$JSON | jq -r '.name')
+	VER=$$(echo $$JSON | jq -r '."dist-tags".latest')
+	SUM=$$(echo $$JSON | jq -r '.description')
+	$(RUN) npm install --global $${NAME}@$${VER} &> /dev/null
+	# success|failure check
+	$(RUN) tape --version &> /dev/null
+	$(call to_info,$${NAME},$${VER},$${SUM})
+
+tree-sitter-cli: info/tree-sitter-cli.md
+info/tree-sitter-cli.md:
+	# echo '##[ $(basename $(notdir $@)) ]##'
+	PKG=$(basename $(notdir $@))
+	JSON=$$($(RUN) npm view --json $${PKG} | jq '.')
+	NAME=$$(echo $$JSON | jq -r '.name')
+	VER=$$(echo $$JSON | jq -r '."dist-tags".latest')
+	SUM=$$(echo $$JSON | jq -r '.description')
+	$(RUN) npm install --global $${NAME}@$${VER} &> /dev/null
+	# success|failure check
+	# Note: the binary is named `tree-sitter` not the package name
+	$(RUN) tree-sitter --version &> /dev/null
+	$(call to_info,$${NAME},$${VER},$${SUM})
+
+vscode-langservers-extracted: info/vscode-langservers-extracted.md
+info/vscode-langservers-extracted.md:
+	# echo '##[ $(basename $(notdir $@)) ]##'
+	PKG=$(basename $(notdir $@))
+	JSON=$$($(RUN) npm view --json $${PKG} | jq '.')
+	NAME=$$(echo $$JSON | jq -r '.name')
+	VER=$$(echo $$JSON | jq -r '."dist-tags".latest')
+	SUM=$$(echo $$JSON | jq -r '.description')
+	$(RUN) npm install --global $${NAME}@$${VER} &> /dev/null
+	# success|failure check
+	#  "vscode-css-language-server": "bin/vscode-css-language-server",
+	#  "vscode-eslint-language-server": "bin/vscode-eslint-language-server",
+	#  "vscode-html-language-server": "bin/vscode-html-language-server",
+	#  "vscode-json-language-server": "bin/vscode-json-language-server",
+	#  "vscode-markdown-language-server": "bin/vscode-markdown-language-server"
+	$(call to_info,vscode-langservers,$${VER},$${SUM})
+
+yaml-language-server: info/yaml-language-server.md
+info/yaml-language-server.md:
+	# echo '##[ $(basename $(notdir $@)) ]##'
+	PKG=$(basename $(notdir $@))
+	JSON=$$($(RUN) npm view --json $${PKG} | jq '.')
+	NAME=$$(echo $$JSON | jq -r '.name')
+	VER=$$(echo $$JSON | jq -r '."dist-tags".latest')
+	SUM=$$(echo $$JSON | jq -r '.description')
+	$(RUN) npm install --global $${NAME}@$${VER} &> /dev/null
+	# success|failure check
+	# TODO
+	$(call to_info,$${NAME},$${VER},$${SUM})
+
+# dnf packages:
+# google-cloud-cli
+# ShellCheck
+# shfmt
+#
+define dnf_installed_info
+  	LINES=$$($(RUN) dnf info --installed $(1))
+	# extract 'name', 'version', 'summary'
+	VER=$$(echo "$${LINES}" | grep -oP '^Version\s+:\s+\K.+' || true)
+	SUM=$$(echo "$${LINES}" | grep -oP '^Summary\s+:\s+\K.+' || true)
+	# consistent write to file format
+	$(call to_info,$(1),$${VER},$${SUM})
+endef
+
+google-cloud-cli: info/google-cloud-cli.md
+info/google-cloud-cli.md:
+	# echo '##[ $(basename $(notdir $@)) ]##'
+	PKG=$(basename $(notdir $@))
+	# add the repo
+	$(RUN) mkdir -p /etc/yum.repos.d
+	$(ADD) files/google-cloud-sdk.repo /etc/yum.repos.d/google-cloud-sdk.repo &> /dev/null
+	$(INSTALL) libxcrypt-compat $${PKG} &> /dev/null
+	# success|failure check
+	# Note the binary is named 'gcloud'
+	$(RUN) gcloud --version &> /dev/null
+	$(RUN) whereis gcloud &> /dev/null
+	$(RUN) which gcloud &> /dev/null
+	$(call dnf_installed_info,$${PKG})
+
+ShellCheck: info/ShellCheck.md
+info/ShellCheck.md:
+	# echo '##[ $(basename $(notdir $@)) ]##'
+	PKG=$(basename $(notdir $@))
+	$(INSTALL) $${PKG} &> /dev/null
+	# success|failure check
+	# Note the binary is named 'sheckcheck'
+	$(RUN) which shellcheck &> /dev/null
+	$(RUN) shellcheck --version &> /dev/null
+	$(call dnf_installed_info,$${PKG})
+
+shfmt: info/shfmt.md
+info/shfmt.md:
+	# echo '##[ $(basename $(notdir $@)) ]##'
+	PKG=$(basename $(notdir $@))
+	$(INSTALL) $${PKG} &> /dev/null
+	# verify installation
+	$(RUN) whereis $${PKG} &> /dev/null
+	$(RUN) which $${PKG} &> /dev/null
+	$(RUN) $${PKG} --version &> /dev/null
+	$(call dnf_installed_info,$${PKG})
+
+# luarocks packages:
+# busted
+# nlua
+
+busted: info/busted.md
+info/busted.md:
+	# echo '##[ $(basename $(notdir $@)) ]##'
+	PKG=$(basename $(notdir $@))
+	$(RUN) luarocks install --global $${PKG} &> /dev/null
+	# verify installation
+	$(RUN) which $${PKG} &> /dev/null
+	$(RUN) $${PKG} --version &> /dev/null
+	LINES=$$($(RUN) luarocks show --porcelain $${PKG})
+	# extract 'name', 'version', 'summary'
+	VER=$$(echo "$${LINES}" | grep -oP '^version\s\K.+')
+	SUM=$$(echo "$${LINES}" | grep -oP '^summary\s\K.+')
+	$(call to_info,$${PKG},$${VER},$${SUM})
+
+nlua: info/nlua.md
+info/nlua.md:
+	# echo '##[ $(basename $(notdir $@)) ]##'
+	PKG=$(basename $(notdir $@))
+	$(RUN) luarocks install --global $${PKG} &> /dev/null
+	# verify installation
+	$(RUN) which $${PKG} &> /dev/null
+	# $(RUN) $${PKG} --version || true
+	LINES=$$($(RUN) luarocks show --porcelain $${PKG})
+	# extract 'name', 'version', 'summary'
+	VER=$$(echo "$${LINES}" | grep -oP '^version\s\K.+')
+	SUM=$$(echo "$${LINES}" | grep -oP '^summary\s\K.+')
+	$(call to_info,$${PKG},$${VER},$${SUM})
+
+pull:
+	echo '##[ $@ ]##'
+	host-spawn
+	podman pull ghcr.io/grantmacken/tbx-coding:latest
+	# toolbox list --containers
+	# toolbox list --images
+	#toolbox create --image ghcr.io/grantmacken/tbx-coding:latest coding
+	exit

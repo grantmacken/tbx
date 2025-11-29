@@ -1,17 +1,4 @@
-# 1. IGNORE ALL FILES AND SUBDIRECTORIES IN ALL DIRECTORIES
-# The pattern '**/*' matches all files and directories recursively,
-# starting from the root of the repository.
-**/*
-
-# 2. EXCEPTION: DO NOT IGNORE DIRECTORIES
-# This is crucial. Git ignores contents of a directory if the directory
-# itself is ignored. We must un-ignore all directories recursively ('/**/')
-# to allow the next rule to function.
-!**/
-
-# 3. EXCEPTION: DO NOT IGNORE .gitkeep FILES
-# This ensures that any file named .gitkeep, regardless of its location,
-# is explicitly tracked by Git.
-!**/.gitkeep
-
+.env
+info/*
+!info/readme/*
 
