@@ -35,3 +35,9 @@ workflow: ## use gh to run the  workflow in GitHub Actions
 	## watch the workflow until it completes
 	gh run watch
 
+watch: ## use gh to watch the last dispatch workflow in GitHub Actions
+	# get the last workflow run id
+	last_run_id=$(gh run list --limit 1 --json databaseId --jq '.[0].databaseId')
+	echo -e "$(CYAN)Watching the last workflow run with id: $(last_run_id)...$(NC)"
+	gh run watch $(last_run_id)
+
