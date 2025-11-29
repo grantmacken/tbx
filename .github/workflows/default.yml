@@ -29,7 +29,9 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
       - name: Make tbx-build-tools toolbox image
-        run: cd build-tools && make .env && make
+        run: |
+          pushd build-tools && make .env && make && popd
+          pushd runtimes && make && popd
 
   # tbx-runtimes:
   #   needs: tbx-build-tools
