@@ -18,7 +18,7 @@ README.md: build-tools
 	$(call tr,"----","-------","-------", $@)
 	for pkg in $(PKGS_LIST)
 	do
-	echo "Processing package: $${pkg}"
+	# echo "Processing package: $${pkg}"
 	$(call dnf_to_table_row,$${pkg},$@)
 	done
 	cat $@
