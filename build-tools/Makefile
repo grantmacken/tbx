@@ -5,15 +5,16 @@ TBX_SUMMARY := A Fedora Toolbox image with CLI tools and build tools
 TBX_IMAGE := ghcr.io/grantmacken/$(TBX_NAME)
 include ../inc/define.mk
 
-TOOLS :=  bat eza fd-find fzf host-spawn jq ripgrep wl-clipboard zoxide stow
+TOOLS := bat eza fd-find fzf host-spawn jq ripgrep wl-clipboard zoxide stow
 BUILD := make gcc gcc-c++ pcre2 autoconf pkgconf
 DEVEL := libicu gettext-devel glibc-devel libevent-devel ncurses-devel openssl-devel perl-devel readline-devel zlib-devel
 
-default: init # TODO
+default: init gh # TODO
 	echo '##[ $@ ]##'
-	buildah commit $(WORKING_CONTAINER) $(TBX_IMAGE)
-	buildah push $(TBX_IMAGE):latest
-	echo '✅ Image pushed to $(TBX_IMAGE):latest'
+	cat info/gh.md
+	# buildah commit $(WORKING_CONTAINER) $(TBX_IMAGE)
+	# buildah push $(TBX_IMAGE):latest
+	# echo '✅ Image pushed to $(TBX_IMAGE):latest'
 
 latest/fedora-toolbox.json:
 	echo '##[ $@ ]##'
@@ -30,6 +31,14 @@ init: latest/fedora-toolbox.json
 	--label maintainer='Grant MacKenzie <grantmacken@gmail.com>' \
 	--env lang=C.UTF-8 $(WORKING_CONTAINER)
 	echo '✅ Base image pulled and working container created'
+
+gh: info/gh.md
+info/gh.md:
+	echo '##[ $@ ]##'
+	mkdir -p $(dir $@)
+	$(RUN) dnf config-manager addrepo --from-repofile=https://cli.github.com/packages/rpm/gh-cli.repo &> /dev/null
+	$(INSTALL) gh --repo gh-cli &>  /dev/null
+	$(call dnf_installed_info,$${PKG})
 
 info/build-tools.md:
 	echo '##[ $@ ]##'
