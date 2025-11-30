@@ -5,7 +5,7 @@ TBX_SUMMARY := A Fedora Toolbox image with CLI tools and build tools
 TBX_IMAGE := ghcr.io/grantmacken/$(TBX_NAME)
 include ../inc/define.mk
 
-TOOLS := make bat eza fd-find fzf host-spawn jq ripgrep wl-clipboard zoxide stow
+TOOLS := make stow bat # eza fd-find fzf host-spawn jq ripgrep wl-clipboard zoxide 
 BUILD := gcc gcc-c++ pcre2 autoconf pkgconf
 DEVEL := libicu gettext-devel glibc-devel libevent-devel ncurses-devel openssl-devel perl-devel readline-devel zlib-devel
 PKGS_LIST := gh $(TOOLS)
@@ -42,13 +42,12 @@ init: latest/fedora-toolbox.json
 	--env lang=C.UTF-8 $(WORKING_CONTAINER)
 	echo '✅ Base image pulled and working container created'
 
-
 build-tools: init
 	$(RUN) dnf config-manager addrepo --from-repofile=https://cli.github.com/packages/rpm/gh-cli.repo &> /dev/null
 	$(INSTALL) gh --repo gh-cli &>  /dev/null
+	$(INSTALL) $(DEVEL) &>/dev/null
+	$(INSTALL) $(BUILD) &>/dev/null
 	$(INSTALL) $(TOOLS) &>/dev/null
-	# $(INSTALL) $(DEVEL) &>/dev/null
-	# $(INSTALL) $(BUILD) &>/dev/null
 	echo '✅ Build tools and CLI tools installed'
 
 
