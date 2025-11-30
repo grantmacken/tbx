@@ -36,7 +36,7 @@ define dnf_installed_info
 endef
 
 define dnf_to_table_row
-  	LINES=$$($(RUN) dnf info --installed $(1))
+  	LINES=$$($(RUN) dnf info --installed $(1) | iconv -f UTF-8 -t ASCII//TRANSLIT)
 	# extract 'name', 'version', 'summary'
 	VER=$$(echo "$${LINES}" | grep -oP '^Version\s+:\s+\K.+' || true)
 	SUM=$$(echo "$${LINES}" | grep -oP '^Summary\s+:\s+\K.+' || true)
