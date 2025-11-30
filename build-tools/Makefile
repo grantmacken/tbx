@@ -10,7 +10,7 @@ BUILD := gcc gcc-c++ pcre2 autoconf pkgconf
 DEVEL := libicu gettext-devel glibc-devel libevent-devel ncurses-devel openssl-devel perl-devel readline-devel zlib-devel
 PKGS_LIST := gh $(TOOLS)
 
-README.md:  init build-tools
+README.md: build-tools
 	echo '##[ $@ ]##'
 	$(file >> $@,the following applications are included in this toolbox: )
 	$(call tr,"Name","Version","Summary", $@)
@@ -43,8 +43,7 @@ init: latest/fedora-toolbox.json
 	echo '✅ Base image pulled and working container created'
 
 
-build-tools: 
-	echo '##[ $< ]##'
+build-tools: init
 	$(RUN) dnf config-manager addrepo --from-repofile=https://cli.github.com/packages/rpm/gh-cli.repo &> /dev/null
 	$(INSTALL) gh --repo gh-cli &>  /dev/null
 	# $(INSTALL) $(TOOLS) &>/dev/null
