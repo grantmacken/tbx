@@ -1,86 +1,35 @@
-SHELL=/usr/bin/bash
-.SHELLFLAGS := -euo pipefail -c
-# -e Exit immediately if a pipeline fails
-# -u Error if there are unset variables and parameters
-# -o option-name Set the option corresponding to option-name
-.ONESHELL:
-.DELETE_ON_ERROR:
-.SECONDARY:
-
-MAKEFLAGS += --warn-undefined-variables
-MAKEFLAGS += --no-builtin-rules
-MAKEFLAGS += --silent
-unexport MAKEFLAGS
-
-HEADING1 := \#
-HEADING2 := $(HEADING1)$(HEADING1)
-HEADING3 := $(HEADING2)$(HEADING1)
-
-include .env
+include ../inc/meta.mk
 WORKING_CONTAINER ?= fedora-toolbox-working-container
-FED_IMAGE := registry.fedoraproject.org/fedora-toolbox
 TBX_NAME := tbx-build-tools
 TBX_SUMMARY := A Fedora Toolbox image with CLI tools and build tools
 TBX_IMAGE := ghcr.io/grantmacken/$(TBX_NAME)
+include ../inc/define.mk
 
-RUN := buildah run $(WORKING_CONTAINER)
-ADD := buildah add --chmod 755 $(WORKING_CONTAINER)
-INSTALL := $(RUN) dnf install --allowerasing --skip-unavailable --skip-broken --no-allow-downgrade -y
-WGET := wget -q --no-check-certificate --timeout=10 --tries=3
 TOOLS :=  bat eza fd-find fzf host-spawn jq ripgrep wl-clipboard zoxide stow
 BUILD := make gcc gcc-c++ pcre2 autoconf pkgconf
 DEVEL := libicu gettext-devel glibc-devel libevent-devel ncurses-devel openssl-devel perl-devel readline-devel zlib-devel
 
-tr = printf "| %-14s | %-8s | %-83s |\n" "$(1)" "$(2)" "$(3)" | tee -a $(4)
-bdu = jq -r ".assets[] | select(.browser_download_url | contains(\"$1\")) | .browser_download_url" $2
-
-## Helper to write info files in a consistent format
-define to_info
-    printf "Name: %s\n"    "$(1)" > $@
-	printf "Version: %s\n" "$(2)" >> $@
-	printf "Summary: %s\n" "$(3)" >> $@
-	printf "✅ %s installed \n" "$(1)"
-endef
-
-define dnf_installed_info
-  	LINES=$$($(RUN) dnf info --installed $(1))
-	# extract 'name', 'version', 'summary'
-	VER=$$(echo "$${LINES}" | grep -oP '^Version\s+:\s+\K.+' || true)
-	SUM=$$(echo "$${LINES}" | grep -oP '^Summary\s+:\s+\K.+' || true)
-	# consistent write to file format
-	$(call to_info,$(1),$${VER},$${SUM})
-endef
-
-default: README.md
+default: init # TODO
 	echo '##[ $@ ]##'
 	buildah commit $(WORKING_CONTAINER) $(TBX_IMAGE)
 	buildah push $(TBX_IMAGE):latest
 	echo '✅ Image pushed to $(TBX_IMAGE):latest'
 
-init: .env
+latest/fedora-toolbox.json:
 	echo '##[ $@ ]##'
+	mkdir -p $(dir $@)
+	skopeo inspect docker://registry.fedoraproject.org/fedora-toolbox:latest | jq '.' > $@
 
-.env: latest/fedora-toolbox.json
-	echo '##[ $@ ]##'
+init: latest/fedora-toolbox.json
 	FROM_REGISTRY=$$(cat $< | jq -r '.Name')
 	FROM_VERSION=$$(cat $< | jq -r '.Labels.version')
 	FROM_NAME=$$(cat $< | jq -r '.Labels.name')
-	printf "FROM_NAME=%s\n" "$$FROM_NAME" | tee $@
-	printf "FROM_REGISTRY=%s\n" "$$FROM_REGISTRY" | tee -a $@
-	printf "FROM_VERSION=%s\n" "$$FROM_VERSION" | tee -a $@
-	buildah pull "$$FROM_REGISTRY:$$FROM_VERSION" &> /dev/null
-	echo -n "WORKING_CONTAINER=" | tee -a .env
-	buildah from "$${FROM_REGISTRY}:$${FROM_VERSION}" | tee -a $@
+	buildah from "$${FROM_REGISTRY}:$${FROM_VERSION}"
 	buildah config \
 	--label summary='a toolbox with cli tools, neovim' \
 	--label maintainer='Grant MacKenzie <grantmacken@gmail.com>' \
 	--env lang=C.UTF-8 $(WORKING_CONTAINER)
 	echo '✅ Base image pulled and working container created'
-
-latest/fedora-toolbox.json:
-	echo '##[ $@ ]##'
-	mkdir -p $(dir $@)
-	skopeo inspect docker://${FED_IMAGE}:latest | jq '.' > $@
 
 info/build-tools.md:
 	echo '##[ $@ ]##'
