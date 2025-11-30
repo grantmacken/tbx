@@ -25,7 +25,7 @@ NC=\033[0m # No Color
 default:
 	pushd build-tools && $(MAKE) .env && $(MAKE) && popd
 	rm -f README.md # remove if exists to avoid git add errors
-	cat ./build-tools/README.md | tee README.md
+	cat build-tools/README.md | tee README.md
 	git add README.md
 	git commit -m "Update README.md from Makefile build" README.md || echo "No changes to commit"
 
