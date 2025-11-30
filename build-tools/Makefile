@@ -5,13 +5,29 @@ TBX_SUMMARY := A Fedora Toolbox image with CLI tools and build tools
 TBX_IMAGE := ghcr.io/grantmacken/$(TBX_NAME)
 include ../inc/define.mk
 
-TOOLS := bat eza fd-find fzf host-spawn jq ripgrep wl-clipboard zoxide stow
-BUILD := make gcc gcc-c++ pcre2 autoconf pkgconf
+TOOLS := make bat eza fd-find fzf host-spawn jq ripgrep wl-clipboard zoxide stow
+BUILD := gcc gcc-c++ pcre2 autoconf pkgconf
 DEVEL := libicu gettext-devel glibc-devel libevent-devel ncurses-devel openssl-devel perl-devel readline-devel zlib-devel
+PKGS_LIST := gh $(TOOLS)
 
-default: init gh # TODO
+default: README.md
+
+README.md: init gh build-tools
+	init gh # TODO
 	echo '##[ $@ ]##'
-	cat info/gh.md
+	$(file >> $@,the following applications are included in this toolbox: )
+	$(call tr,"Name","Version","Summary", $@)
+	$(call tr,"----","-------","-------", $@)
+	for pkg in $(PKGS_LIST)
+	do
+	NAME=$$(cat info/$${pkg}.md | grep -oP '^Name:\s\K.+')
+	VER=$$(cat info/$${pkg}.md | grep -oP '^Version:\s\K.+')
+	SUM=$$(cat info/$${pkg}.md | grep -oP '^Summary:\s\K.+')
+	$(call tr,$${NAME},$${VER},$${SUM},$@)
+	done
+	cat $@
+	echo '✅ README.md created'
+
 	# buildah commit $(WORKING_CONTAINER) $(TBX_IMAGE)
 	# buildah push $(TBX_IMAGE):latest
 	# echo '✅ Image pushed to $(TBX_IMAGE):latest'
@@ -36,9 +52,17 @@ gh: info/gh.md
 info/gh.md:
 	echo '##[ $@ ]##'
 	mkdir -p $(dir $@)
+	PKG=$(basename $(notdir $@))
 	$(RUN) dnf config-manager addrepo --from-repofile=https://cli.github.com/packages/rpm/gh-cli.repo &> /dev/null
 	$(INSTALL) gh --repo gh-cli &>  /dev/null
 	$(call dnf_installed_info,$${PKG})
+
+build-tools: $(TOOLS)
+	echo '##[ $< ]##'
+	mkdir -p info
+	$(INSTALL) $< &>/dev/null
+	$(call dnf_installed_info,$<,info/$<.md)
+
 
 info/build-tools.md:
 	echo '##[ $@ ]##'
