@@ -13,13 +13,13 @@ PKGS_LIST := gh $(TOOLS)
 default: README.md
 
 README.md: init build-tools
-	init gh # TODO
 	echo '##[ $@ ]##'
 	# $(file >> $@,the following applications are included in this toolbox: )
 	# $(call tr,"Name","Version","Summary", $@)
 	# $(call tr,"----","-------","-------", $@)
 	for pkg in $(PKGS_LIST)
 	do
+	echo "Processing package: $${pkg}"
 	$(call dnf_installed_info,$${pkg})
 	done
 	cat $@
@@ -49,10 +49,10 @@ build-tools:
 	echo '##[ $< ]##'
 	$(RUN) dnf config-manager addrepo --from-repofile=https://cli.github.com/packages/rpm/gh-cli.repo &> /dev/null
 	$(INSTALL) gh --repo gh-cli &>  /dev/null
-	$(INSTALL) $(TOOLS) &>/dev/null
-	$(INSTALL) $(DEVEL) &>/dev/null
-	$(INSTALL) $(BUILD) &>/dev/null
-	echo '✅ Build tools and CLI tools installed'	
+	# $(INSTALL) $(TOOLS) &>/dev/null
+	# $(INSTALL) $(DEVEL) &>/dev/null
+	# $(INSTALL) $(BUILD) &>/dev/null
+	echo '✅ Build tools and CLI tools installed'
 
 
 
