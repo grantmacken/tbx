@@ -368,15 +368,15 @@ info/google-cloud-cli.md:
 	# echo '##[ $(basename $(notdir $@)) ]##'
 	PKG=$(basename $(notdir $@))
 	# add the repo
-	$(RUN) mkdir -p /etc/yum.repos.d
-	$(ADD) files/google-cloud-sdk.repo /etc/yum.repos.d/google-cloud-sdk.repo &> /dev/null
-	$(INSTALL) libxcrypt-compat $${PKG} &> /dev/null
+	# $(RUN) mkdir -p /etc/yum.repos.d
+	# $(ADD) files/google-cloud-sdk.repo /etc/yum.repos.d/google-cloud-sdk.repo &> /dev/null
+	$(INSTALL) libxcrypt-compat $${PKG}
 	# success|failure check
 	# Note the binary is named 'gcloud'
-	$(RUN) gcloud --version &> /dev/null
-	$(RUN) whereis gcloud &> /dev/null
-	$(RUN) which gcloud &> /dev/null
-	$(call dnf_installed_info,$${PKG})
+	$(RUN) gcloud --version 
+	$(RUN) whereis gcloud
+	$(RUN) which gcloud
+	# $(call dnf_installed_info,$${PKG})
 
 ShellCheck: info/ShellCheck.md
 info/ShellCheck.md:
