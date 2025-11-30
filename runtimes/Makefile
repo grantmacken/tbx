@@ -14,40 +14,10 @@ unexport MAKEFLAGS
 
 ## hardcoded working container
 WORKING_CONTAINER := tbx-build-tools-working-container
-RUN := buildah run $(WORKING_CONTAINER)
-ADD := buildah add --chmod 755 $(WORKING_CONTAINER)
-INSTALL := $(RUN) dnf install --allowerasing --skip-unavailable --skip-broken --no-allow-downgrade -y
-INFO    := $(RUN) dnf info
-WGET := wget -q --no-check-certificate --timeout=10 --tries=3
-TAR  := tar xz --strip-components=1 -C
-TAR_NO_STRIP := tar xz -C
+include ../inc/defines.mk
 
-tr = printf "| %-14s | %-8s | %-83s |\n" "$(1)" "$(2)" "$(3)" | tee -a $(4)
-bdu = jq -r ".assets[] | select(.browser_download_url | contains(\"$1\")) | .browser_download_url" $2
-tarball = jq -r '.tarball_url' $1
-
-DNF_LIST := golang nodejs uv # luajit 
+DNF_LIST := golang nodejs uv # luajit
 OTP := erlang erlang-rebar3 elixir gleam
-
-HEADING1 := \#
-HEADING2 := $(HEADING1)$(HEADING1)
-
-## Helper to write info files in a consistent format
-define to_info
-    printf "Name: %s\n"    "$(1)" > $@
-	printf "Version: %s\n" "$(2)" >> $@
-	printf "Summary: %s\n" "$(3)" >> $@
-	printf "✅ %s installed \n" "$(1)"
-endef
-
-define dnf_installed_info
-  	LINES=$$($(RUN) dnf info --installed $(1))
-	# extract 'name', 'version', 'summary'
-	VER=$$(echo "$${LINES}" | grep -oP '^Version\s+:\s+\K.+' || true)
-	SUM=$$(echo "$${LINES}" | grep -oP '^Summary\s+:\s+\K.+' || true)
-	# consistent write to file format
-	$(call to_info,$(1),$${VER},$${SUM})
-endef
 
 
 default:  README.md

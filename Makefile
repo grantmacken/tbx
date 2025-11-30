@@ -18,7 +18,7 @@ default:
 	pushd runtimes && $(MAKE) && popd
 	rm -f README.md # remove if exists to avoid git add errors
 	cat build-tools/README.md > README.md
-	cat runtimes/README.md > README.md
+	cat runtimes/README.md >> README.md
 	cat README.md
 	# git add README.md
 	#git commit -m "Update README.md from Makefile build" README.md || echo "No changes to commit"
