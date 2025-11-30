@@ -35,3 +35,12 @@ define dnf_installed_info
 	# consistent write to file format
 	$(call to_info,$(1),$${VER},$${SUM})
 endef
+
+define dnf_to_table_row
+  	LINES=$$($(RUN) dnf info --installed $(1))
+	# extract 'name', 'version', 'summary'
+	VER=$$(echo "$${LINES}" | grep -oP '^Version\s+:\s+\K.+' || true)
+	SUM=$$(echo "$${LINES}" | grep -oP '^Summary\s+:\s+\K.+' || true)
+	# consistent write to file format
+	$(call tr,$(1),$${VER},$${SUM},$(2))
+endef

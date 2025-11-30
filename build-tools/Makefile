@@ -18,7 +18,7 @@ README.md: build-tools
 	for pkg in $(PKGS_LIST)
 	do
 	echo "Processing package: $${pkg}"
-	# $(call dnf_installed_info,$${pkg})
+	$(call dnf_to_table_row,$${pkg},$@)
 	done
 	cat $@
 	echo '✅ README.md created'
