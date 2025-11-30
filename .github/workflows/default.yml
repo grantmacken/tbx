@@ -30,9 +30,11 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
       - name: Make tbx-build-tools toolbox image
         run: |
-          pushd build-tools && make .env && make && popd
-          sleep 60  # Wait a bit to ensure image is available
-          pushd runtimes && make && popd
+          # pushd build-tools && make .env && make && popd
+          # sleep 60  # Wait a bit to ensure image is available
+          # pushd runtimes && make && popd
+          # sleep 60  # Wait a bit to ensure image is available
+          pushd coding && make && popd
 
   # tbx-runtimes:
   #   needs: tbx-build-tools
