@@ -8,7 +8,7 @@ include ../inc/define.mk
 TOOLS := make bat eza fd-find fzf host-spawn jq ripgrep wl-clipboard zoxide stow
 BUILD := gcc gcc-c++ pcre2 autoconf pkgconf
 DEVEL := libicu gettext-devel glibc-devel libevent-devel ncurses-devel openssl-devel perl-devel readline-devel zlib-devel
-PKGS_LIST := gh # $(TOOLS)
+PKGS_LIST := gh $(TOOLS)
 
 README.md: build-tools
 	echo '##[ $@ ]##'
@@ -46,7 +46,7 @@ init: latest/fedora-toolbox.json
 build-tools: init
 	$(RUN) dnf config-manager addrepo --from-repofile=https://cli.github.com/packages/rpm/gh-cli.repo &> /dev/null
 	$(INSTALL) gh --repo gh-cli &>  /dev/null
-	# $(INSTALL) $(TOOLS) &>/dev/null
+	$(INSTALL) $(TOOLS) &>/dev/null
 	# $(INSTALL) $(DEVEL) &>/dev/null
 	# $(INSTALL) $(BUILD) &>/dev/null
 	echo '✅ Build tools and CLI tools installed'
