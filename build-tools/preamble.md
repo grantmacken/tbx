@@ -9,8 +9,9 @@ toolbox enter building
 ```
 
 
-The tbx-build-toolbox container provides three tooling categories
+The building toolbox container provides three tooling categories
+ - build tools: gcc, gcc-c++, pcre2, autoconf, and pkgconf
+ - development headers and libraries
+ - CLI tools
 
- - cli tools
- - build tools
- - devel headers
+

@@ -14,7 +14,7 @@ PKGS_LIST := gh $(TOOLS)
 README.md: build-tools
 	echo '##[ $@ ]##'
 	cat preamble.md >> $@
-	$(file >> $@,the following applications are included in this toolbox: )
+	$(file >> $@,The following applications are included in this toolbox: )
 	$(call tr,"Name","Version","Summary", $@)
 	$(call tr,"----","-------","-------", $@)
 	for pkg in $(PKGS_LIST)
@@ -23,9 +23,9 @@ README.md: build-tools
 	done
 	cat $@
 	echo '✅ README.md created'
-	# buildah commit $(WORKING_CONTAINER) $(TBX_IMAGE)
-	# buildah push $(TBX_IMAGE):latest
-	# echo '✅ Image pushed to $(TBX_IMAGE):latest'
+	buildah commit $(WORKING_CONTAINER) $(TBX_IMAGE)
+	buildah push $(TBX_IMAGE):latest
+	echo '✅ Image pushed to $(TBX_IMAGE):latest'
 
 latest/fedora-toolbox.json:
 	echo '##[ $@ ]##'
