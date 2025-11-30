@@ -67,6 +67,25 @@ define to_info
 	printf "✅ %s installed \n" "$(1)"
 endef
 
+define dnf_installed_info
+  	LINES=$$($(RUN) dnf info --installed $(1))
+	# extract 'name', 'version', 'summary'
+	VER=$$(echo "$${LINES}" | grep -oP '^Version\s+:\s+\K.+' || true)
+	SUM=$$(echo "$${LINES}" | grep -oP '^Summary\s+:\s+\K.+' || true)
+	# consistent write to file format
+	$(call to_info,$(1),$${VER},$${SUM})
+endef
+
+define uv_tool_info
+# extract 'name', 'version', 'summary'
+	LINE=$$($(RUN) uv tool list | grep $(1) )
+	# extract 'name', 'version', 'summary'
+	NAME=$$(echo $$LINE | cut -d' ' -f1)
+	VER=$$(echo $$LINE  | cut -d' ' -f2)
+	SUM='$(2)'
+	$(call to_info,$${NAME},$${VER},$${SUM})
+endef
+
 default: README.md
 	echo '##[ $@ ]##'
 	buildah commit $(WORKING_CONTAINER) ghcr.io/grantmacken/tbx-coding
@@ -184,15 +203,7 @@ info/harper-ls.md: latest/harper-ls.json
 # mbake
 # specify-cli
 
-define uv_tool_info
-# extract 'name', 'version', 'summary'
-	LINE=$$($(RUN) uv tool list | grep $(1) )
-	# extract 'name', 'version', 'summary'
-	NAME=$$(echo $$LINE | cut -d' ' -f1)
-	VER=$$(echo $$LINE  | cut -d' ' -f2)
-	SUM='$(2)'
-	$(call to_info,$${NAME},$${VER},$${SUM})
-endef
+
 
 tombi: info/tombi.md
 info/tombi.md:
@@ -354,15 +365,6 @@ info/yaml-language-server.md:
 # ShellCheck
 # shfmt
 #
-define dnf_installed_info
-  	LINES=$$($(RUN) dnf info --installed $(1))
-	# extract 'name', 'version', 'summary'
-	VER=$$(echo "$${LINES}" | grep -oP '^Version\s+:\s+\K.+' || true)
-	SUM=$$(echo "$${LINES}" | grep -oP '^Summary\s+:\s+\K.+' || true)
-	# consistent write to file format
-	$(call to_info,$(1),$${VER},$${SUM})
-endef
-
 google-cloud-cli: info/google-cloud-cli.md
 info/google-cloud-cli.md:
 	# echo '##[ $(basename $(notdir $@)) ]##'

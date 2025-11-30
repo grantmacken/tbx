@@ -22,6 +22,10 @@ CYAN=\033[0;36m
 WHITE=\033[0;37m
 NC=\033[0m # No Color
 
+dfault:
+	pushd build-tools && $(MAKE) .env && $(MAKE) && popd
+
+
 help: ## show available make targets
 	cat $(MAKEFILE_LIST) |
 	grep -oP '^[a-zA-Z_-]+:.*?## .*$$' |

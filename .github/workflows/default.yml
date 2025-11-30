@@ -29,12 +29,7 @@ jobs:
           password: ${{ github.token }}
       - uses: actions/checkout@v4
       - name: Build tbx mages
-        run: |
-          pushd build-tools && make .env && make && popd
-          sleep 60  # Wait a bit to ensure image is available
-          pushd runtimes && make && popd
-          sleep 60  # Wait a bit to ensure image is available
-          pushd coding && make && popd
+        run: make
       - name: Set up Git
         run: |
           git config --local user.name "github-actions[bot]"
@@ -43,7 +38,7 @@ jobs:
       - name: Commit and push README.md changes
         run: |
           rm -f README.md # remove if exists to avoid git add errors
-          cat ./coding/README.md | tee README.md
+          cat ./build-tool/README.md | tee README.md
           git add README.md
           git commit -m "Update README.md from Makefile build" README.md || echo "No changes to commit"
         env:
