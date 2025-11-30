@@ -8,7 +8,7 @@ include ../inc/define.mk
 TOOLS := make bat eza fd-find fzf host-spawn jq ripgrep wl-clipboard zoxide stow
 BUILD := gcc gcc-c++ pcre2 autoconf pkgconf
 DEVEL := libicu gettext-devel glibc-devel libevent-devel ncurses-devel openssl-devel perl-devel readline-devel zlib-devel
-PKGS_LIST := gh $(TOOLS)
+PKGS_LIST := gh # $(TOOLS)
 
 README.md: build-tools
 	echo '##[ $@ ]##'
