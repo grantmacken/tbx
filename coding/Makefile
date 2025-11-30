@@ -42,7 +42,7 @@ HEADING2 := $(HEADING1)$(HEADING1)
 HEADING3 := $(HEADING2)$(HEADING1)
 
 # BASH_LIST := nodejs-bash-language-server ShellCheck shfmt
-DNF_LIST     :=  google-cloud-cli ShellCheck shfmt
+DNF_LIST     :=   ShellCheck shfmt # google-cloud-cli
 UV_TOOL_LIST :=  tombi  mbake # specify-cli
 NPM_LIST := bash-language-server \
 			copilot \
