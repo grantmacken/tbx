@@ -14,4 +14,6 @@ The building toolbox container provides three tooling categories
  - development headers and libraries
  - CLI tools
 
+ In addition to the CLI tools provided by the Fedora toolbox, we have included the following The CLI tools:
+
 

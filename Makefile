@@ -14,4 +14,6 @@ unexport MAKEFLAGS
 
 default:
 	pushd build-tools && $(MAKE) && popd
+	sleep 30 # wait for image to settle
+	pushd runtimes && $(MAKE) && popd
 

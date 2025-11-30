@@ -2,19 +2,55 @@
 include ../inc/meta.mk
 ## hardcoded working container
 WORKING_CONTAINER := tbx-build-tools-working-container
+TBX_NAME := tbx-runtimes
+TBX_SUMMARY := A Fedora Toolbox image with runtimes and build tools
+TBX_IMAGE := ghcr.io/grantmacken/$(TBX_NAME)
+
 include ../inc/defines.mk
 
 DNF_LIST := golang nodejs uv # luajit
 OTP := erlang erlang-rebar3 elixir gleam
 
+README.md: runtimes
+	echo '##[ $@ ]##'
+	cat preamble.md > $@
+	$(file >> $@,The following programming language runtimes and associated languages are included in this toolbox: )
+	$(call tr,"Name","Version","Summary", $@)
+	$(call tr,"----","-------","-------", $@)
+	$(file >> $@,The following applications are included in this toolbox: )
+	$(call tr,"Name","Version","Summary", $@)
+	$(call tr,"----","-------","-------", $@)
+	for pkg in $(DNF_LIST)
+	do
+	$(call dnf_to_table_row,$${pkg},$@)
+	done
 
-default:  README.md
+
+	
+init:
+	buildah pull ghcr.io/grantmacken/tbx-build-tools &>/dev/null
+	buildah from ghcr.io/grantmacken/tbx-build-tools
+	buildah config \
+	--label summary='a toolbox with programming language runtimes' \
+	--label maintainer='Grant MacKenzie <grantmacken@gmail.com>' \
+	--env lang=C.UTF-8 \
+	--env ELIXIR_ERL_OPTIONS="+fnu" $(WORKING_CONTAINER)
+	mkdir -p info
+
+runtimes: init
+	echo '##[ $@ ]##'
+	$(RUN) dnf update -y &>/dev/null
+	$(INSTALL) $(DNF_LIST) &>/dev/null
+	echo '✅ All runtimes installed'
+
+
+xdefault:  README.md
 	echo '##[ $@ ]##'
 	buildah commit $(WORKING_CONTAINER) ghcr.io/grantmacken/tbx-runtimes
 	buildah push ghcr.io/grantmacken/tbx-runtimes:latest
 	echo '✅ ghcr.io/grantmacken/tbx-runtimes:latest built and pushed'
 
-README.md: init $(DNF_LIST) $(OTP) # luarocks
+xxREADME.md: init $(DNF_LIST) $(OTP) # luarocks
 	echo '##[ $@ ]##'
 	mkdir -p $(dir $@)
 	# create or overwrite README.md
@@ -75,16 +111,7 @@ README.md: init $(DNF_LIST) $(OTP) # luarocks
 	# $(call tr,$${NAME},$${VER},$${SUM},$@)
 
 
-init:
-	buildah pull ghcr.io/grantmacken/tbx-build-tools &>/dev/null
-	buildah from ghcr.io/grantmacken/tbx-build-tools
-	buildah config \
-	--label summary='a toolbox with programming language runtimes' \
-	--label maintainer='Grant MacKenzie <grantmacken@gmail.com>' \
-	--env lang=C.UTF-8 \
-	--env ELIXIR_ERL_OPTIONS="+fnu" $(WORKING_CONTAINER)
-	mkdir -p info
-	$(RUN) dnf update -y &>/dev/null
+
 
 uv: info/uv.md
 info/uv.md:
