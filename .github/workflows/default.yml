@@ -28,6 +28,7 @@ jobs:
           username: ${{ github.repository_owner }}
           password: ${{ github.token }}
       - uses: actions/checkout@v4
+      - name: Build
         run: make
       - name: Set up Git
         run: |
