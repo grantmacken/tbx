@@ -28,18 +28,12 @@ jobs:
           username: ${{ github.repository_owner }}
           password: ${{ github.token }}
       - uses: actions/checkout@v4
-      - name: Build tbx mages
-        run: make
       - name: Set up Git
         run: |
           git config --local user.name "github-actions[bot]"
           git config --local user.email "github-actions[bot]@users.noreply.github.com"
           git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git
-      - name: Commit and push README.md changes
-        run: |
-          rm -f README.md # remove if exists to avoid git add errors
-          cat ./build-tool/README.md | tee README.md
-          git add README.md
-          git commit -m "Update README.md from Makefile build" README.md || echo "No changes to commit"
+      - name: Build tbx mages
+        run: make
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
