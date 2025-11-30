@@ -1,5 +1,4 @@
 
-
 RUN     := buildah run $(WORKING_CONTAINER)
 SH      := $(RUN) sh -c
 INSTALL := $(RUN) dnf install --allowerasing --skip-unavailable --skip-broken --no-allow-downgrade -y
@@ -22,7 +21,7 @@ bdu = jq -r ".assets[] | select(.browser_download_url | contains(\"$1\")) | .bro
 
 ## Helper to write info files in a consistent format
 define to_info
-    printf "Name: %s\n"    "$(1)" > $@
+    printf "Name: %s\n"    "$(1)" >> $@
 	printf "Version: %s\n" "$(2)" >> $@
 	printf "Summary: %s\n" "$(3)" >> $@
 	printf "✅ %s installed \n" "$(1)"

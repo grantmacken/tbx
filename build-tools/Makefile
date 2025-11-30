@@ -12,22 +12,18 @@ PKGS_LIST := gh $(TOOLS)
 
 default: README.md
 
-README.md: init gh build-tools
+README.md: init build-tools
 	init gh # TODO
 	echo '##[ $@ ]##'
-	$(file >> $@,the following applications are included in this toolbox: )
-	$(call tr,"Name","Version","Summary", $@)
-	$(call tr,"----","-------","-------", $@)
+	# $(file >> $@,the following applications are included in this toolbox: )
+	# $(call tr,"Name","Version","Summary", $@)
+	# $(call tr,"----","-------","-------", $@)
 	for pkg in $(PKGS_LIST)
 	do
-	NAME=$$(cat info/$${pkg}.md | grep -oP '^Name:\s\K.+')
-	VER=$$(cat info/$${pkg}.md | grep -oP '^Version:\s\K.+')
-	SUM=$$(cat info/$${pkg}.md | grep -oP '^Summary:\s\K.+')
-	$(call tr,$${NAME},$${VER},$${SUM},$@)
+	$(call dnf_installed_info,$${pkg})
 	done
 	cat $@
 	echo '✅ README.md created'
-
 	# buildah commit $(WORKING_CONTAINER) $(TBX_IMAGE)
 	# buildah push $(TBX_IMAGE):latest
 	# echo '✅ Image pushed to $(TBX_IMAGE):latest'
@@ -48,70 +44,56 @@ init: latest/fedora-toolbox.json
 	--env lang=C.UTF-8 $(WORKING_CONTAINER)
 	echo '✅ Base image pulled and working container created'
 
-gh: info/gh.md
-info/gh.md:
-	echo '##[ $@ ]##'
-	mkdir -p $(dir $@)
-	PKG=$(basename $(notdir $@))
-	$(RUN) dnf config-manager addrepo --from-repofile=https://cli.github.com/packages/rpm/gh-cli.repo &> /dev/null
-	$(INSTALL) gh --repo gh-cli &>  /dev/null
-	$(call dnf_installed_info,$${PKG})
 
-build-tools: $(TOOLS)
+build-tools: 
 	echo '##[ $< ]##'
-	mkdir -p info
-	$(INSTALL) $< &>/dev/null
-	$(call dnf_installed_info,$<,info/$<.md)
-
-
-info/build-tools.md:
-	echo '##[ $@ ]##'
-	mkdir -p $(dir $@)
 	$(RUN) dnf config-manager addrepo --from-repofile=https://cli.github.com/packages/rpm/gh-cli.repo &> /dev/null
 	$(INSTALL) gh --repo gh-cli &>  /dev/null
 	$(INSTALL) $(TOOLS) &>/dev/null
 	$(INSTALL) $(DEVEL) &>/dev/null
 	$(INSTALL) $(BUILD) &>/dev/null
-	echo '✅ Build tools installed' | tee $@
+	echo '✅ Build tools and CLI tools installed'	
 
-README.md: info/build-tools.md
-	echo '##[ $@ ]##'
-	mkdir -p $(dir $@)
-	touch $@
-	printf "\n$(HEADING1) %s toolbox \n" "$(TBX_NAME)" | tee -a $@
-	printf "%s \n\n" "$(TBX_SUMMARY) " | tee -a $@
-	printf "Built From: %s" "$(FROM_NAME)" | tee -a $@
-	printf "Version:    %s" "$(FROM_VERSION)" | tee -a $@
-	printf "Registry:   %s" "$(FROM_REGISTRY)" | tee -a $@
-	# description
-	cat << EOF | tee -a $@
-	This toolbox contains a selection of CLI tools and build tools to help with
-	development and building software from source. 
-	It is the foundation for other toolboxes I use for development.
-	It is the first toolbox I create when setting up a new system.
-	EOF
-	printf "# %s\n\n" "The toolbox contains ... " | tee -a $@
-	printf "\n$(HEADING2) %s\n\n" "Selected CLI Tools" | tee -a $@
-	$(call tr,"Name","Version","Summary",$@)
-	$(call tr,"----","-------","----------------------------",$@)
-	$(RUN) sh -c  'dnf info -q --installed $(TOOLS) | \
-	grep -oP "(Name.+:\s\K.+)|(Ver.+:\s\K.+)|(Sum.+:\s\K.+)" | \
-	paste  - - -  | sort -u ' | \
-	awk -F'\t' '{printf "| %-14s | %-8s | %-83s |\n", $$1, $$2, $$3}' | \
-	tee -a $@
-	printf "\n$(HEADING2) %s\n\n" "Selected Build Tooling for Make Installs" | tee -a $@
-	$(call tr,"Name","Version","Summary",$@)
-	$(call tr,"----","-------","----------------------------",$@)
-	$(RUN) sh -c  'dnf info -q --installed $(BUILD) | \
-	grep -oP "(Name.+:\s\K.+)|(Ver.+:\s\K.+)|(Sum.+:\s\K.+)" | \
-	paste  - - -  | sort -u ' | \
-	awk -F'\t' '{printf "| %-14s | %-8s | %-83s |\n", $$1, $$2, $$3}' | \
-	tee -a $@
-	printf "\n$(HEADING2) %s\n\n" "Selected Development files for BUILD" | tee -a $@
-	$(call tr,"Name","Version","Summary",$@)
-	$(call tr,"----","-------","----------------------------",$@)
-	$(RUN) sh -c  'dnf info -q --installed $(DEVEL) | \
-	grep -oP "(Name.+:\s\K.+)|(Ver.+:\s\K.+)|(Sum.+:\s\K.+)" | \
-	paste  - - -  | sort -u ' | \
-	awk -F'\t' '{printf "| %-14s | %-8s | %-83s |\n", $$1, $$2, $$3}' | \
-	tee -a $@
+
+
+# README.md: info/build-tools.md
+# 	echo '##[ $@ ]##'
+# 	mkdir -p $(dir $@)
+# 	touch $@
+# 	printf "\n$(HEADING1) %s toolbox \n" "$(TBX_NAME)" | tee -a $@
+# 	printf "%s \n\n" "$(TBX_SUMMARY) " | tee -a $@
+# 	printf "Built From: %s" "$(FROM_NAME)" | tee -a $@
+# 	printf "Version:    %s" "$(FROM_VERSION)" | tee -a $@
+# 	printf "Registry:   %s" "$(FROM_REGISTRY)" | tee -a $@
+# 	# description
+# 	cat << EOF | tee -a $@
+# 	This toolbox contains a selection of CLI tools and build tools to help with
+# 	development and building software from source. 
+# 	It is the foundation for other toolboxes I use for development.
+# 	It is the first toolbox I create when setting up a new system.
+# 	EOF
+# 	printf "# %s\n\n" "The toolbox contains ... " | tee -a $@
+# 	printf "\n$(HEADING2) %s\n\n" "Selected CLI Tools" | tee -a $@
+# 	$(call tr,"Name","Version","Summary",$@)
+# 	$(call tr,"----","-------","----------------------------",$@)
+# 	$(RUN) sh -c  'dnf info -q --installed $(TOOLS) | \
+# 	grep -oP "(Name.+:\s\K.+)|(Ver.+:\s\K.+)|(Sum.+:\s\K.+)" | \
+# 	paste  - - -  | sort -u ' | \
+# 	awk -F'\t' '{printf "| %-14s | %-8s | %-83s |\n", $$1, $$2, $$3}' | \
+# 	tee -a $@
+# 	printf "\n$(HEADING2) %s\n\n" "Selected Build Tooling for Make Installs" | tee -a $@
+# 	$(call tr,"Name","Version","Summary",$@)
+# 	$(call tr,"----","-------","----------------------------",$@)
+# 	$(RUN) sh -c  'dnf info -q --installed $(BUILD) | \
+# 	grep -oP "(Name.+:\s\K.+)|(Ver.+:\s\K.+)|(Sum.+:\s\K.+)" | \
+# 	paste  - - -  | sort -u ' | \
+# 	awk -F'\t' '{printf "| %-14s | %-8s | %-83s |\n", $$1, $$2, $$3}' | \
+# 	tee -a $@
+# 	printf "\n$(HEADING2) %s\n\n" "Selected Development files for BUILD" | tee -a $@
+# 	$(call tr,"Name","Version","Summary",$@)
+# 	$(call tr,"----","-------","----------------------------",$@)
+# 	$(RUN) sh -c  'dnf info -q --installed $(DEVEL) | \
+# 	grep -oP "(Name.+:\s\K.+)|(Ver.+:\s\K.+)|(Sum.+:\s\K.+)" | \
+# 	paste  - - -  | sort -u ' | \
+# 	awk -F'\t' '{printf "| %-14s | %-8s | %-83s |\n", $$1, $$2, $$3}' | \
+# 	tee -a $@
