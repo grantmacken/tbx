@@ -35,19 +35,19 @@ jobs:
           # pushd runtimes && make && popd
           # sleep 60  # Wait a bit to ensure image is available
           pushd coding && make && popd
-      # - name: Set up Git
-      #   run: |
-      #     git config --local user.name "github-actions[bot]"
-      #     git config --local user.email "github-actions[bot]@users.noreply.github.com"
-      #     git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git
-      # - name: Commit and push README.md changes
-      #   run: |
-      #     rm -f README.md # remove if exists to avoid git add errors
-      #     cp ./info/README.md README.md
-      #     git add README.md
-      #     git commit -m "Update README.md from Makefile build" README.md || echo "No changes to commit"
-      # env:
-      #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Set up Git
+        run: |
+          git config --local user.name "github-actions[bot]"
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git
+      - name: Commit and push README.md changes
+        run: |
+          rm -f ../README.md # remove if exists to avoid git add errors
+          cat ./coding/README.md | tee README.md
+          git add README.md
+          git commit -m "Update README.md from Makefile build" README.md || echo "No changes to commit"
+      env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
   # tbx-runtimes:
   #   needs: tbx-build-tools
   #   runs-on: ubuntu-latest

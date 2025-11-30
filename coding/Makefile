@@ -67,13 +67,13 @@ define to_info
 	printf "✅ %s installed \n" "$(1)"
 endef
 
-default: info/README.md
+default: README.md
 	echo '##[ $@ ]##'
 	buildah commit $(WORKING_CONTAINER) ghcr.io/grantmacken/tbx-coding
 	buildah push ghcr.io/grantmacken/tbx-coding:latest
 	echo '✅ ghcr.io/grantmacken/tbx-coding:latest built and pushed'
 
-info/README.md: init $(PKGS_LIST)
+README.md: init $(PKGS_LIST)
 	echo '##[ $@ ]##'
 	mkdir -p $(dir $@)
 	cat info/readme/preamble.md > $@
