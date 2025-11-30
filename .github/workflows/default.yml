@@ -42,13 +42,13 @@ jobs:
           git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git
       - name: Commit and push README.md changes
         run: |
-          rm -f ../README.md # remove if exists to avoid git add errors
+          rm -f README.md # remove if exists to avoid git add errors
           cat ./coding/README.md | tee README.md
           git add README.md
           git commit -m "Update README.md from Makefile build" README.md || echo "No changes to commit"
-      env:
+        env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-  # tbx-runtimes:
+    # tbx-runtimes:
   #   needs: tbx-build-tools
   #   runs-on: ubuntu-latest
   #   permissions:
