@@ -10,17 +10,15 @@ BUILD := gcc gcc-c++ pcre2 autoconf pkgconf
 DEVEL := libicu gettext-devel glibc-devel libevent-devel ncurses-devel openssl-devel perl-devel readline-devel zlib-devel
 PKGS_LIST := gh $(TOOLS)
 
-default: README.md
-
-README.md: init build-tools
+README.md:  init build-tools
 	echo '##[ $@ ]##'
-	# $(file >> $@,the following applications are included in this toolbox: )
-	# $(call tr,"Name","Version","Summary", $@)
-	# $(call tr,"----","-------","-------", $@)
+	$(file >> $@,the following applications are included in this toolbox: )
+	$(call tr,"Name","Version","Summary", $@)
+	$(call tr,"----","-------","-------", $@)
 	for pkg in $(PKGS_LIST)
 	do
 	echo "Processing package: $${pkg}"
-	$(call dnf_installed_info,$${pkg})
+	# $(call dnf_installed_info,$${pkg})
 	done
 	cat $@
 	echo '✅ README.md created'
