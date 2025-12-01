@@ -70,7 +70,6 @@ README.md: init dnf_list pkgs_list
 	do
 	$(call dnf_to_table_row,$${pkg},$@)
 	done
-	cat @
 	echo '✅ README.md created'
 
 coding: init lists
