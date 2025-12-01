@@ -8,7 +8,6 @@ include ../inc/define.mk
 # ft_confs  := $(wildcard site/after/filetype/*.lua)
 # ft_targs := $(patsubst  site/after/ftplugin/*.lua, info/after/ftplugin/%.md,$(ft_confs))
 
-# BASH_LIST := nodejs-bash-language-server ShellCheck shfmt
 DNF_LIST     :=   ShellCheck shfmt # google-cloud-cli
 UV_TOOL_LIST :=  tombi  mbake # specify-cli
 NPM_LIST := bash-language-server \
@@ -83,13 +82,9 @@ dnf_list:
 nvim_config: info/nvim_config.md
 info/nvim_config.md:
 	echo '##[ $(basename $(notdir $@)) ]##'
-	$(RUN) which nvim_plugins
-	$(RUN) which nvim_plugins
 	$(RUN) nvim_plugins
-	# $(call to_info,nvim-plugins,1.0.0,'Neovim plugins installed via nvim_plugins script')
-	$(RUN) which nvim_treesitters
-	$(RUN) nvim_treesitters
-	# $(call to_info,nvim-treesitter,1.0.0,'Neovim treesitter parsers installed via nvim_treesitter script')
+	$(call to_info,nvim-plugins,1.0.0,'Neovim plugins installed via nvim_plugins script')
+	$(RUN) tree -L 3 /usr/local/share/nvim/site/pack
 	echo '✅ Neovim configuration completed'
 	# echo '##[ $(basename $(notdir $@)) ]##'
 
