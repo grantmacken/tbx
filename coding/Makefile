@@ -24,6 +24,7 @@ NPM_LIST := bash-language-server \
 
 RELEASE_BINARY_LIST :=  neovim lua-language-server harper-ls
 PKGS_LIST := $(RELEASE_BINARY_LIST) $(UV_TOOL_LIST) $(NPM_LIST)
+
 default: README.md
 	echo '##[ $@ ]##'
 	buildah commit $(WORKING_CONTAINER) ghcr.io/grantmacken/tbx-coding
@@ -53,7 +54,7 @@ init:
 README.md: init dnf_list pkgs_list 
 	echo '##[ $@ ]##'
 	mkdir -p $(dir $@)
-	cat info/readme/preamble.md > $@
+	cat preamble.md > $@
 	echo $@
 	$(file >> $@,the following applications are included in this toolbox: )
 	$(call tr,"Name","Version","Summary", $@)
@@ -65,8 +66,15 @@ README.md: init dnf_list pkgs_list
 	SUM=$$(cat info/$${pkg}.md | grep -oP '^Summary:\s\K.+')
 	$(call tr,$${NAME},$${VER},$${SUM},$@)
 	done
+	for pkg in $(DNF_LIST)
+	do
+	$(call dnf_to_table_row,$${pkg},$@)
+	done
+	cat @
 	echo '✅ README.md created'
 
+coding: init lists
+lists: dnf_list pkgs_list
 pkgs_list: $(PKGS_LIST) 
 
 dnf_list:
