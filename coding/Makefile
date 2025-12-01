@@ -23,8 +23,7 @@ NPM_LIST := bash-language-server \
 # tape
 
 RELEASE_BINARY_LIST :=  neovim lua-language-server harper-ls
-PKGS_LIST := $(RELEASE_BINARY_LIST) $(UV_TOOL_LIST) $(NPM_LIST) $(DNF_LIST)
-
+PKGS_LIST := $(RELEASE_BINARY_LIST) $(UV_TOOL_LIST) $(NPM_LIST)
 default: README.md
 	echo '##[ $@ ]##'
 	buildah commit $(WORKING_CONTAINER) ghcr.io/grantmacken/tbx-coding
@@ -51,7 +50,7 @@ init:
 	$(RUN) dnf update -y &>/dev/null
 
 
-README.md: init $(PKGS_LIST)
+README.md: init dnf_list pkgs_list 
 	echo '##[ $@ ]##'
 	mkdir -p $(dir $@)
 	cat info/readme/preamble.md > $@
@@ -66,6 +65,14 @@ README.md: init $(PKGS_LIST)
 	SUM=$$(cat info/$${pkg}.md | grep -oP '^Summary:\s\K.+')
 	$(call tr,$${NAME},$${VER},$${SUM},$@)
 	done
+	echo '✅ README.md created'
+
+pkgs_list: $(PKGS_LIST) 
+
+dnf_list:
+	echo '##[ $@ ]##'
+	$(RUN) dnf update -y &>/dev/null
+	$(INSTALL) $(DNF_LIST) &>/dev/null
 
 # release binaries:
 # neovim
@@ -318,27 +325,30 @@ info/google-cloud-cli.md:
 	$(RUN) which gcloud &> /dev/null
 	$(call dnf_installed_info,$${PKG})
 
-ShellCheck: info/ShellCheck.md
-info/ShellCheck.md:
-	# echo '##[ $(basename $(notdir $@)) ]##'
-	PKG=$(basename $(notdir $@))
-	$(INSTALL) $${PKG} &> /dev/null
-	# success|failure check
-	# Note the binary is named 'sheckcheck'
-	$(RUN) which shellcheck &> /dev/null
-	$(RUN) shellcheck --version &> /dev/null
-	$(call dnf_installed_info,$${PKG})
 
-shfmt: info/shfmt.md
-info/shfmt.md:
-	# echo '##[ $(basename $(notdir $@)) ]##'
-	PKG=$(basename $(notdir $@))
-	$(INSTALL) $${PKG} &> /dev/null
-	# verify installation
-	$(RUN) whereis $${PKG} &> /dev/null
-	$(RUN) which $${PKG} &> /dev/null
-	$(RUN) $${PKG} --version &> /dev/null
-	$(call dnf_installed_info,$${PKG})
+
+
+# ShellCheck: info/ShellCheck.md
+# info/ShellCheck.md:
+# 	# echo '##[ $(basename $(notdir $@)) ]##'
+# 	PKG=$(basename $(notdir $@))
+# 	$(INSTALL) $${PKG} &> /dev/null
+# 	# success|failure check
+# 	# Note the binary is named 'sheckcheck'
+# 	$(RUN) which shellcheck &> /dev/null
+# 	$(RUN) shellcheck --version &> /dev/null
+# 	$(call dnf_installed_info,$${PKG})
+#
+# shfmt: info/shfmt.md
+# info/shfmt.md:
+# 	# echo '##[ $(basename $(notdir $@)) ]##'
+# 	PKG=$(basename $(notdir $@))
+# 	$(INSTALL) $${PKG} &> /dev/null
+# 	# verify installation
+# 	$(RUN) whereis $${PKG} &> /dev/null
+# 	$(RUN) which $${PKG} &> /dev/null
+# 	$(RUN) $${PKG} --version &> /dev/null
+# 	$(call dnf_installed_info,$${PKG})
 
 # luarocks packages:
 # busted
