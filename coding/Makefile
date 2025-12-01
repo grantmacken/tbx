@@ -1,33 +1,12 @@
-
-
+include ../inc/meta.mk
 WORKING_CONTAINER := tbx-runtimes-working-container
+include ../inc/define.mk
 # actions
-RUN     := buildah run $(WORKING_CONTAINER)
-SH      := $(RUN) sh -c
-INSTALL := $(RUN) dnf install --allowerasing --skip-unavailable --skip-broken --no-allow-downgrade -y
-# LINK    := $(RUN) ln -s $(shell which host-spawn)
-ADD    := buildah add --chmod 755 $(WORKING_CONTAINER)
-RW_ADD := buildah add --chmod  644 $(WORKING_CONTAINER)
-WGET   := wget -q --no-check-certificate --timeout=10 --tries=3
-# everything is site dir
-# DIR_SITE   := /usr/share/nvim/site
-DIR_BIN    := /usr/local/bin
-TAR          := tar xz --strip-components=1 -C
-TAR_NO_STRIP := tar xz -C
-
-max_field := $(shell echo -n 'copilot-language-server' | wc -c)
-tr = printf "| %-$(max_field)s | %-8s | %-85s |\n" "$(1)" "$(2)" "$(3)" | tee -a $(4)
-bdu = jq -r ".assets[] | select(.browser_download_url | contains(\"$1\")) | .browser_download_url" $2
-
-lsp_confs := $(wildcard site/lsp/*.lua)
-lsp_targs := $(patsubst site/lsp/%.lua,info/site/lsp/%.md,$(lsp_confs))
-
-ft_confs  := $(wildcard site/after/filetype/*.lua)
-ft_targs := $(patsubst  site/after/ftplugin/*.lua, info/after/ftplugin/%.md,$(ft_confs))
-
-HEADING1 := \#
-HEADING2 := $(HEADING1)$(HEADING1)
-HEADING3 := $(HEADING2)$(HEADING1)
+# lsp_confs := $(wildcard site/lsp/*.lua)
+# lsp_targs := $(patsubst site/lsp/%.lua,info/site/lsp/%.md,$(lsp_confs))
+#
+# ft_confs  := $(wildcard site/after/filetype/*.lua)
+# ft_targs := $(patsubst  site/after/ftplugin/*.lua, info/after/ftplugin/%.md,$(ft_confs))
 
 # BASH_LIST := nodejs-bash-language-server ShellCheck shfmt
 DNF_LIST     :=   ShellCheck shfmt # google-cloud-cli
@@ -35,66 +14,24 @@ UV_TOOL_LIST :=  tombi  mbake # specify-cli
 NPM_LIST := bash-language-server \
 			copilot \
 			copilot-language-server \
-			faucet \
-			tape \
 			tree-sitter-cli \
 			vscode-langservers-extracted \
 			yaml-language-server
 
-RELEASE_BINARY_LIST :=  neovim lua-language-server harper-ls
+# removed:
+# fauce
+# tape
 
-# ROCKS_LIST := busted nlua
-# $(ROCKS_LIST)
+RELEASE_BINARY_LIST :=  neovim lua-language-server harper-ls
 PKGS_LIST := $(RELEASE_BINARY_LIST)  $(UV_TOOL_LIST)  $(NPM_LIST) $(DNF_LIST)
 
 ## Helper to write info files in a consistent format
-define to_info
-    printf "Name: %s\n"    "$(1)" > $@
-	printf "Version: %s\n" "$(2)" >> $@
-	printf "Summary: %s\n" "$(3)" >> $@
-	printf "✅ %s installed \n" "$(1)"
-endef
-
-define dnf_installed_info
-  	LINES=$$($(RUN) dnf info --installed $(1))
-	# extract 'name', 'version', 'summary'
-	VER=$$(echo "$${LINES}" | grep -oP '^Version\s+:\s+\K.+' || true)
-	SUM=$$(echo "$${LINES}" | grep -oP '^Summary\s+:\s+\K.+' || true)
-	# consistent write to file format
-	$(call to_info,$(1),$${VER},$${SUM})
-endef
-
-define uv_tool_info
-# extract 'name', 'version', 'summary'
-	LINE=$$($(RUN) uv tool list | grep $(1) )
-	# extract 'name', 'version', 'summary'
-	NAME=$$(echo $$LINE | cut -d' ' -f1)
-	VER=$$(echo $$LINE  | cut -d' ' -f2)
-	SUM='$(2)'
-	$(call to_info,$${NAME},$${VER},$${SUM})
-endef
 
 default: README.md
 	echo '##[ $@ ]##'
 	buildah commit $(WORKING_CONTAINER) ghcr.io/grantmacken/tbx-coding
 	buildah push ghcr.io/grantmacken/tbx-coding:latest
 	echo '✅ ghcr.io/grantmacken/tbx-coding:latest built and pushed'
-
-README.md: init $(PKGS_LIST)
-	echo '##[ $@ ]##'
-	mkdir -p $(dir $@)
-	cat info/readme/preamble.md > $@
-	echo $@
-	$(file >> $@,the following applications are included in this toolbox: )
-	$(call tr,"Name","Version","Summary", $@)
-	$(call tr,"----","-------","-------", $@)
-	for pkg in $(PKGS_LIST)
-	do
-	NAME=$$(cat info/$${pkg}.md | grep -oP '^Name:\s\K.+')
-	VER=$$(cat info/$${pkg}.md | grep -oP '^Version:\s\K.+')
-	SUM=$$(cat info/$${pkg}.md | grep -oP '^Summary:\s\K.+')
-	$(call tr,$${NAME},$${VER},$${SUM},$@)
-	done
 
 init:
 	echo '##[ $@ ]##'
@@ -114,6 +51,25 @@ init:
 	mkdir -p latest
 	# update dnf repos
 	$(RUN) dnf update -y &>/dev/null
+
+
+README.md: init $(PKGS_LIST)
+	echo '##[ $@ ]##'
+	mkdir -p $(dir $@)
+	cat info/readme/preamble.md > $@
+	echo $@
+	$(file >> $@,the following applications are included in this toolbox: )
+	$(call tr,"Name","Version","Summary", $@)
+	$(call tr,"----","-------","-------", $@)
+	for pkg in $(PKGS_LIST)
+	do
+	NAME=$$(cat info/$${pkg}.md | grep -oP '^Name:\s\K.+')
+	VER=$$(cat info/$${pkg}.md | grep -oP '^Version:\s\K.+')
+	SUM=$$(cat info/$${pkg}.md | grep -oP '^Summary:\s\K.+')
+	$(call tr,$${NAME},$${VER},$${SUM},$@)
+	done
+
+
 
 # release binaries:
 # neovim
@@ -190,8 +146,6 @@ info/harper-ls.md: latest/harper-ls.json
 # tombi
 # mbake
 # specify-cli
-
-
 
 tombi: info/tombi.md
 info/tombi.md:
