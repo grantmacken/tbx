@@ -49,6 +49,7 @@ init:
 	mkdir -p latest
 	# update dnf repos
 	$(RUN) dnf update -y &>/dev/null
+	echo '✅ Base image pulled and working container created'
 
 README.md: init dnf_list pkgs_list 
 	echo '##[ $@ ]##'
@@ -79,6 +80,7 @@ dnf_list:
 	echo '##[ $@ ]##'
 	$(RUN) dnf update -y &>/dev/null
 	$(INSTALL) $(DNF_LIST) &>/dev/null
+	echo '✅ DNF packages installed'
 
 # release binaries:
 # neovim
@@ -139,6 +141,7 @@ info/lua-language-server.md: latest/lua-language-server.json
 	# get version from the binary
 	VER=$$($(RUN) lua-language-server --version)
 	$(call to_info,$${PKG},$${VER},'Lua language server')
+	echo '✅ Lua Language Server installed'
 
 # harper-ls
 harper-ls: info/harper-ls.md
