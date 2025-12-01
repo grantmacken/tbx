@@ -17,11 +17,12 @@ README.md: runtimes
 	$(file >> $@,The following programming language runtimes and associated languages are included in this toolbox: )
 	$(call tr,"Name","Version","Summary", $@)
 	$(call tr,"----","-------","-------", $@)
-	cat otp.md > $@
-	# ## erlang otp
+	$(call tr,"Name","Version","Summary", $@)
+	$(call tr,"----","-------","-------", $@)
 	NAME=$$(cat info/erlang.md | grep -oP '^Name\s+:\s+\K.+')
 	VER=$$(jq -r '.name' latest/erlang.json | cut -d' ' -f2)
 	SUM=$$(cat info/erlang.md | grep -oP '^Summary\s+:\s+\K.+')
+	$(call tr,$${NAME},$${VER},$${SUM},$@)
 	NAME=rebar3
 	VER=$$(jq -r '.tag_name' latest/erlang-rebar3.json | cut -d'v' -f2)
 	SUM=$$(cat info/erlang-rebar3.md | grep -oP '^Summary\s+:\s+\K.+')
@@ -37,14 +38,14 @@ README.md: runtimes
 	VER=$$(echo $$LINE | cut -d' ' -f2)
 	SUM="Gleam programming language"
 	$(call tr,$${NAME},$${VER},$${SUM},$@)
-	cat $@
-
-# $(call tr,"Name","Version","Summary", $@)
-# $(call tr,"----","-------","-------", $@)
-# for pkg in $(DNF_LIST)
-# do
-# $(call dnf_to_table_row,$${pkg},$@)
-# done
+	for pkg in $(DNF_LIST)
+	do
+	$(call dnf_to_table_row,$${pkg},$@)
+	done
+	echo '✅ README.md created'
+	buildah commit $(WORKING_CONTAINER) ghcr.io/grantmacken/tbx-runtimes
+	buildah push ghcr.io/grantmacken/tbx-runtimes:latest
+	echo '✅ ghcr.io/grantmacken/tbx-runtimes:latest built and pushed'
 
 init:
 	buildah pull ghcr.io/grantmacken/tbx-build-tools &>/dev/null
@@ -127,7 +128,6 @@ info/elixir.md: latest/elixir.json
 	$(RUN) mix --version
 	$(INFO) elixir > $@
 
-
 ##[[ rebar3 ]]##
 erlang-rebar3: info/erlang-rebar3.md
 
@@ -167,15 +167,6 @@ info/gleam.md: files/gleam.tar
 	## success|failure check
 	$(RUN) gleam --version &>/dev/null
 	## extract version number
-
-
-
-xdefault:  README.md
-	echo '##[ $@ ]##'
-	buildah commit $(WORKING_CONTAINER) ghcr.io/grantmacken/tbx-runtimes
-	buildah push ghcr.io/grantmacken/tbx-runtimes:latest
-	echo '✅ ghcr.io/grantmacken/tbx-runtimes:latest built and pushed'
-
 
 golang: info/golang.md
 info/golang.md:
@@ -238,8 +229,6 @@ info/luarocks.md: latest/luarocks.json
 	# $(RUN) ls /usr/local/cargo/bin/
 	# $(RUN) ln -sf /usr/local/cargo/bin/* /usr/local/bin/
 	# $(RUN) lx --help
-
-
 
 pull:
 	podman pull ghcr.io/grantmacken/tbx-runtimes:latest
