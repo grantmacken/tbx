@@ -105,6 +105,8 @@ info/neovim.md:
 
 nvim_config: info/nvim_config.md
 info/nvim_config.md:
+	echo '##[ $(basename $(notdir $@)) ]##'
+	$(RUN) which nvim_plugins
 	$(RUN) which nvim_plugins
 	$(RUN) nvim_plugins
 	$(call to_info,nvim-plugins,1.0.0,'Neovim plugins installed via nvim_plugins script')
