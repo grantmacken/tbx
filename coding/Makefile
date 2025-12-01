@@ -69,8 +69,6 @@ README.md: init $(PKGS_LIST)
 	$(call tr,$${NAME},$${VER},$${SUM},$@)
 	done
 
-
-
 # release binaries:
 # neovim
 # lua-language-server

@@ -17,8 +17,6 @@ README.md: runtimes
 	$(file >> $@,The following programming language runtimes and associated languages are included in this toolbox: )
 	$(call tr,"Name","Version","Summary", $@)
 	$(call tr,"----","-------","-------", $@)
-	$(call tr,"Name","Version","Summary", $@)
-	$(call tr,"----","-------","-------", $@)
 	NAME=$$(cat info/erlang.md | grep -oP '^Name\s+:\s+\K.+')
 	VER=$$(jq -r '.name' latest/erlang.json | cut -d' ' -f2)
 	SUM=$$(cat info/erlang.md | grep -oP '^Summary\s+:\s+\K.+')
