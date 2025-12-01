@@ -24,6 +24,7 @@ README.md: runtimes
 	do
 	$(call dnf_to_table_row,$${pkg},$@)
 	done
+	cat $@
 
 
 	
