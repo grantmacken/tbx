@@ -6,7 +6,7 @@ TBX_NAME := tbx-runtimes
 TBX_SUMMARY := A Fedora Toolbox image with runtimes and build tools
 TBX_IMAGE := ghcr.io/grantmacken/$(TBX_NAME)
 
-include ../inc/defines.mk
+include ../inc/define.mk
 
 DNF_LIST := golang nodejs uv # luajit
 OTP := erlang erlang-rebar3 elixir gleam
