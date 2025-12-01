@@ -15,12 +15,6 @@ README.md: runtimes
 	echo '##[ $@ ]##'
 	cat preamble.md > $@
 	$(file >> $@,The following programming language runtimes and associated languages are included in this toolbox: )
-	# $(call tr,"Name","Version","Summary", $@)
-	# $(call tr,"----","-------","-------", $@)
-	# for pkg in $(DNF_LIST)
-	# do
-	# $(call dnf_to_table_row,$${pkg},$@)
-	# done
 	$(call tr,"Name","Version","Summary", $@)
 	$(call tr,"----","-------","-------", $@)
 	cat otp.md > $@
@@ -30,6 +24,13 @@ README.md: runtimes
 	SUM="$$(echo $${DNF_INFO} | grep -oP '^Summary\s+:\s+\K.+' || true)"
 	$(call tr,$${NAME},$${VER},$${SUM},$@)
 	cat $@
+
+# $(call tr,"Name","Version","Summary", $@)
+# $(call tr,"----","-------","-------", $@)
+# for pkg in $(DNF_LIST)
+# do
+# $(call dnf_to_table_row,$${pkg},$@)
+# done
 
 init:
 	buildah pull ghcr.io/grantmacken/tbx-build-tools &>/dev/null
