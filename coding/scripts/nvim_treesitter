@@ -1,8 +1,7 @@
 #!/usr/bin/env -S nvim -l
 -- set XDG_DATA_HOME for vim.pack
-vim.uv.os_setenv("XDG_DATA_HOME", "/usr/share")
+vim.uv.os_setenv("XDG_DATA_HOME", "/usr/local/share")
 -- unset at scripts end
-
 local treesitters = {
 'awk',
 'bash',
@@ -24,8 +23,6 @@ local treesitters = {
 'javascript',
 'jq',
 'json',
-'just',
-'latex',
 'ledger',
 'make',
 'markdown_inline',

@@ -8,36 +8,41 @@ to /usr/local/share/:/usr/share/, so system administrators are
 expected to install site plugins to /usr/share/nvim/site.
 -- unset at scripts end
 vim.print(vim.fn.stdpath('data'))
-]]--
+]] --
 -- use pack.add
--- /usr/share/nvim/site/pack/core/opt/
-vim.uv.os_setenv("XDG_DATA_HOME", "/usr/share")
+-- /usr/local/share/nvim/site/pack/core/opt/
+vim.uv.os_setenv("XDG_DATA_HOME", "/usr/local/share")
 
--- COLORSCHEMES
-vim.pack.add({ 
- 'https://github.com/catppuccin/nvim',
- 'https://github.com/neanias/everforest-nvim',
- 'https://github.com/rebelot/kanagawa.nvim',
- 'https://github.com/vague2k/vague.nvim'
- })
+-- install mini.nvim
+-- add to start directory so it's always loaded
+local clone_cmd = {
+  'git', 'clone', '--filter=blob:none',
+  'https://github.com/nvim-mini/mini.nvim',
+  '/usr/local/share/nvim/site/pack/core/start/mini.nvim'
+}
+vim.fn.system(clone_cmd)
 
--- # vim.pack.add({ -- DEPS  other plugins may depend on these being available
--- # 'https://github.com/folke/snacks.nvim',
--- #  'https://github.com/nvim-lua/plenary.nvim',
--- # })
+-- add other plugins into opt directory
 
-vim.pack.add({
- 'https://github.com/MagicDuck/grug-far.nvim',
- 'https://github.com/echasnovski/mini.nvim',
- 'https://github.com/folke/flash.nvim',
- 'https://github.com/gbprod/yanky.nvim',
- 'https://github.com/hiphish/rainbow-delimiters.nvim',
- 'https://github.com/ibhagwan/fzf-lua',
- 'https://github.com/lambdalisue/vim-suda',
- 'https://github.com/lewis6991/gitsigns.nvim',
- 'https://github.com/mistweaverco/kulala.nvim',
- 'https://github.com/stevearc/oil.nvim',
- 'https://github.com/stevearc/resession.nvim',
- })
+local color_schemes = {
+  'https://github.com/neanias/everforest-nvim',
+  'https://github.com/rebelot/kanagawa.nvim',
+}
+
+vim.pack.add(color_schemes)
+
+local ui_bling = {
+  'https://github.com/MeanderingProgrammer/render-markdown.nvim',
+  'https://github.com/hiphish/rainbow-delimiters.nvim',
+  'https://github.com/lewis6991/gitsigns.nvim',
+  'https://github.com/rachartier/tiny-inline-diagnostic.nvim',
+  'https://github.com/stevearc/oil.nvim',
+  'https://github.com/stevearc/quicker.nvim',
+}
+
+vim.pack.add(ui_bling)
+
+-- 'https://github.com/ray-x/lsp_signature.nvim',
+-- 'https://github.com/rachartier/tiny-code-action.nvim',
 
 vim.uv.os_unsetenv("XDG_DATA_HOME")

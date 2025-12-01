@@ -50,7 +50,6 @@ init:
 	# update dnf repos
 	$(RUN) dnf update -y &>/dev/null
 
-
 README.md: init dnf_list pkgs_list 
 	echo '##[ $@ ]##'
 	mkdir -p $(dir $@)
@@ -72,9 +71,9 @@ README.md: init dnf_list pkgs_list
 	done
 	echo '✅ README.md created'
 
-coding: init lists
+coding: init lists nvim_config
 lists: dnf_list pkgs_list
-pkgs_list: $(PKGS_LIST) 
+pkgs_list: $(PKGS_LIST)
 
 dnf_list:
 	echo '##[ $@ ]##'
@@ -102,6 +101,15 @@ info/neovim.md:
 	# get version from the binary
 	VER=$$($(RUN) nvim -v | grep -oP 'NVIM v\K\d+\.\d+\.\d+' )
 	$(call to_info,$${PKG},$${VER},Neovim text editor)
+
+nvim_config: info/nvim_config.md
+info/nvim_config.md:
+	$(RUN) nvim_plugins
+	$(call to_info,nvim-plugins,1.0.0,'Neovim plugins installed via nvim_plugins script')
+	$(RUN) nvim_treesitter
+	$(call to_info,nvim-treesitter,1.0.0,'Neovim treesitter parsers installed via nvim_treesitter script')
+	echo '✅ Neovim configuration completed'
+	# echo '##[ $(basename $(notdir $@)) ]##'
 
 lua-language-server: info/lua-language-server.md
 latest/lua-language-server.json:
@@ -389,11 +397,3 @@ info/google-cloud-cli.md:
 # 	SUM=$$(echo "$${LINES}" | grep -oP '^summary\s\K.+')
 # 	$(call to_info,$${PKG},$${VER},$${SUM})
 
-pull:
-	echo '##[ $@ ]##'
-	host-spawn
-	podman pull ghcr.io/grantmacken/tbx-coding:latest
-	# toolbox list --containers
-	# toolbox list --images
-	#toolbox create --image ghcr.io/grantmacken/tbx-coding:latest coding
-	exit
