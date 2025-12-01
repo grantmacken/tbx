@@ -51,7 +51,7 @@ init:
 	$(RUN) dnf update -y &>/dev/null
 	echo '✅ Base image pulled and working container created'
 
-README.md: init dnf_list pkgs_list 
+README.md: init dnf_list pkgs_list nvim_config 
 	echo '##[ $@ ]##'
 	mkdir -p $(dir $@)
 	cat preamble.md > $@
@@ -72,8 +72,6 @@ README.md: init dnf_list pkgs_list
 	done
 	echo '✅ README.md created'
 
-coding: init lists nvim_config
-lists: dnf_list pkgs_list
 pkgs_list: $(PKGS_LIST)
 
 dnf_list:
@@ -81,6 +79,21 @@ dnf_list:
 	$(RUN) dnf update -y &>/dev/null
 	$(INSTALL) $(DNF_LIST) &>/dev/null
 	echo '✅ DNF packages installed'
+
+nvim_config: info/nvim_config.md
+info/nvim_config.md:
+	echo '##[ $(basename $(notdir $@)) ]##'
+	$(RUN) which nvim_plugins
+	$(RUN) which nvim_plugins
+	$(RUN) nvim_plugins
+	# $(call to_info,nvim-plugins,1.0.0,'Neovim plugins installed via nvim_plugins script')
+	$(RUN) which nvim_treesitters
+	$(RUN) nvim_treesitters
+	# $(call to_info,nvim-treesitter,1.0.0,'Neovim treesitter parsers installed via nvim_treesitter script')
+	echo '✅ Neovim configuration completed'
+	# echo '##[ $(basename $(notdir $@)) ]##'
+
+
 
 # release binaries:
 # neovim
@@ -103,20 +116,7 @@ info/neovim.md:
 	# get version from the binary
 	VER=$$($(RUN) nvim -v | grep -oP 'NVIM v\K\d+\.\d+\.\d+' )
 	$(call to_info,$${PKG},$${VER},Neovim text editor)
-	echo '✅ Neovim installed'
 
-nvim_config: info/nvim_config.md
-info/nvim_config.md:
-	echo '##[ $(basename $(notdir $@)) ]##'
-	$(RUN) which nvim_plugins
-	$(RUN) which nvim_plugins
-	$(RUN) nvim_plugins
-	$(call to_info,nvim-plugins,1.0.0,'Neovim plugins installed via nvim_plugins script')
-	$(RUN) which nvim_treesitters
-	$(RUN) nvim_treesitters
-	$(call to_info,nvim-treesitter,1.0.0,'Neovim treesitter parsers installed via nvim_treesitter script')
-	echo '✅ Neovim configuration completed'
-	# echo '##[ $(basename $(notdir $@)) ]##'
 
 lua-language-server: info/lua-language-server.md
 latest/lua-language-server.json:
