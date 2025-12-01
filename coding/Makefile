@@ -84,7 +84,7 @@ info/nvim_plugins.md:
 
 info/nvim_treesitters.md:
 	# $(RUN) tree -L 3 /usr/local/share/nvim/site/pack
-	$(RUN) nvim_treesitters
+	$(RUN) nvim_treesitters &> /dev/null
 	$(call to_info,nvim-treesitters,1.0.0,'Neovim treesitter parsers installed via nvim_treesitters script')
 	# $(RUN) tree -L 4 /usr/local/share/nvim/site
 	# echo '##[ $(basename $(notdir $@)) ]##'
