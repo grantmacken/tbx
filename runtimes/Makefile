@@ -68,14 +68,19 @@ dnf_list: init
 
 otp_list: erlang elixir erlang-rebar3 gleam
 
+
+erlang: info/erlang.md
+
+
 latest/erlang.json:
 	echo '##[ $@ ]##'
 	mkdir -p $(dir $@)
 	$(WGET) https://api.github.com/repos/erlang/otp/releases/latest -O $@
 
-erlang: info/erlang.md
+
 info/erlang.md: latest/erlang.json
 	echo '##[ $@ ]##'
+	mkdir -p $(dir $@)
 	mkdir -p files/otp
 	$(RUN) mkdir -p /tmp/otp
 	VER=$$(jq -r '.name' $< | cut -d' ' -f2)
