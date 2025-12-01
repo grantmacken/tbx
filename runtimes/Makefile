@@ -23,7 +23,7 @@ README.md: runtimes
 	done
 	$(call tr,"Name","Version","Summary", $@)
 	$(call tr,"----","-------","-------", $@)
-	cat otp_preamble.md > $@
+	cat otp.md > $@
 	DNF_INFO=$$($(INFO) erlang)
 	NAME=$$(echo $${DNF_INFO} | grep -oP '^Name\s+:\s+\K.+')
 	VER=$$(jq -r '.name' latest/erlang.json | cut -d' ' -f2)
