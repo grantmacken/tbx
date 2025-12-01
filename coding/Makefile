@@ -85,6 +85,8 @@ info/nvim_config.md:
 	$(RUN) nvim_plugins
 	$(call to_info,nvim-plugins,1.0.0,'Neovim plugins installed via nvim_plugins script')
 	$(RUN) tree -L 3 /usr/local/share/nvim/site/pack
+	$(RUN) nvim_treesitters
+	$(RUN) tree -L 4 /usr/local/share/nvim/site
 	echo '✅ Neovim configuration completed'
 	# echo '##[ $(basename $(notdir $@)) ]##'
 
