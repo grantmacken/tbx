@@ -1,12 +1,6 @@
 include ../inc/meta.mk
 WORKING_CONTAINER := tbx-runtimes-working-container
 include ../inc/define.mk
-# actions
-# lsp_confs := $(wildcard site/lsp/*.lua)
-# lsp_targs := $(patsubst site/lsp/%.lua,info/site/lsp/%.md,$(lsp_confs))
-#
-# ft_confs  := $(wildcard site/after/filetype/*.lua)
-# ft_targs := $(patsubst  site/after/ftplugin/*.lua, info/after/ftplugin/%.md,$(ft_confs))
 
 DNF_LIST     :=   ShellCheck shfmt # google-cloud-cli
 UV_TOOL_LIST :=  tombi  mbake # specify-cli
@@ -23,6 +17,7 @@ NPM_LIST := bash-language-server \
 
 RELEASE_BINARY_LIST :=  neovim lua-language-server harper-ls
 PKGS_LIST := $(RELEASE_BINARY_LIST) $(UV_TOOL_LIST) $(NPM_LIST)
+NVIM_CONFIG_LIST := nvim_plugins nvim_treesitters
 
 default: README.md
 	echo '##[ $@ ]##'
@@ -58,7 +53,7 @@ README.md: init dnf_list pkgs_list nvim_config
 	$(file >> $@,the following applications are included in this toolbox: )
 	$(call tr,"Name","Version","Summary", $@)
 	$(call tr,"----","-------","-------", $@)
-	for pkg in $(PKGS_LIST)
+	for pkg in $(PKGS_LIST) $(NVIM_CONFIG_LIST)
 	do
 	NAME=$$(cat info/$${pkg}.md | grep -oP '^Name:\s\K.+')
 	VER=$$(cat info/$${pkg}.md | grep -oP '^Version:\s\K.+')
@@ -79,18 +74,20 @@ dnf_list:
 	$(INSTALL) $(DNF_LIST) &>/dev/null
 	echo '✅ DNF packages installed'
 
-nvim_config: info/nvim_config.md
-info/nvim_config.md:
+nvim_config: info/nvim_plugins.md info/nvim_treesitters.md
+	echo '✅ Neovim configuration completed'
+
+info/nvim_plugins.md:
 	echo '##[ $(basename $(notdir $@)) ]##'
 	$(RUN) nvim_plugins
 	$(call to_info,nvim-plugins,1.0.0,'Neovim plugins installed via nvim_plugins script')
-	$(RUN) tree -L 3 /usr/local/share/nvim/site/pack
+
+info/nvim_treesitters.md:
+	# $(RUN) tree -L 3 /usr/local/share/nvim/site/pack
 	$(RUN) nvim_treesitters
-	$(RUN) tree -L 4 /usr/local/share/nvim/site
-	echo '✅ Neovim configuration completed'
+	$(call to_info,nvim-treesitters,1.0.0,'Neovim treesitter parsers installed via nvim_treesitters script')
+	# $(RUN) tree -L 4 /usr/local/share/nvim/site
 	# echo '##[ $(basename $(notdir $@)) ]##'
-
-
 
 # release binaries:
 # neovim
@@ -173,7 +170,7 @@ info/harper-ls.md: latest/harper-ls.json
 tombi: info/tombi.md
 info/tombi.md:
 	# echo '##[ $(basename $(notdir $@)) ]##'
-	PKG=$(basename $(notdir $@)) 
+	PKG=$(basename $(notdir $@))
 	$(RUN) uv tool install $${PKG} &> /dev/null
 	# success|failure check
 	$(RUN) which $${PKG} &> /dev/null
