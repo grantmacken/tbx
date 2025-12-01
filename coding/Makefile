@@ -101,12 +101,15 @@ info/neovim.md:
 	# get version from the binary
 	VER=$$($(RUN) nvim -v | grep -oP 'NVIM v\K\d+\.\d+\.\d+' )
 	$(call to_info,$${PKG},$${VER},Neovim text editor)
+	echo '✅ Neovim installed'
 
 nvim_config: info/nvim_config.md
 info/nvim_config.md:
+	$(RUN) which nvim_plugins
 	$(RUN) nvim_plugins
 	$(call to_info,nvim-plugins,1.0.0,'Neovim plugins installed via nvim_plugins script')
-	$(RUN) nvim_treesitter
+	$(RUN) which nvim_treesitters
+	$(RUN) nvim_treesitters
 	$(call to_info,nvim-treesitter,1.0.0,'Neovim treesitter parsers installed via nvim_treesitter script')
 	echo '✅ Neovim configuration completed'
 	# echo '##[ $(basename $(notdir $@)) ]##'
