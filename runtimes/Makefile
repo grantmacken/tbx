@@ -18,10 +18,24 @@ README.md: runtimes
 	$(call tr,"Name","Version","Summary", $@)
 	$(call tr,"----","-------","-------", $@)
 	cat otp.md > $@
-	DNF_INFO="$$($(INFO) erlang)"
-	NAME="$$(echo $${DNF_INFO} | grep -oP '^Name\s+:\s+\K.+' || true)"
-	VER="$$(jq -r '.name' latest/erlang.json | cut -d' ' -f2 || true)"
-	SUM="$$(echo $${DNF_INFO} | grep -oP '^Summary\s+:\s+\K.+' || true)"
+	# ## erlang otp
+	NAME=$$(cat info/erlang.md | grep -oP '^Name\s+:\s+\K.+')
+	VER=$$(jq -r '.name' latest/erlang.json | cut -d' ' -f2)
+	SUM=$$(cat info/erlang.md | grep -oP '^Summary\s+:\s+\K.+')
+	NAME=rebar3
+	VER=$$(jq -r '.tag_name' latest/erlang-rebar3.json | cut -d'v' -f2)
+	SUM=$$(cat info/erlang-rebar3.md | grep -oP '^Summary\s+:\s+\K.+')
+	$(call tr,$${NAME},$${VER},$${SUM},$@)
+	# elixir
+	NAME=$$(cat info/elixir.md | grep -oP '^Name\s+:\s+\K.+')
+	VER=$$(jq -r '.tag_name' latest/elixir.json | cut -d'v' -f2)
+	SUM=$$(cat info/elixir.md | grep -oP '^Summary\s+:\s+\K.+')
+	$(call tr,$${NAME},$${VER},$${SUM},$@)
+	# gleam
+	LINE=$$($(RUN) gleam --version)
+	NAME=$$(echo $$LINE | cut -d' ' -f1)
+	VER=$$(echo $$LINE | cut -d' ' -f2)
+	SUM="Gleam programming language"
 	$(call tr,$${NAME},$${VER},$${SUM},$@)
 	cat $@
 
@@ -51,16 +65,16 @@ dnf_list: init
 	$(RUN) dnf update -y &>/dev/null
 	$(INSTALL) $(DNF_LIST) &>/dev/null
 
-otp_list: erlang
+otp_list: erlang elixir erlang-rebar3 gleam
 
 latest/erlang.json:
 	echo '##[ $@ ]##'
 	mkdir -p $(dir $@)
 	$(WGET) https://api.github.com/repos/erlang/otp/releases/latest -O $@
 
-erlang: latest/erlang.json
+erlang: info/erlang.md
+info/erlang.md: latest/erlang.json
 	echo '##[ $@ ]##'
-	mkdir -p $(dir $@)
 	mkdir -p files/otp
 	$(RUN) mkdir -p /tmp/otp
 	VER=$$(jq -r '.name' $< | cut -d' ' -f2)
@@ -87,12 +101,12 @@ erlang: latest/erlang.json
 	# success|failure check
 	$(RUN) erl -eval 'erlang:display(erlang:system_info(otp_release)), halt().'  -noshell &>/dev/null
 	$(RUN) rm -fR /tmp/otp
+	$(INFO) erlang > $@
 	# extract name, version, summary
 
 
 ##[[ ELIXIR ]]##
 elixir: info/elixir.md
-
 latest/elixir.json:
 	echo '##[ $@ ]##'
 	mkdir -p $(dir $@)
@@ -111,7 +125,6 @@ info/elixir.md: latest/elixir.json
 	# success|failure check
 	$(RUN) elixir --version
 	$(RUN) mix --version
-	
 	$(INFO) elixir > $@
 
 
