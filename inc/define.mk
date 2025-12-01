@@ -44,3 +44,13 @@ define dnf_to_table_row
 	# consistent write to file format
 	$(call tr,$(1),$${VER},$${SUM},$(2))
 endef
+
+define uv_tool_info
+# extract 'name', 'version', 'summary'
+	LINE=$$($(RUN) uv tool list | grep $(1) )
+	# extract 'name', 'version', 'summary'
+	NAME=$$(echo $$LINE | cut -d' ' -f1)
+	VER=$$(echo $$LINE  | cut -d' ' -f2)
+	SUM='$(2)'
+	$(call to_info,$${NAME},$${VER},$${SUM})
+endef

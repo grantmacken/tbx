@@ -23,9 +23,7 @@ NPM_LIST := bash-language-server \
 # tape
 
 RELEASE_BINARY_LIST :=  neovim lua-language-server harper-ls
-PKGS_LIST := $(RELEASE_BINARY_LIST)  $(UV_TOOL_LIST)  $(NPM_LIST) $(DNF_LIST)
-
-## Helper to write info files in a consistent format
+PKGS_LIST := $(RELEASE_BINARY_LIST) $(UV_TOOL_LIST) $(NPM_LIST) $(DNF_LIST)
 
 default: README.md
 	echo '##[ $@ ]##'
