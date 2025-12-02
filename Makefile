@@ -13,7 +13,7 @@ MAKEFLAGS += --silent
 unexport MAKEFLAGS
 
 default:
-	# pushd build-tools && $(MAKE) && popd
+	# pushd build-:tools && $(MAKE) && popd
 	# sleep 60 # wait for image to settle
 	# pushd runtimes && $(MAKE) && popd
 	# sleep 60 # wait for image to settle
