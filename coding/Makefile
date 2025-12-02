@@ -75,6 +75,10 @@ dnf_list:
 	echo '✅ DNF packages installed'
 
 nvim_config: info/nvim_plugins.md info/nvim_treesitters.md
+	echo '##[ $@ ]##'
+	$(RUN) mkdir -p /etc/xdg/nvim
+	$(ADD) files/sysinit.vim  /etc/xdg/nvim/sysinit.vim &> /dev/null
+	$(RUN) ls -la /etc/xdg/nvim/sysinit.vim
 	echo '✅ Neovim configuration completed'
 
 info/nvim_plugins.md:
@@ -110,7 +114,6 @@ info/neovim.md:
 	# get version from the binary
 	VER=$$($(RUN) nvim -v | grep -oP 'NVIM v\K\d+\.\d+\.\d+' )
 	$(call to_info,$${PKG},$${VER},Neovim text editor)
-
 
 lua-language-server: info/lua-language-server.md
 latest/lua-language-server.json:
