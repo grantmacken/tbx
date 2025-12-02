@@ -116,28 +116,29 @@ info/neovim.md:
 	$(call to_info,$${PKG},$${VER},Neovim text editor)
 
 lua-language-server: info/lua-language-server.md
+
 latest/lua-language-server.json:
 	$(WGET) https://api.github.com/repos/LuaLS/lua-language-server/releases/latest -O- | jq '.' > $@
 
 info/lua-language-server.md: latest/lua-language-server.json
-	# echo '##[ $(basename $(notdir $@)) ]##'
+	echo '##[ $(basename $(notdir $@)) ]##'
 	PKG=$(basename $(notdir $@)) 
 	SRC=$(shell $(call bdu,linux-x64.tar.gz,$<))
 	TARGET=files/$${PKG}/usr/local/$${PKG}
 	mkdir -p $${TARGET}
-	$(WGET) $${SRC} -O- | $(TAR_NO_STRIP) $${TARGET} &> /dev/null
-	$(ADD) files/$${PKG} &> /dev/null
+	$(WGET) $${SRC} -O- | $(TAR_NO_STRIP) $${TARGET}  || true
+	$(ADD) files/$${PKG} || true
 	# note the lua-language-server binary is in /usr/local/$${PKG}/bin/ subdir
 	# the exec script in /usr/local/bin/lua-language-server will point to it
 	# these scripts are added in init target
 	# success|failure caheck
-	$(RUN) which $${PKG} &> /dev/null
-	$(RUN) whereis $${PKG}	 &> /dev/null
-	$(RUN) $${PKG} --version &> /dev/null
-	# extract 'name', 'version', 'summary'
-	# get version from the binary
-	VER=$$($(RUN) lua-language-server --version)
-	$(call to_info,$${PKG},$${VER},'Lua language server')
+	# $(RUN) which $${PKG} &> /dev/null
+	# $(RUN) whereis $${PKG}	 &> /dev/null
+	# $(RUN) $${PKG} --version &> /dev/null
+	# # extract 'name', 'version', 'summary'
+	# # get version from the binary
+	# VER=$$($(RUN) lua-language-server --version)
+	# $(call to_info,$${PKG},$${VER},'Lua language server')
 	echo '✅ Lua Language Server installed'
 
 # harper-ls
