@@ -129,9 +129,9 @@ info/lua-language-server.md: latest/lua-language-server.json
 	mkdir -p $(dir $@)
 	TARGET=files/$${PKG}
 	mkdir -p $${TARGET}
-	VER=$$(jq -r '.name' $<)
+	VER=$$(jq -r '.tag_name' $<)
 	echo " - Version: $${VER}"
-	SRC=$$(jq -r '.tarball_url' $<)
+	SRC="https://github.com/LuaLS/lua-language-server/archive/refs/tags/$${VER}.tar.gz"
 	echo " - Download Url: $${SRC}"
 	$(WGET) $${SRC} -O- | $(TAR) $${TARGET}
 	ls -al $${TARGET}
