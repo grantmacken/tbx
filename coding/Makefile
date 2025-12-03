@@ -135,9 +135,11 @@ info/lua-language-server.md: latest/lua-language-server.json
 	echo " - Download Url: $${SRC}"
 	$(WGET) $${SRC} -O- | $(TAR) $${TARGET} &>/dev/null
 	$(ADD) files/$${PKG}  &>/dev/null
-	$(RUN) cd /usr/local/$${PKG} && ./make.sh &> /dev/null
+	$(RUN) cd /usr/local/$${PKG} && ./make.sh
 	# note the lua-language-server binary is in /usr/local/$${PKG}/bin/ subdir
 	$(RUN) ls -al /usr/local/$${PKG}/bin
+	# success|failure check
+	touch $@
 
 xinfo/lua-language-server.md: xlatest/lua-language-server.json
 	# echo '##[ $(basename $(notdir $@)) ]##'
