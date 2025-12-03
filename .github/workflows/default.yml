@@ -1,9 +1,9 @@
 name: Sequential Toolbox Builds
 
 on:
-  push:
-    branches:
-      - main
+  # push:
+  #   branches:
+  #     - main
   # Run weekly on Sunday at 00:00 UTC
   schedule:
     - cron: '0 0 * * 0'
