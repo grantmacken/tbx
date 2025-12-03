@@ -123,39 +123,22 @@ latest/lua-language-server.json:
 	mkdir -p $(dir $@)
 	$(WGET) https://api.github.com/repos/LuaLS/lua-language-server/releases/latest -O- | jq '.' > $@
 
-### SRC="https://github.com/LuaLS/lua-language-server/archive/refs/tags/$${VER}.tar.gz"
-
+#
 # NOTE: building from source as prebuilt binaries are not working with latest release
-## @see isssue https://github.com/LuaLS/lua-language-server/issues/3301
+# @see isssue https://github.com/LuaLS/lua-language-server/issues/3301
+# latest/lua-language-server.json
 
-info/lua-language-server.md: latest/lua-language-server.json
-	PKG=$(basename $(notdir $@))
-	echo " - installing $${PKG}"
-	mkdir -p $(dir $@)
-	pushd files &> /dev/null
-	git clone https://github.com/LuaLS/lua-language-server &> /dev/null
-	popd &> /dev/null
-	SRC=files/$${PKG}
-	#ls -al $${SRC} || true
-	$(ADD) $${SRC} /usr/local/$${PKG} || true
-	# $(RUN) ls /usr/local/ | grep $${PKG} || true
-	#$(RUN) ls /usr/local/$${PKG} || true
-	$(RUN) bash -c "cd /usr/local/$${PKG} && ./make.sh" || true
-	# # note the lua-language-server binary is in /usr/local/$${PKG}/bin/ subdir
-	# $(RUN) ls -al /usr/local/$${PKG}/bin
-	# success|failure check
-	touch $@
-
-xinfo/lua-language-server.md: xlatest/lua-language-server.json
+info/lua-language-server.md:
 	# echo '##[ $(basename $(notdir $@)) ]##'
 	PKG=$(basename $(notdir $@))
 	echo " - Binary Name:  $${PKG}"
-	SRC=$(shell $(call bdu,linux-x64.tar.gz,$<))
+	# SRC=$(shell $(call bdu,linux-x64.tar.gz,$<))
+	SRC="https://github.com/LuaLS/lua-language-server/archive/refs/tags/3.15.0.tar.gz"
 	echo " - Download Url: $${SRC}"
-	TARGET=files/$${PKG}/usr/local/$${PKG}
-	mkdir -p $${TARGET}
-	$(WGET) $${SRC} -O- | $(TAR_NO_STRIP) $${TARGET} &> /dev/null
-	$(ADD) files/$${PKG} &> /dev/null
+	TARGET="files/$${PKG}"
+	mkdir -p "$${TARGET}"
+	$(WGET) $${SRC} -O- | $(TAR_NO_STRIP) $${TARGET}
+	$(ADD) files/$${PKG}  /usr/local/${PKG} &> /dev/null
 	# note the lua-language-server binary is in /usr/local/$${PKG}/bin/ subdir
 	# the exec script in /usr/local/bin/lua-language-server will point to it
 	# these scripts are added in init target
