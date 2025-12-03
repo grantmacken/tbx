@@ -125,6 +125,9 @@ latest/lua-language-server.json:
 
 ### SRC="https://github.com/LuaLS/lua-language-server/archive/refs/tags/$${VER}.tar.gz"
 
+# NOTE: building from source as prebuilt binaries are not working with latest release
+## @see isssue https://github.com/LuaLS/lua-language-server/issues/3301
+
 info/lua-language-server.md: latest/lua-language-server.json
 	PKG=$(basename $(notdir $@))
 	echo " - installing $${PKG}"
@@ -135,7 +138,8 @@ info/lua-language-server.md: latest/lua-language-server.json
 	SRC=files/$${PKG}
 	ls -al $${SRC} || true
 	$(ADD) $${SRC} /usr/local/$${PKG} || true
-	# $(RUN) tree -L 2 /usr/local/$${PKG} || true
+	$(RUN) ls /usr/local/ | grep $${PKG} || true
+	$(RUN) ls /usr/local/$${PKG} || true
 	$(RUN) cd /usr/local/$${PKG} && make.sh || true
 	# # note the lua-language-server binary is in /usr/local/$${PKG}/bin/ subdir
 	# $(RUN) ls -al /usr/local/$${PKG}/bin
