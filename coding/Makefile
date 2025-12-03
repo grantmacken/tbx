@@ -127,14 +127,15 @@ info/lua-language-server.md: latest/lua-language-server.json
 	PKG=$(basename $(notdir $@))
 	echo " - installing $${PKG}"
 	mkdir -p $(dir $@)
-	TARGET=files/$${PKG}/usr/local/$${PKG}
+	TARGET=files/$${PKG}
 	mkdir -p $${TARGET}
 	VER=$$(jq -r '.name' $<)
 	echo " - Version: $${VER}"
 	SRC=$$(jq -r '.tarball_url' $<)
 	echo " - Download Url: $${SRC}"
 	$(WGET) $${SRC} -O- | $(TAR) $${TARGET}
-	$(RUN) tree -L 3 /usr/local/$${PKG} || true
+	ls -al $${TARGET}
+	# $(RUN) tree -L 3 /usr/local/$${PKG} || true
 	# $(RUN) cd /usr/local/$${PKG} && ./make.sh
 	# # note the lua-language-server binary is in /usr/local/$${PKG}/bin/ subdir
 	# $(RUN) ls -al /usr/local/$${PKG}/bin
