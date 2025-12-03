@@ -47,6 +47,8 @@ init:
 
 README.md: init lua-language-server  # dnf_list pkgs_list nvim_config
 	echo '##[ $@ ]##'
+
+xxxxx:
 	mkdir -p $(dir $@)
 	cat preamble.md > $@
 	echo $@
