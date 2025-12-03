@@ -136,10 +136,10 @@ info/lua-language-server.md: latest/lua-language-server.json
 	$(WGET) $${SRC} -O- | $(TAR) $${TARGET}
 	ls -al $${TARGET}
 	$(ADD) files/$${PKG} /usr/local/ &> /dev/null
-	$(RUN) tree -L 3 /usr/local/$${PKG} || true
-	$(RUN) cd /usr/local/$${PKG} && ./make.sh
+	$(RUN) tree -L 2 /usr/local || true
+	# $(RUN) cd /usr/local/$${PKG} && ./make.sh
 	# # note the lua-language-server binary is in /usr/local/$${PKG}/bin/ subdir
-	$(RUN) ls -al /usr/local/$${PKG}/bin
+	# $(RUN) ls -al /usr/local/$${PKG}/bin
 	# success|failure check
 	touch $@
 
