@@ -12,7 +12,7 @@ on:
 
 jobs:
   # First branch build job
-  build-tools:
+  build-toolboxes:
     runs-on: ubuntu-latest
     timeout-minutes: 30
     continue-on-error: false
