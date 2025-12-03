@@ -133,13 +133,13 @@ info/lua-language-server.md:
 	PKG=$(basename $(notdir $@))
 	echo " - Binary Name:  $${PKG}"
 	# SRC=$(shell $(call bdu,linux-x64.tar.gz,$<))
-	SRC="https://github.com/LuaLS/lua-language-server/archive/refs/tags/3.15.0.tar.gz"
+	SRC="https://github.com/LuaLS/lua-language-server/releases/download/3.15.0/lua-language-server-3.15.0-linux-x64.tar.gz"
 	echo " - Download Url: $${SRC}"
 	TARGET="files/$${PKG}/usr/local/$${PKG}"
 	mkdir -p "$${TARGET}"
 	$(WGET) $${SRC} -O- | $(TAR_NO_STRIP) $${TARGET}
 	$(ADD) files/$${PKG} &> /dev/null
-	$(RUN) tree -L 2 /usr/local/$${PKG}
+	$(RUN) tree -L 3 /usr/local/$${PKG}
 	# note the lua-language-server binary is in /usr/local/$${PKG}/bin/ subdir
 	# the exec script in /usr/local/bin/lua-language-server will point to it
 	# these scripts are added in init target
