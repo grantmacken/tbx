@@ -2,7 +2,7 @@ include ../inc/meta.mk
 WORKING_CONTAINER := tbx-runtimes-working-container
 include ../inc/define.mk
 
-DNF_LIST     :=  ShellCheck shfmt #  libunwind # google-cloud-cli
+DNF_LIST     :=  ShellCheck shfmt #  google-cloud-cli
 UV_TOOL_LIST :=  tombi  mbake # specify-cli
 NPM_LIST := bash-language-server \
 			copilot \
@@ -15,7 +15,7 @@ NPM_LIST := bash-language-server \
 # fauce
 # tape
 
-RELEASE_BINARY_LIST :=  neovim  harper-ls
+RELEASE_BINARY_LIST :=  neovim  harper-ls lua-language-server
 PKGS_LIST := $(RELEASE_BINARY_LIST) $(UV_TOOL_LIST) $(NPM_LIST)
 NVIM_CONFIG_LIST := nvim_plugins nvim_treesitters
 
@@ -139,20 +139,17 @@ info/lua-language-server.md:
 	mkdir -p "$${TARGET}"
 	$(WGET) $${SRC} -O- | $(TAR_NO_STRIP) $${TARGET}
 	$(ADD) files/$${PKG} &> /dev/null
-	$(RUN) tree -L 3 /usr/local/$${PKG}
 	# note the lua-language-server binary is in /usr/local/$${PKG}/bin/ subdir
 	# the exec script in /usr/local/bin/lua-language-server will point to it
 	# these scripts are added in init target
-	$(RUN) ls -al /usr/local/bin
 	# # success|failure check
-	$(RUN) which $${PKG} || true
-	$(RUN) whereis $${PKG} || true
-	$(RUN) $${PKG} --version || true
+	$(RUN) which $${PKG} &> /dev/null
+	$(RUN) whereis $${PKG} &> /dev/null
+	$(RUN) $${PKG} --version &> /dev/null
 	# extract 'name', 'version', 'summary'
 	# get version from the binary
 	VER=$$($(RUN) lua-language-server --version)
 	$(call to_info,$${PKG},$${VER},'Lua language server')
-	echo '✅ Lua Language Server installed'
 
 # harper-ls
 harper-ls: info/harper-ls.md

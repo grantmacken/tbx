@@ -35,16 +35,15 @@ jobs:
           git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git
       - name: Build
         run: make
-      # - name: Commit and push README.md changes
-      #   run: |
-      #     rm -f README.md # remove if exists to avoid git add errors
-      #     touch README.md
-      #     cat build-tools/README.md | tee - README.md
-      #     cat runtimes/README.md  | tee -a README.md
-      #     cat coding/README.md  | tee -a README.md
-      #     git add README.md
-      #     git commit -m "Update README.md from Makefile build" README.md || echo "No changes to commit"
-      #     git push origin HEAD:${GITHUB_REF#refs/heads/}
-      #   env:
-      #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      #
+      - name: Commit and push README.md changes
+        run: |
+          rm -f README.md # remove if exists to avoid git add errors
+          touch README.md
+          cat build-tools/README.md | tee - README.md
+          cat runtimes/README.md  | tee -a README.md
+          cat coding/README.md  | tee -a README.md
+          git add README.md
+          git commit -m "Update README.md from Makefile build" README.md || echo "No changes to commit"
+          git push origin HEAD:${GITHUB_REF#refs/heads/}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
