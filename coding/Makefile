@@ -145,14 +145,14 @@ info/lua-language-server.md:
 	# these scripts are added in init target
 	$(RUN) ls -al /usr/local/bin
 	# # success|failure check
-	# $(RUN) which $${PKG} || true
-	# $(RUN) whereis $${PKG} || true
-	# $(RUN) $${PKG} --version || true
-	# # extract 'name', 'version', 'summary'
-	# # get version from the binary
-	# VER=$$($(RUN) lua-language-server --version)
-	# $(call to_info,$${PKG},$${VER},'Lua language server')
-	# echo '✅ Lua Language Server installed'
+	$(RUN) which $${PKG} || true
+	$(RUN) whereis $${PKG} || true
+	$(RUN) $${PKG} --version || true
+	# extract 'name', 'version', 'summary'
+	# get version from the binary
+	VER=$$($(RUN) lua-language-server --version)
+	$(call to_info,$${PKG},$${VER},'Lua language server')
+	echo '✅ Lua Language Server installed'
 
 # harper-ls
 harper-ls: info/harper-ls.md
