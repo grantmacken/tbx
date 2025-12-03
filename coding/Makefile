@@ -2,7 +2,7 @@ include ../inc/meta.mk
 WORKING_CONTAINER := tbx-runtimes-working-container
 include ../inc/define.mk
 
-DNF_LIST     :=   ShellCheck shfmt libunwind # google-cloud-cli
+DNF_LIST     :=  ShellCheck shfmt #  libunwind # google-cloud-cli
 UV_TOOL_LIST :=  tombi  mbake # specify-cli
 NPM_LIST := bash-language-server \
 			copilot \
@@ -15,7 +15,7 @@ NPM_LIST := bash-language-server \
 # fauce
 # tape
 
-RELEASE_BINARY_LIST :=  neovim lua-language-server harper-ls
+RELEASE_BINARY_LIST :=  neovim  harper-ls
 PKGS_LIST := $(RELEASE_BINARY_LIST) $(UV_TOOL_LIST) $(NPM_LIST)
 NVIM_CONFIG_LIST := nvim_plugins nvim_treesitters
 
@@ -45,7 +45,7 @@ init:
 	$(RUN) dnf update -y &>/dev/null
 	echo '✅ Base image pulled and working container created'
 
-README.md: init dnf_list pkgs_list nvim_config
+README.md: init lua-language-server  # dnf_list pkgs_list nvim_config
 	echo '##[ $@ ]##'
 	mkdir -p $(dir $@)
 	cat preamble.md > $@
@@ -122,6 +122,22 @@ latest/lua-language-server.json:
 	$(WGET) https://api.github.com/repos/LuaLS/lua-language-server/releases/latest -O- | jq '.' > $@
 
 info/lua-language-server.md: latest/lua-language-server.json
+	PKG=$(basename $(notdir $@))
+	echo " - installing $${PKG}" 
+	mkdir -p $(dir $@)
+	TARGET=files/$${PKG}/usr/local/$${PKG}
+	mkdir -p $${TARGET}
+	VER=$$(jq -r '.name' $<)
+	echo " - Version: $${VER}" 
+	SRC=$$(jq -r '.tarball_url' $<)
+	echo " - Download Url: $${SRC}"
+	$(WGET) $${SRC} -O- | $(TAR) $${TARGET} &>/dev/null
+	$(ADD) files/$${PKG}  &>/dev/null
+	$(RUN) cd /usr/local/$${PKG} && ./make.sh &> /dev/null
+	# note the lua-language-server binary is in /usr/local/$${PKG}/bin/ subdir
+	$(RUN) ls -al /usr/local/$${PKG}/bin
+
+xinfo/lua-language-server.md: xlatest/lua-language-server.json
 	# echo '##[ $(basename $(notdir $@)) ]##'
 	PKG=$(basename $(notdir $@))
 	echo " - Binary Name:  $${PKG}"

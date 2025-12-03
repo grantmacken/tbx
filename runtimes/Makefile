@@ -41,6 +41,14 @@ README.md: runtimes
 	do
 	$(call dnf_to_table_row,$${pkg},$@)
 	done
+
+xxx:
+	# luarocks
+	LINE=$$($(RUN) luarocks | grep -oP '^Lua.+')
+	NAME=$$(cat info/luarocks.md | grep -oP '^Name\s+:\s+\K.+')
+	VER=$$($(RUN) luarocks --version | head -1 | cut -d' ' -f2)
+	SUM=$$(cat info/luarocks.md | grep -oP '^Summary\s+:\s+\K.+')
+	$(call tr,$${NAME},$${VER},$${SUM},$@)
 	echo '✅ README.md created'
 	buildah commit $(WORKING_CONTAINER) ghcr.io/grantmacken/tbx-runtimes
 	buildah push ghcr.io/grantmacken/tbx-runtimes:latest
@@ -58,9 +66,9 @@ init:
 
 runtimes: init lists
 
-lists: dnf_list otp_list lua_list
+lists: dnf_list otp_list # lua_list
 
-dnf_list: init 
+dnf_list: init
 	echo '##[ $@ ]##'
 	$(RUN) dnf update -y &>/dev/null
 	$(INSTALL) $(DNF_LIST) &>/dev/null

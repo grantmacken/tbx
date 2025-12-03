@@ -7,8 +7,8 @@ include ../inc/define.mk
 
 # removed eza as no locnger maintained by maintainer
 TOOLS := make stow bat fd-find fzf host-spawn jq ripgrep wl-clipboard zoxide 
-BUILD := gcc gcc-c++ pcre2 autoconf pkgconf
-DEVEL := libicu gettext-devel glibc-devel libevent-devel ncurses-devel openssl-devel perl-devel readline-devel zlib-devel
+BUILD := gcc gcc-c++ pcre2 autoconf pkgconf ninja-build
+DEVEL := libstdc++-static libicu gettext-devel glibc-devel libevent-devel ncurses-devel openssl-devel perl-devel readline-devel zlib-devel
 PKGS_LIST := gh $(TOOLS)
 
 README.md: build-tools
