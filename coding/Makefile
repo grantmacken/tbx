@@ -134,6 +134,7 @@ info/lua-language-server.md: latest/lua-language-server.json
 	# note the lua-language-server binary is in /usr/local/$${PKG}/bin/ subdir
 	# the exec script in /usr/local/bin/lua-language-server will point to it
 	# these scripts are added in init target
+	$(RUN) ls -al /usr/local/bin
 	# success|failure caheck
 	$(RUN) which $${PKG} || true
 	$(RUN) whereis $${PKG} || true
