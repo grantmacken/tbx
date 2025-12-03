@@ -8,7 +8,7 @@ TBX_IMAGE := ghcr.io/grantmacken/$(TBX_NAME)
 
 include ../inc/define.mk
 
-DNF_LIST := golang nodejs uv luajit
+DNF_LIST := golang nodejs uv luajit 
 OTP := erlang erlang-rebar3 elixir gleam
 
 README.md: runtimes
