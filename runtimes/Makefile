@@ -8,8 +8,9 @@ TBX_IMAGE := ghcr.io/grantmacken/$(TBX_NAME)
 
 include ../inc/define.mk
 
-DNF_LIST := golang nodejs uv luajit 
+DNF_LIST := golang nodejs uv
 OTP := erlang erlang-rebar3 elixir gleam
+LUA := luajit luarocks
 
 README.md: runtimes
 	echo '##[ $@ ]##'
@@ -57,7 +58,7 @@ init:
 
 runtimes: init lists
 
-lists: dnf_list otp_list
+lists: dnf_list otp_list lua_list
 
 dnf_list: init 
 	echo '##[ $@ ]##'
@@ -176,6 +177,8 @@ info/golang.md:
 	# verify installation
 	$(RUN) go version &> /dev/null
 	$(INFO) --installed golang > $@
+
+lua_list: luajit luarocks
 
 luajit: info/luajit.md
 info/luajit.md:
