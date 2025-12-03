@@ -2,7 +2,7 @@ include ../inc/meta.mk
 WORKING_CONTAINER := tbx-runtimes-working-container
 include ../inc/define.mk
 
-DNF_LIST     :=   ShellCheck shfmt # google-cloud-cli
+DNF_LIST     :=   ShellCheck shfmt libunwind # google-cloud-cli
 UV_TOOL_LIST :=  tombi  mbake # specify-cli
 NPM_LIST := bash-language-server \
 			copilot \
@@ -45,7 +45,7 @@ init:
 	$(RUN) dnf update -y &>/dev/null
 	echo '✅ Base image pulled and working container created'
 
-README.md: init dnf_list pkgs_list nvim_config 
+README.md: init dnf_list pkgs_list nvim_config
 	echo '##[ $@ ]##'
 	mkdir -p $(dir $@)
 	cat preamble.md > $@
