@@ -127,8 +127,7 @@ info/lua-language-server.md: latest/lua-language-server.json
 	PKG=$(basename $(notdir $@))
 	echo " - installing $${PKG}"
 	mkdir -p $(dir $@)
-	mkdir -p files
-	cd files && git clone https://github.com/LuaLS/lua-language-server
+	git clone https://github.com/LuaLS/lua-language-server || true
 	# TARGET=files/$${PKG}
 	# mkdir -p $${TARGET}
 	# VER=$$(jq -r '.tag_name' $<)
@@ -137,7 +136,7 @@ info/lua-language-server.md: latest/lua-language-server.json
 	# echo " - Download Url: $${SRC}"
 	# $(WGET) $${SRC} -O- | $(TAR) $${TARGET}
 	# ls -al $${TARGET}
-	$(ADD) files/$${PKG} /usr/local/$${PKG} &> /dev/null
+	$(ADD) $${PKG} /usr/local/$${PKG} &> /dev/null
 	$(RUN) tree -L 2 /usr/local/$${PKG} || true
 	$(RUN) cd /usr/local/$${PKG} && ./make.sh || true
 	# # note the lua-language-server binary is in /usr/local/$${PKG}/bin/ subdir
