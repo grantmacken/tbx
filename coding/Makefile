@@ -136,11 +136,11 @@ info/lua-language-server.md: latest/lua-language-server.json
 	git clone https://github.com/LuaLS/lua-language-server &> /dev/null
 	popd &> /dev/null
 	SRC=files/$${PKG}
-	ls -al $${SRC} || true
+	#ls -al $${SRC} || true
 	$(ADD) $${SRC} /usr/local/$${PKG} || true
-	$(RUN) ls /usr/local/ | grep $${PKG} || true
-	$(RUN) ls /usr/local/$${PKG} || true
-	$(RUN) cd /usr/local/$${PKG} && make.sh || true
+	# $(RUN) ls /usr/local/ | grep $${PKG} || true
+	#$(RUN) ls /usr/local/$${PKG} || true
+	$(RUN) bash -c "cd /usr/local/$${PKG} && ./make.sh" || true
 	# # note the lua-language-server binary is in /usr/local/$${PKG}/bin/ subdir
 	# $(RUN) ls -al /usr/local/$${PKG}/bin
 	# success|failure check
