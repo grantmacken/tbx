@@ -127,14 +127,16 @@ info/lua-language-server.md: latest/lua-language-server.json
 	PKG=$(basename $(notdir $@))
 	echo " - installing $${PKG}"
 	mkdir -p $(dir $@)
-	TARGET=files/$${PKG}
-	mkdir -p $${TARGET}
-	VER=$$(jq -r '.tag_name' $<)
-	echo " - Version: $${VER}"
-	SRC="https://github.com/LuaLS/lua-language-server/archive/refs/tags/$${VER}.tar.gz"
-	echo " - Download Url: $${SRC}"
-	$(WGET) $${SRC} -O- | $(TAR) $${TARGET}
-	ls -al $${TARGET}
+	mkdir -p files
+	cd files && git clone https://github.com/LuaLS/lua-language-server
+	# TARGET=files/$${PKG}
+	# mkdir -p $${TARGET}
+	# VER=$$(jq -r '.tag_name' $<)
+	# echo " - Version: $${VER}"
+	# SRC="https://github.com/LuaLS/lua-language-server/archive/refs/tags/$${VER}.tar.gz"
+	# echo " - Download Url: $${SRC}"
+	# $(WGET) $${SRC} -O- | $(TAR) $${TARGET}
+	# ls -al $${TARGET}
 	$(ADD) files/$${PKG} /usr/local/$${PKG} &> /dev/null
 	$(RUN) tree -L 2 /usr/local/$${PKG} || true
 	$(RUN) cd /usr/local/$${PKG} && ./make.sh || true
