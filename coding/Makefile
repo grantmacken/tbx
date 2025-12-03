@@ -15,7 +15,7 @@ NPM_LIST := bash-language-server \
 # fauce
 # tape
 
-RELEASE_BINARY_LIST :=  neovim  harper-ls # lua-language-server
+RELEASE_BINARY_LIST :=  neovim lua-language-server harper-ls
 PKGS_LIST := $(RELEASE_BINARY_LIST) $(UV_TOOL_LIST) $(NPM_LIST)
 NVIM_CONFIG_LIST := nvim_plugins nvim_treesitters
 
@@ -45,7 +45,7 @@ init:
 	$(RUN) dnf update -y &>/dev/null
 	echo '✅ Base image pulled and working container created'
 
-README.md: init dnf_list pkgs_list nvim_config
+README.md: init dnf_list pkgs_list nvim_config 
 	echo '##[ $@ ]##'
 	mkdir -p $(dir $@)
 	cat preamble.md > $@
@@ -118,27 +118,30 @@ info/neovim.md:
 lua-language-server: info/lua-language-server.md
 
 latest/lua-language-server.json:
+	mkdir -p $(dir $@)
 	$(WGET) https://api.github.com/repos/LuaLS/lua-language-server/releases/latest -O- | jq '.' > $@
 
 info/lua-language-server.md: latest/lua-language-server.json
-	echo '##[ $(basename $(notdir $@)) ]##'
-	PKG=$(basename $(notdir $@)) 
+	# echo '##[ $(basename $(notdir $@)) ]##'
+	PKG=$(basename $(notdir $@))
+	echo " - Binary Name:  $${PKG}"
 	SRC=$(shell $(call bdu,linux-x64.tar.gz,$<))
+	echo " - Download Url: $${SRC}"
 	TARGET=files/$${PKG}/usr/local/$${PKG}
 	mkdir -p $${TARGET}
-	$(WGET) $${SRC} -O- | $(TAR_NO_STRIP) $${TARGET}  || true
-	$(ADD) files/$${PKG} || true
+	$(WGET) $${SRC} -O- | $(TAR_NO_STRIP) $${TARGET} &> /dev/null
+	$(ADD) files/$${PKG} &> /dev/null
 	# note the lua-language-server binary is in /usr/local/$${PKG}/bin/ subdir
 	# the exec script in /usr/local/bin/lua-language-server will point to it
 	# these scripts are added in init target
 	# success|failure caheck
-	# $(RUN) which $${PKG} &> /dev/null
-	# $(RUN) whereis $${PKG}	 &> /dev/null
-	# $(RUN) $${PKG} --version &> /dev/null
-	# # extract 'name', 'version', 'summary'
-	# # get version from the binary
-	# VER=$$($(RUN) lua-language-server --version)
-	# $(call to_info,$${PKG},$${VER},'Lua language server')
+	$(RUN) which $${PKG} || true
+	$(RUN) whereis $${PKG} || true
+	$(RUN) $${PKG} --version || true
+	# extract 'name', 'version', 'summary'
+	# get version from the binary
+	VER=$$($(RUN) lua-language-server --version)
+	$(call to_info,$${PKG},$${VER},'Lua language server')
 	echo '✅ Lua Language Server installed'
 
 # harper-ls
