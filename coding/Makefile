@@ -45,7 +45,7 @@ init:
 	$(RUN) dnf update -y &>/dev/null
 	echo '✅ Base image pulled and working container created'
 
-README.md: init lua-language-server  # dnf_list pkgs_list nvim_config
+README.md: init dnf_list pkgs_list nvim_config
 	mkdir -p $(dir $@)
 	cat preamble.md > $@
 	echo $@
