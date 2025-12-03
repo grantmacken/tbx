@@ -135,23 +135,24 @@ info/lua-language-server.md:
 	# SRC=$(shell $(call bdu,linux-x64.tar.gz,$<))
 	SRC="https://github.com/LuaLS/lua-language-server/archive/refs/tags/3.15.0.tar.gz"
 	echo " - Download Url: $${SRC}"
-	TARGET="files/$${PKG}"
+	TARGET="files/$${PKG}/usr/local/$${PKG}"
 	mkdir -p "$${TARGET}"
 	$(WGET) $${SRC} -O- | $(TAR_NO_STRIP) $${TARGET}
-	$(ADD) files/$${PKG}  /usr/local/${PKG} &> /dev/null
+	$(ADD) files/$${PKG} &> /dev/null
+	$(RUN) tree -L 2 /usr/local/$${PKG}
 	# note the lua-language-server binary is in /usr/local/$${PKG}/bin/ subdir
 	# the exec script in /usr/local/bin/lua-language-server will point to it
 	# these scripts are added in init target
 	$(RUN) ls -al /usr/local/bin
-	# success|failure caheck
-	$(RUN) which $${PKG} || true
-	$(RUN) whereis $${PKG} || true
-	$(RUN) $${PKG} --version || true
-	# extract 'name', 'version', 'summary'
-	# get version from the binary
-	VER=$$($(RUN) lua-language-server --version)
-	$(call to_info,$${PKG},$${VER},'Lua language server')
-	echo '✅ Lua Language Server installed'
+	# # success|failure check
+	# $(RUN) which $${PKG} || true
+	# $(RUN) whereis $${PKG} || true
+	# $(RUN) $${PKG} --version || true
+	# # extract 'name', 'version', 'summary'
+	# # get version from the binary
+	# VER=$$($(RUN) lua-language-server --version)
+	# $(call to_info,$${PKG},$${VER},'Lua language server')
+	# echo '✅ Lua Language Server installed'
 
 # harper-ls
 harper-ls: info/harper-ls.md
