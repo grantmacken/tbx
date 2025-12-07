@@ -26,11 +26,11 @@ Once inside the toolbox, you can start Using neovim and other installed tools fo
 | neovim                  | 0.12.0   | Neovim text editor                                                                    |
 | harper-ls               | 1.1.0    | 'Harper Language Server Grammar Checker'                                              |
 | lua-language-server     | 3.15.0   | 'Lua language server'                                                                 |
-| tombi                   | v0.7.0   | "TOML Formatter                                                                       |
+| tombi                   | v0.7.3   | "TOML Formatter                                                                       |
 | mbake                   | v1.4.3   | Makefile formatter and linter                                                         |
 | bash-language-server    | 5.6.0    | A language server for Bash                                                            |
-| copilot                 | 0.0.365  | GitHub Copilot CLI brings the power of Copilot coding agent directly to your terminal. |
-| copilot-language-server | 1.399.0  | Your AI pair programmer                                                               |
+| copilot                 | 0.0.367  | GitHub Copilot CLI brings the power of Copilot coding agent directly to your terminal. |
+| copilot-language-server | 1.400.0  | Your AI pair programmer                                                               |
 | tree-sitter-cli         | 0.25.10  | CLI for generating fast incremental parsers                                           |
 | vscode-langservers      | 4.10.0   | HTML/CSS/JSON/ESLint language servers extracted from [vscode](https://github.com/Microsoft/vscode). |
 | yaml-language-server    | 1.19.2   | YAML language server                                                                  |
