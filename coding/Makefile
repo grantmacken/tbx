@@ -86,7 +86,8 @@ latest/nvim-mini.json:
 info/nvim-mini.md: latest/nvim-mini.json
 	echo '##[ $(basename $(notdir $@)) ]##'
 	PKG=$(basename $(notdir $@))
-	SRC=$(shell $(call bdu,linux-x64.tar.gz,$<))
+	SRC=$$( jq -r '.tarball_url' $< )
+	echo " - Download Url: $${SRC}"
 	TARGET="files/$${PKG}/usr/local/share/nvim/site/pack/core/start/mini.nvim"
 	mkdir -p "$${TARGET}"
 	$(WGET) $${SRC} -O- | $(TAR) $${TARGET}
@@ -97,7 +98,7 @@ info/nvim-mini.md: latest/nvim-mini.json
 	# extract 'name', 'version', 'summary'
 	VER=$$(jq -r '.tag_name' $< | sed 's/^v//')
 	SUM='40+ independent Lua modules for Neovim'
-	$(call to_info,mini.nvim,$${VER},${SUM})
+	$(call to_info,mini.nvim,$${VER},$${SUM})
 
 info/nvim_treesitters.md:
 	$(RUN) nvim_treesitters &> /dev/null
