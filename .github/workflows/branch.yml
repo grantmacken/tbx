@@ -1,0 +1,20 @@
+name: Branch Workflow
+
+on:
+  push:
+    branches-ignore:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    continue-on-error: false
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: Run workflow
+        run: |
+          echo "Running on branch ${{ github.ref_name }}"
+          pushd coding && make && popd
+
