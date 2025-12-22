@@ -48,7 +48,7 @@ README.md: init dnf_list pkgs_list nvim_config
 	$(file >> $@,the following applications are included in this toolbox: )
 	$(call tr,"Name","Version","Summary", $@)
 	$(call tr,"----","-------","-------", $@)
-	for pkg in $(PKGS_LIST)
+	for pkg in $(PKGS_LIST) $(NVIM_CONFIG_LIST)
 	do
 	NAME=$$(cat info/$${pkg}.md | grep -oP '^Name:\s\K.+')
 	VER=$$(cat info/$${pkg}.md | grep -oP '^Version:\s\K.+')
@@ -70,7 +70,7 @@ dnf_list:
 	echo '✅ DNF packages installed'
 
 ## Neovim configuration ##
-nvim_config: nvim_mini
+nvim_config: $(NVIM_CONFIG_LIST)
 	# echo '✅ Neovim configuration completed'
 	# echo '##[ $@ ]##'
 	# $(RUN) mkdir -p /etc/xdg/nvim
