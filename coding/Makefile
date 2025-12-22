@@ -3,7 +3,7 @@ WORKING_CONTAINER := tbx-runtimes-working-container
 include ../inc/define.mk
 
 DNF_LIST     :=  ShellCheck shfmt #  google-cloud-cli
-UV_TOOL_LIST :=  tombi  mbake # specify-cli
+UV_TOOL_LIST :=  tombi  mbake     # specify-cli
 NPM_LIST := bash-language-server \
 			copilot \
 			copilot-language-server \
@@ -11,13 +11,9 @@ NPM_LIST := bash-language-server \
 			vscode-langservers-extracted \
 			yaml-language-server
 
-# removed:
-# fauce
-# tape
-
 RELEASE_BINARY_LIST :=  neovim  harper-ls lua-language-server
 PKGS_LIST := $(RELEASE_BINARY_LIST) $(UV_TOOL_LIST) $(NPM_LIST)
-NVIM_CONFIG_LIST := nvim_plugins nvim_treesitters
+NVIM_CONFIG_LIST :=  nvim_treesitters # nvim_plugins
 
 default: README.md
 	echo '##[ $@ ]##'
@@ -73,12 +69,14 @@ dnf_list:
 	$(INSTALL) $(DNF_LIST) &>/dev/null
 	echo '✅ DNF packages installed'
 
-nvim_config: info/nvim_plugins.md info/nvim_treesitters.md
-	echo '##[ $@ ]##'
-	$(RUN) mkdir -p /etc/xdg/nvim
-	$(ADD) files/sysinit.vim  /etc/xdg/nvim/sysinit.vim &> /dev/null
-	$(RUN) ls -la /etc/xdg/nvim/sysinit.vim
-	echo '✅ Neovim configuration completed'
+## Neovim configuration ##
+nvim_config: $(NVIM_CONFIG_LIST)
+nvim_config:  info/nvim_treesitters.md # info/nvim_plugins.md
+	# echo '✅ Neovim configuration completed'
+	# echo '##[ $@ ]##'
+	# $(RUN) mkdir -p /etc/xdg/nvim
+	# $(ADD) files/sysinit.vim  /etc/xdg/nvim/sysinit.vim &> /dev/null
+	# $(RUN) ls -la /etc/xdg/nvim/sysinit.vim
 
 info/nvim_plugins.md:
 	echo '##[ $(basename $(notdir $@)) ]##'
@@ -86,11 +84,8 @@ info/nvim_plugins.md:
 	$(call to_info,nvim-plugins,1.0.0,'Neovim plugins installed via nvim_plugins script')
 
 info/nvim_treesitters.md:
-	# $(RUN) tree -L 3 /usr/local/share/nvim/site/pack
 	$(RUN) nvim_treesitters &> /dev/null
 	$(call to_info,nvim-treesitters,1.0.0,'Neovim treesitter parsers installed via nvim_treesitters script')
-	# $(RUN) tree -L 4 /usr/local/share/nvim/site
-	# echo '##[ $(basename $(notdir $@)) ]##'
 
 # release binaries:
 # neovim
