@@ -16,5 +16,5 @@ jobs:
       - name: Run workflow
         run: |
           echo "Running on branch ${{ github.ref_name }}"
-          pushd coding && make && popd
+          pushd coding && make init && nvim_mini && popd
 

@@ -13,7 +13,7 @@ NPM_LIST := bash-language-server \
 
 RELEASE_BINARY_LIST :=  neovim  harper-ls lua-language-server
 PKGS_LIST := $(RELEASE_BINARY_LIST) $(UV_TOOL_LIST) $(NPM_LIST)
-NVIM_CONFIG_LIST :=  nvim_treesitters # nvim_plugins
+NVIM_CONFIG_LIST :=  nvim_treesitters nvim_mini
 
 default: README.md
 	echo '##[ $@ ]##'
@@ -48,7 +48,7 @@ README.md: init dnf_list pkgs_list nvim_config
 	$(file >> $@,the following applications are included in this toolbox: )
 	$(call tr,"Name","Version","Summary", $@)
 	$(call tr,"----","-------","-------", $@)
-	for pkg in $(PKGS_LIST) $(NVIM_CONFIG_LIST)
+	for pkg in $(PKGS_LIST)
 	do
 	NAME=$$(cat info/$${pkg}.md | grep -oP '^Name:\s\K.+')
 	VER=$$(cat info/$${pkg}.md | grep -oP '^Version:\s\K.+')
@@ -70,18 +70,34 @@ dnf_list:
 	echo '✅ DNF packages installed'
 
 ## Neovim configuration ##
-nvim_config: $(NVIM_CONFIG_LIST)
-nvim_config:  info/nvim_treesitters.md # info/nvim_plugins.md
+nvim_config: nvim_mini
 	# echo '✅ Neovim configuration completed'
 	# echo '##[ $@ ]##'
 	# $(RUN) mkdir -p /etc/xdg/nvim
 	# $(ADD) files/sysinit.vim  /etc/xdg/nvim/sysinit.vim &> /dev/null
 	# $(RUN) ls -la /etc/xdg/nvim/sysinit.vim
+	#
+nvim_mini: info/nvim-mini.md
 
-info/nvim_plugins.md:
+latest/nvim-mini.json:
+	echo ' - fetching latest release info: ##[  $(basename $(notdir $@)) ]##'
+	$(WGET) https://api.github.com/repos/nvim-mini/mini.nvim/releases/latest -O- | jq '.' > $@
+
+info/nvim-mini.md: latest/nvim-mini.json
 	echo '##[ $(basename $(notdir $@)) ]##'
-	$(RUN) nvim_plugins
-	$(call to_info,nvim-plugins,1.0.0,'Neovim plugins installed via nvim_plugins script')
+	PKG=$(basename $(notdir $@))
+	SRC=$(shell $(call bdu,linux-x64.tar.gz,$<))
+	TARGET="files/$${PKG}/usr/local/share/nvim/site/pack/core/start/mini.nvim"
+	mkdir -p "$${TARGET}"
+	$(WGET) $${SRC} -O- | $(TAR) $${TARGET}
+	$(ADD) files/$${PKG} &> /dev/null
+	# success|failure check
+	$(RUN) ls -la /usr/local/share/nvim/site/pack/core/start/mini.nvim
+	# $(RUN) nvim --headless +MiniInfo +q &> /dev/null
+	# extract 'name', 'version', 'summary'
+	VER=$$(jq -r '.tag_name' $< | sed 's/^v//')
+	SUM='40+ independent Lua modules for Neovim'
+	$(call to_info,mini.nvim,$${VER},${SUM})
 
 info/nvim_treesitters.md:
 	$(RUN) nvim_treesitters &> /dev/null
