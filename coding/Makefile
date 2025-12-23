@@ -18,10 +18,13 @@ PKGS_LIST := $(RELEASE_BINARY_LIST) $(UV_TOOL_LIST) $(NPM_LIST) $(NVIM_PLUGIN_LI
 
 default: # README.md
 	echo '##[ $@ ]##'
-	echo $(GITHUB_REF)
-	# buildah commit $(WORKING_CONTAINER) ghcr.io/grantmacken/tbx-coding
-	# buildah push ghcr.io/grantmacken/tbx-coding:latest
-	# echo '✅ ghcr.io/grantmacken/tbx-coding:latest built and pushed'
+ifeq ($(GITHUB_REF_NAME), main)
+	buildah commit $(WORKING_CONTAINER) ghcr.io/grantmacken/tbx-coding
+	buildah push ghcr.io/grantmacken/tbx-coding:latest
+	echo '✅ ghcr.io/grantmacken/tbx-coding:latest built and pushed'
+else
+	echo " - skipping image push for branch: $(GITHUB_REF_NAME) "
+endif
 
 init:
 	echo '##[ $@ ]##'
