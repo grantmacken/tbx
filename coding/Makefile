@@ -10,11 +10,11 @@ NPM_LIST := bash-language-server \
 			tree-sitter-cli \
 			vscode-langservers-extracted \
 			yaml-language-server
-NVIM_PLUGIN_LIST := nvim-mini # nvim-treesitters
+NVIM_PLUGIN_LIST := nvim-mini treesitters
 
 # NOTE: the following lists are used in the README generation 
 RELEASE_BINARY_LIST :=  neovim  harper-ls lua-language-server
-PKGS_LIST := $(RELEASE_BINARY_LIST) $(UV_TOOL_LIST) $(NPM_LIST) $(NVIM_PLUGIN_LIST)
+PKGS_LIST :=  $(NVIM_PLUGIN_LIST) # $(RELEASE_BINARY_LIST) $(UV_TOOL_LIST) $(NPM_LIST)
 
 default: README.md
 	echo '##[ $@ ]##'
@@ -79,20 +79,20 @@ dnf_list:
 nvim-mini: info/nvim-mini.md
 
 latest/nvim-mini.json:
-	echo ' - fetching latest release info:  $(basename $(notdir $@))'
+	# echo ' - fetching latest release info:  $(basename $(notdir $@))'
 	$(WGET) https://api.github.com/repos/nvim-mini/mini.nvim/releases/latest -O- | jq '.' > $@
 
 info/nvim-mini.md: latest/nvim-mini.json
 	echo '##[ $(basename $(notdir $@)) ]##'
 	PKG=$(basename $(notdir $@))
 	SRC=$$( jq -r '.tarball_url' $< )
-	echo " - Download Url: $${SRC}"
+	# echo " - Download Url: $${SRC}"
 	TARGET="files/$${PKG}/usr/local/share/nvim/site/pack/core/start/mini.nvim"
 	mkdir -p "$${TARGET}"
 	$(WGET) $${SRC} -O- | $(TAR) $${TARGET}
 	$(ADD) files/$${PKG} &> /dev/null
 	# success|failure check
-	$(RUN) ls -la /usr/local/share/nvim/site/pack/core/start/mini.nvim
+	$(RUN) ls -la /usr/local/share/nvim/site/pack/core/start/mini.nvim &> /dev/null:w
 	# $(RUN) nvim --headless +MiniInfo +q &> /dev/null
 	# extract 'name', 'version', 'summary'
 	VER=$$(jq -r '.tag_name' $< | sed 's/^v//')
@@ -100,12 +100,12 @@ info/nvim-mini.md: latest/nvim-mini.json
 	$(call to_info,mini.nvim,$${VER},$${SUM})
 
 
-nvim-treesitters:  info/nvim-treesitters.md
-info/nvim-treesitters.md:
+treesitters:  info/treesitters.md
+info/treesitters.md:
 	echo '##[ $(basename $(notdir $@)) ]##'
 	PKG=$(basename $(notdir $@))
 	$(RUN) $${PKG} &> /dev/null
-	$(call to_info,$${PKG},1.0.0,'Treesitter parsers installed via nvim-treesitters script')
+	$(call to_info,$${PKG},1.0.0,'Treesitter parsers installed via treesitters script')
 
 # release binaries:
 # neovim
@@ -143,10 +143,10 @@ latest/lua-language-server.json:
 info/lua-language-server.md:
 	# echo '##[ $(basename $(notdir $@)) ]##'
 	PKG=$(basename $(notdir $@))
-	echo " - Binary Name:  $${PKG}"
+	# echo " - Binary Name:  $${PKG}"
 	# SRC=$(shell $(call bdu,linux-x64.tar.gz,$<))
 	SRC="https://github.com/LuaLS/lua-language-server/releases/download/3.15.0/lua-language-server-3.15.0-linux-x64.tar.gz"
-	echo " - Download Url: $${SRC}"
+	# echo " - Download Url: $${SRC}"
 	TARGET="files/$${PKG}/usr/local/$${PKG}"
 	mkdir -p "$${TARGET}"
 	$(WGET) $${SRC} -O- | $(TAR_NO_STRIP) $${TARGET}
