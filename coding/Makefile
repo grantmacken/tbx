@@ -42,7 +42,7 @@ init:
 	$(RUN) dnf update -y &>/dev/null
 	echo '✅ Base image pulled and working container created'
 
-README.md: init dnf_list pkgs_list nvim_config
+README.md: init dnf_list pkgs_list
 	mkdir -p $(dir $@)
 	cat preamble.md > $@
 	echo $@
@@ -71,7 +71,6 @@ dnf_list:
 	echo '✅ DNF packages installed'
 
 ## Neovim Plugins ##
-nvim_plugin_list: $(NVIM_PLUGIN_LIST)
 
 nvim-mini: info/nvim-mini.md
 
