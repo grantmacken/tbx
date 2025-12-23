@@ -56,9 +56,9 @@ README.md: init dnf_list pkgs_list
 	$(call tr,"----","-------","-------", $@)
 	for pkg in $(PKGS_LIST)
 	do
-	NAME=$$(cat info/$${pkg}.md | grep -oP '^Name:\s\K.+')
-	VER=$$(cat info/$${pkg}.md | grep -oP '^Version:\s\K.+')
-	SUM=$$(cat info/$${pkg}.md | grep -oP '^Summary:\s\K.+')
+	NAME=$$(cat info/$${pkg}.md | grep -oP '^Name:\s\K.+' || true)
+	VER=$$(cat info/$${pkg}.md | grep -oP '^Version:\s\K.+' || true)
+	SUM=$$(cat info/$${pkg}.md | grep -oP '^Summary:\s\K.+' || true)
 	$(call tr,$${NAME},$${VER},$${SUM},$@)
 	done
 	for pkg in $(DNF_LIST)
