@@ -100,6 +100,8 @@ info/nvim-mini.md: latest/nvim-mini.json
 	SUM='40+ independent Lua modules for Neovim'
 	$(call to_info,mini.nvim,$${VER},$${SUM})
 
+
+nvim_treesitters:  info/nvim_treesitters.md
 info/nvim_treesitters.md:
 	$(RUN) nvim_treesitters &> /dev/null
 	$(call to_info,nvim-treesitters,1.0.0,'Neovim treesitter parsers installed via nvim_treesitters script')
