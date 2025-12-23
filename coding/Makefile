@@ -16,7 +16,7 @@ NVIM_PLUGIN_LIST := nvim-mini # nvim-treesitters
 RELEASE_BINARY_LIST :=  neovim  harper-ls lua-language-server
 PKGS_LIST := $(RELEASE_BINARY_LIST) $(UV_TOOL_LIST) $(NPM_LIST) $(NVIM_PLUGIN_LIST)
 
-default: # README.md
+default: README.md
 	echo '##[ $@ ]##'
 ifeq ($(GITHUB_REF_NAME), main)
 	buildah commit $(WORKING_CONTAINER) ghcr.io/grantmacken/tbx-coding
