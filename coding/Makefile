@@ -16,11 +16,12 @@ NVIM_PLUGIN_LIST := nvim-mini # nvim-treesitters
 RELEASE_BINARY_LIST :=  neovim  harper-ls lua-language-server
 PKGS_LIST := $(RELEASE_BINARY_LIST) $(UV_TOOL_LIST) $(NPM_LIST) $(NVIM_PLUGIN_LIST)
 
-default: README.md
+default: # README.md
 	echo '##[ $@ ]##'
-	buildah commit $(WORKING_CONTAINER) ghcr.io/grantmacken/tbx-coding
-	buildah push ghcr.io/grantmacken/tbx-coding:latest
-	echo '✅ ghcr.io/grantmacken/tbx-coding:latest built and pushed'
+	echo $(GITHUB_REF)
+	# buildah commit $(WORKING_CONTAINER) ghcr.io/grantmacken/tbx-coding
+	# buildah push ghcr.io/grantmacken/tbx-coding:latest
+	# echo '✅ ghcr.io/grantmacken/tbx-coding:latest built and pushed'
 
 init:
 	echo '##[ $@ ]##'
@@ -163,14 +164,11 @@ info/lua-language-server.md:
 harper-ls: info/harper-ls.md
 
 latest/harper-ls.json:
-	echo ' - fetching latest release info: ##[  $(basename $(notdir $@)) ]##'
 	$(WGET) https://api.github.com/repos/Automattic/harper/releases/latest -O- | jq '.' > $@
 
 info/harper-ls.md: latest/harper-ls.json
-	# echo ' - installing  latest version: ##[ $(basename $(notdir $@)) ]##'
 	PKG=$(basename $(notdir $@))
 	SRC=$(shell $(call bdu,"harper-ls-x86_64-unknown-linux-gnu",$<))
-	# echo " - download url: $${SRC}"
 	TARGET="files/$${PKG}/usr/local/bin"
 	mkdir -p $${TARGET}
 	$(WGET) $${SRC} -O- | $(TAR_NO_STRIP) $${TARGET} &> /dev/null
