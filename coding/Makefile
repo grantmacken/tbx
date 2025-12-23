@@ -10,10 +10,11 @@ NPM_LIST := bash-language-server \
 			tree-sitter-cli \
 			vscode-langservers-extracted \
 			yaml-language-server
+NVIM_PLUGIN_LIST := nvim-mini # nvim-treesitters
 
+# NOTE: the following lists are used in the README generation 
 RELEASE_BINARY_LIST :=  neovim  harper-ls lua-language-server
-PKGS_LIST := $(RELEASE_BINARY_LIST) $(UV_TOOL_LIST) $(NPM_LIST)
-NVIM_CONFIG_LIST :=  nvim-treesitters nvim-mini
+PKGS_LIST := $(RELEASE_BINARY_LIST) $(UV_TOOL_LIST) $(NPM_LIST) $(NVIM_PLUGIN_LIST)
 
 default: README.md
 	echo '##[ $@ ]##'
@@ -48,7 +49,7 @@ README.md: init dnf_list pkgs_list nvim_config
 	$(file >> $@,the following applications are included in this toolbox: )
 	$(call tr,"Name","Version","Summary", $@)
 	$(call tr,"----","-------","-------", $@)
-	for pkg in $(PKGS_LIST) $(NVIM_CONFIG_LIST)
+	for pkg in $(PKGS_LIST)
 	do
 	NAME=$$(cat info/$${pkg}.md | grep -oP '^Name:\s\K.+')
 	VER=$$(cat info/$${pkg}.md | grep -oP '^Version:\s\K.+')
@@ -69,18 +70,13 @@ dnf_list:
 	$(INSTALL) $(DNF_LIST) &>/dev/null
 	echo '✅ DNF packages installed'
 
-## Neovim configuration ##
-nvim_config: $(NVIM_CONFIG_LIST)
-	# echo '✅ Neovim configuration completed'
-	# echo '##[ $@ ]##'
-	# $(RUN) mkdir -p /etc/xdg/nvim
-	# $(ADD) files/sysinit.vim  /etc/xdg/nvim/sysinit.vim &> /dev/null
-	# $(RUN) ls -la /etc/xdg/nvim/sysinit.vim
-	#
+## Neovim Plugins ##
+nvim_plugin_list: $(NVIM_PLUGIN_LIST)
+
 nvim-mini: info/nvim-mini.md
 
 latest/nvim-mini.json:
-	echo ' - fetching latest release info: ##[  $(basename $(notdir $@)) ]##'
+	echo ' - fetching latest release info:  $(basename $(notdir $@))'
 	$(WGET) https://api.github.com/repos/nvim-mini/mini.nvim/releases/latest -O- | jq '.' > $@
 
 info/nvim-mini.md: latest/nvim-mini.json
