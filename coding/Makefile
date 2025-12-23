@@ -103,10 +103,9 @@ info/nvim-mini.md: latest/nvim-mini.json
 
 treesitters:  info/treesitters.md
 info/treesitters.md:
-	echo '##[ $(basename $(notdir $@)) ]##'
-	PKG=$(basename $(notdir $@))
-	$(RUN) $${PKG} &> /dev/null
-	$(call to_info,$${PKG},1.0.0,'Treesitter parsers installed via treesitters script')
+	echo '##[ $(basename $(notdir $@)) ]##' || true
+	$(RUN) treesitters &> /dev/null
+	$(call to_info,treesitters,1.0.0,'Treesitter parsers installed via treesitters script')
 
 # release binaries:
 # neovim
