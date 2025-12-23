@@ -31,7 +31,6 @@ init:
 	buildah pull ghcr.io/grantmacken/tbx-runtimes &>/dev/null
 	buildah from ghcr.io/grantmacken/tbx-runtimes &>/dev/null
 	$(ADD) scripts/ $(DIR_BIN)/ &>/dev/null
-	$(RUN) ls -al $(DIR_BIN)
 	buildah config \
 	--label summary='a toolbox with cli tools, neovim' \
 	--label description='a toolbox with cli tools, neovim, lsp servers, linters and formaters' \
@@ -103,8 +102,7 @@ info/nvim-mini.md: latest/nvim-mini.json
 
 treesitters:  info/treesitters.md
 info/treesitters.md:
-	echo '##[ $(basename $(notdir $@)) ]##' || true
-	$(RUN) treesitters &> /dev/null
+	$(RUN) treesitters || true
 	$(call to_info,treesitters,1.0.0,'Treesitter parsers installed via treesitters script')
 
 # release binaries:
