@@ -92,7 +92,7 @@ info/nvim-mini.md: latest/nvim-mini.json
 	$(WGET) $${SRC} -O- | $(TAR) $${TARGET}
 	$(ADD) files/$${PKG} &> /dev/null
 	# success|failure check
-	$(RUN) ls -la /usr/local/share/nvim/site/pack/core/start/mini.nvim &> /dev/null:w
+	$(RUN) ls -la /usr/local/share/nvim/site/pack/core/start/mini.nvim &> /dev/null
 	# $(RUN) nvim --headless +MiniInfo +q &> /dev/null
 	# extract 'name', 'version', 'summary'
 	VER=$$(jq -r '.tag_name' $< | sed 's/^v//')
