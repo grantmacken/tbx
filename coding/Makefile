@@ -31,6 +31,7 @@ init:
 	buildah pull ghcr.io/grantmacken/tbx-runtimes &>/dev/null
 	buildah from ghcr.io/grantmacken/tbx-runtimes &>/dev/null
 	$(ADD) scripts/ $(DIR_BIN)/ &>/dev/null
+	$(RUN) ls -al $(DIR_BIN)
 	buildah config \
 	--label summary='a toolbox with cli tools, neovim' \
 	--label description='a toolbox with cli tools, neovim, lsp servers, linters and formaters' \
@@ -83,7 +84,7 @@ latest/nvim-mini.json:
 	$(WGET) https://api.github.com/repos/nvim-mini/mini.nvim/releases/latest -O- | jq '.' > $@
 
 info/nvim-mini.md: latest/nvim-mini.json
-	echo '##[ $(basename $(notdir $@)) ]##'
+	# echo '##[ $(basename $(notdir $@)) ]##'
 	PKG=$(basename $(notdir $@))
 	SRC=$$( jq -r '.tarball_url' $< )
 	# echo " - Download Url: $${SRC}"
