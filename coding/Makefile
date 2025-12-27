@@ -12,9 +12,9 @@ NPM_LIST := bash-language-server \
 			yaml-language-server
 NVIM_PLUGIN_LIST := nvim-mini treesitters
 
-# NOTE: the following lists are used in the README generation 
+# NOTE: the following lists are used in the README generation
 RELEASE_BINARY_LIST :=  neovim  harper-ls lua-language-server
-PKGS_LIST :=  $(RELEASE_BINARY_LIST) $(UV_TOOL_LIST) $(NPM_LIST) $(NVIM_PLUGIN_LIST)
+PKGS_LIST :=  $(RELEASE_BINARY_LIST) $(UV_TOOL_LIST) $(NPM_LIST) 
 
 default: README.md
 	echo '##[ $@ ]##'
