@@ -3,27 +3,28 @@ WORKING_CONTAINER := tbx-runtimes-working-container
 include ../inc/define.mk
 
 DNF_LIST     :=  ShellCheck shfmt #  google-cloud-cli
-UV_TOOL_LIST :=  tombi  mbake # specify-cli
+UV_TOOL_LIST :=  tombi  mbake     # specify-cli
 NPM_LIST := bash-language-server \
 			copilot \
 			copilot-language-server \
 			tree-sitter-cli \
 			vscode-langservers-extracted \
 			yaml-language-server
+NVIM_PLUGIN_LIST := nvim-mini treesitters
 
-# removed:
-# fauce
-# tape
-
+# NOTE: the following lists are used in the README generation
 RELEASE_BINARY_LIST :=  neovim  harper-ls lua-language-server
-PKGS_LIST := $(RELEASE_BINARY_LIST) $(UV_TOOL_LIST) $(NPM_LIST)
-NVIM_CONFIG_LIST := nvim_plugins nvim_treesitters
+PKGS_LIST :=  $(RELEASE_BINARY_LIST) $(UV_TOOL_LIST) $(NPM_LIST) 
 
 default: README.md
 	echo '##[ $@ ]##'
+ifeq ($(GITHUB_REF_NAME), main)
 	buildah commit $(WORKING_CONTAINER) ghcr.io/grantmacken/tbx-coding
 	buildah push ghcr.io/grantmacken/tbx-coding:latest
 	echo '✅ ghcr.io/grantmacken/tbx-coding:latest built and pushed'
+else
+	echo " - skipping image push for branch: $(GITHUB_REF_NAME) "
+endif
 
 init:
 	echo '##[ $@ ]##'
@@ -45,18 +46,18 @@ init:
 	$(RUN) dnf update -y &>/dev/null
 	echo '✅ Base image pulled and working container created'
 
-README.md: init dnf_list pkgs_list nvim_config
+README.md: init dnf_list pkgs_list
 	mkdir -p $(dir $@)
 	cat preamble.md > $@
 	echo $@
 	$(file >> $@,the following applications are included in this toolbox: )
 	$(call tr,"Name","Version","Summary", $@)
 	$(call tr,"----","-------","-------", $@)
-	for pkg in $(PKGS_LIST) $(NVIM_CONFIG_LIST)
+	for pkg in $(PKGS_LIST)
 	do
-	NAME=$$(cat info/$${pkg}.md | grep -oP '^Name:\s\K.+')
-	VER=$$(cat info/$${pkg}.md | grep -oP '^Version:\s\K.+')
-	SUM=$$(cat info/$${pkg}.md | grep -oP '^Summary:\s\K.+')
+	NAME=$$(cat info/$${pkg}.md | grep -oP '^Name:\s\K.+' || true)
+	VER=$$(cat info/$${pkg}.md | grep -oP '^Version:\s\K.+' || true)
+	SUM=$$(cat info/$${pkg}.md | grep -oP '^Summary:\s\K.+' || true)
 	$(call tr,$${NAME},$${VER},$${SUM},$@)
 	done
 	for pkg in $(DNF_LIST)
@@ -73,24 +74,36 @@ dnf_list:
 	$(INSTALL) $(DNF_LIST) &>/dev/null
 	echo '✅ DNF packages installed'
 
-nvim_config: info/nvim_plugins.md info/nvim_treesitters.md
-	echo '##[ $@ ]##'
-	$(RUN) mkdir -p /etc/xdg/nvim
-	$(ADD) files/sysinit.vim  /etc/xdg/nvim/sysinit.vim &> /dev/null
-	$(RUN) ls -la /etc/xdg/nvim/sysinit.vim
-	echo '✅ Neovim configuration completed'
+## Neovim Plugins ##
 
-info/nvim_plugins.md:
-	echo '##[ $(basename $(notdir $@)) ]##'
-	$(RUN) nvim_plugins
-	$(call to_info,nvim-plugins,1.0.0,'Neovim plugins installed via nvim_plugins script')
+nvim-mini: info/nvim-mini.md
 
-info/nvim_treesitters.md:
-	# $(RUN) tree -L 3 /usr/local/share/nvim/site/pack
-	$(RUN) nvim_treesitters &> /dev/null
-	$(call to_info,nvim-treesitters,1.0.0,'Neovim treesitter parsers installed via nvim_treesitters script')
-	# $(RUN) tree -L 4 /usr/local/share/nvim/site
+latest/nvim-mini.json:
+	# echo ' - fetching latest release info:  $(basename $(notdir $@))'
+	$(WGET) https://api.github.com/repos/nvim-mini/mini.nvim/releases/latest -O- | jq '.' > $@
+
+info/nvim-mini.md: latest/nvim-mini.json
 	# echo '##[ $(basename $(notdir $@)) ]##'
+	PKG=$(basename $(notdir $@))
+	SRC=$$( jq -r '.tarball_url' $< )
+	# echo " - Download Url: $${SRC}"
+	TARGET="files/$${PKG}/usr/local/share/nvim/site/pack/core/start/mini.nvim"
+	mkdir -p "$${TARGET}"
+	$(WGET) $${SRC} -O- | $(TAR) $${TARGET}
+	$(ADD) files/$${PKG} &> /dev/null
+	# success|failure check
+	$(RUN) ls -la /usr/local/share/nvim/site/pack/core/start/mini.nvim &> /dev/null
+	# $(RUN) nvim --headless +MiniInfo +q &> /dev/null
+	# extract 'name', 'version', 'summary'
+	VER=$$(jq -r '.tag_name' $< | sed 's/^v//')
+	SUM='40+ independent Lua modules for Neovim'
+	$(call to_info,mini.nvim,$${VER},$${SUM})
+
+
+treesitters:  info/treesitters.md
+info/treesitters.md:
+	$(RUN) treesitters || true
+	$(call to_info,treesitters,1.0.0,'Treesitter parsers installed via treesitters script')
 
 # release binaries:
 # neovim
@@ -128,10 +141,10 @@ latest/lua-language-server.json:
 info/lua-language-server.md:
 	# echo '##[ $(basename $(notdir $@)) ]##'
 	PKG=$(basename $(notdir $@))
-	echo " - Binary Name:  $${PKG}"
+	# echo " - Binary Name:  $${PKG}"
 	# SRC=$(shell $(call bdu,linux-x64.tar.gz,$<))
 	SRC="https://github.com/LuaLS/lua-language-server/releases/download/3.15.0/lua-language-server-3.15.0-linux-x64.tar.gz"
-	echo " - Download Url: $${SRC}"
+	# echo " - Download Url: $${SRC}"
 	TARGET="files/$${PKG}/usr/local/$${PKG}"
 	mkdir -p "$${TARGET}"
 	$(WGET) $${SRC} -O- | $(TAR_NO_STRIP) $${TARGET}
@@ -152,14 +165,11 @@ info/lua-language-server.md:
 harper-ls: info/harper-ls.md
 
 latest/harper-ls.json:
-	echo ' - fetching latest release info: ##[  $(basename $(notdir $@)) ]##'
 	$(WGET) https://api.github.com/repos/Automattic/harper/releases/latest -O- | jq '.' > $@
 
 info/harper-ls.md: latest/harper-ls.json
-	# echo ' - installing  latest version: ##[ $(basename $(notdir $@)) ]##'
 	PKG=$(basename $(notdir $@))
 	SRC=$(shell $(call bdu,"harper-ls-x86_64-unknown-linux-gnu",$<))
-	# echo " - download url: $${SRC}"
 	TARGET="files/$${PKG}/usr/local/bin"
 	mkdir -p $${TARGET}
 	$(WGET) $${SRC} -O- | $(TAR_NO_STRIP) $${TARGET} &> /dev/null
