@@ -75,8 +75,8 @@ It is designed to be a modern alternative to pip and poetry.
 | elixir                  | 1.19.5   | A modern approach to programming for the Erlang VM                                    |
 | gleam                   | 1.14.0   | Gleam programming language                                                            |
 | golang                  | 1.25.6   | The Go Programming Language                                                           |
-| nodejs                  | 22.20.0  | JavaScript runtime                                                                    |
-| uv                      | 0.9.21   | An extremely fast Python package installer and resolver, written in Rust              |
+| nodejs                  | 22.22.0  | JavaScript runtime                                                                    |
+| uv                      | 0.9.26   | An extremely fast Python package installer and resolver, written in Rust              |
 # tbx-coding: a toolbox for coding
 
 This tbx-coding toolbox container image is built **from**
@@ -105,11 +105,11 @@ Once inside the toolbox, you can start Using neovim and other installed tools fo
 | neovim                  | 0.12.0   | Neovim text editor                                                                    |
 | harper-ls               | 1.5.1    | 'Harper Language Server Grammar Checker'                                              |
 | lua-language-server     | 3.15.0   | 'Lua language server'                                                                 |
-| tombi                   | v0.7.24  | "TOML Formatter                                                                       |
+| tombi                   | v0.7.25  | "TOML Formatter                                                                       |
 | mbake                   | v1.4.4   | Makefile formatter and linter                                                         |
 | bash-language-server    | 5.6.0    | A language server for Bash                                                            |
-| copilot                 | 0.0.394  | GitHub Copilot CLI brings the power of Copilot coding agent directly to your terminal. |
-| copilot-language-server | 1.413.0  | Your AI pair programmer                                                               |
+| copilot                 | 0.0.400  | GitHub Copilot CLI brings the power of Copilot coding agent directly to your terminal. |
+| copilot-language-server | 1.418.0  | Your AI pair programmer                                                               |
 | tree-sitter-cli         | 0.26.3   | CLI for generating fast incremental parsers                                           |
 | vscode-langservers      | 4.10.0   | HTML/CSS/JSON/ESLint language servers extracted from [vscode](https://github.com/Microsoft/vscode). |
 | yaml-language-server    | 1.19.2   | YAML language server                                                                  |
