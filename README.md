@@ -70,13 +70,13 @@ It is designed to be a modern alternative to pip and poetry.
 
 | Name                    | Version  | Summary                                                                               |
 | ----                    | -------  | -------                                                                               |
-| erlang                  | 27.3.4.7 | General-purpose programming language and runtime environment                          |
+| erlang                  | 29.0-rc1 | General-purpose programming language and runtime environment                          |
 | rebar3                  | 3.26.0   | Tool for working with Erlang projects                                                 |
 | elixir                  | 1.19.5   | A modern approach to programming for the Erlang VM                                    |
 | gleam                   | 1.14.0   | Gleam programming language                                                            |
-| golang                  | 1.25.6   | The Go Programming Language                                                           |
+| golang                  | 1.25.7   | The Go Programming Language                                                           |
 | nodejs                  | 22.22.0  | JavaScript runtime                                                                    |
-| uv                      | 0.9.26   | An extremely fast Python package installer and resolver, written in Rust              |
+| uv                      | 0.9.30   | An extremely fast Python package installer and resolver, written in Rust              |
 # tbx-coding: a toolbox for coding
 
 This tbx-coding toolbox container image is built **from**
@@ -103,13 +103,13 @@ Once inside the toolbox, you can start Using neovim and other installed tools fo
 | Name                    | Version  | Summary                                                                               |
 | ----                    | -------  | -------                                                                               |
 | neovim                  | 0.12.0   | Neovim text editor                                                                    |
-| harper-ls               | 1.6.0    | 'Harper Language Server Grammar Checker'                                              |
+| harper-ls               | 1.7.0    | 'Harper Language Server Grammar Checker'                                              |
 | lua-language-server     | 3.15.0   | 'Lua language server'                                                                 |
-| tombi                   | v0.7.27  | "TOML Formatter                                                                       |
+| tombi                   | v0.7.28  | "TOML Formatter                                                                       |
 | mbake                   | v1.4.5   | Makefile formatter and linter                                                         |
 | bash-language-server    | 5.6.0    | A language server for Bash                                                            |
-| copilot                 | 0.0.406  | GitHub Copilot CLI brings the power of Copilot coding agent directly to your terminal. |
-| copilot-language-server | 1.425.0  | Your AI pair programmer                                                               |
+| copilot                 | 0.0.410  | GitHub Copilot CLI brings the power of Copilot coding agent directly to your terminal. |
+| copilot-language-server | 1.430.0  | Your AI pair programmer                                                               |
 | tree-sitter-cli         | 0.26.5   | CLI for generating fast incremental parsers                                           |
 | vscode-langservers      | 4.10.0   | HTML/CSS/JSON/ESLint language servers extracted from [vscode](https://github.com/Microsoft/vscode). |
 | yaml-language-server    | 1.19.2   | YAML language server                                                                  |
