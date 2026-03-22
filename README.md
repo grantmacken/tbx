@@ -24,7 +24,7 @@ The building toolbox container provides three tooling categories
 | make                    | 4.4.1    | A GNU tool which simplifies the build process for users                               |
 | stow                    | 2.4.1    | Manage the installation of software packages from source                              |
 | bat                     | 0.25.0   | Cat(1) clone with wings                                                               |
-| fd-find                 | 10.3.0   | Fd is a simple, fast and user-friendly alternative to find                            |
+| fd-find                 | 10.4.2   | Fd is a simple, fast and user-friendly alternative to find                            |
 | fzf                     | 0.67.0   | A command-line fuzzy finder written in Go                                             |
 | host-spawn              | 1.6.2    | Run commands on your host from inside your toolbox or flatpak sandbox                 |
 | jq                      | 1.8.1    | Command-line JSON processor                                                           |
@@ -73,10 +73,10 @@ It is designed to be a modern alternative to pip and poetry.
 | erlang                  | 28.4.1   | General-purpose programming language and runtime environment                          |
 | rebar3                  | 3.27.0   | Tool for working with Erlang projects                                                 |
 | elixir                  | 1.19.5   | A modern approach to programming for the Erlang VM                                    |
-| gleam                   | 1.14.0   | Gleam programming language                                                            |
+| gleam                   | 1.15.2   | Gleam programming language                                                            |
 | golang                  | 1.25.8   | The Go Programming Language                                                           |
 | nodejs                  | 22.22.0  | JavaScript runtime                                                                    |
-| uv                      | 0.10.6   | An extremely fast Python package installer and resolver, written in Rust              |
+| uv                      | 0.10.9   | An extremely fast Python package installer and resolver, written in Rust              |
 # tbx-coding: a toolbox for coding
 
 This tbx-coding toolbox container image is built **from**
@@ -103,13 +103,13 @@ Once inside the toolbox, you can start Using neovim and other installed tools fo
 | Name                    | Version  | Summary                                                                               |
 | ----                    | -------  | -------                                                                               |
 | neovim                  | 0.12.0   | Neovim text editor                                                                    |
-| harper-ls               | 1.10.0   | 'Harper Language Server Grammar Checker'                                              |
+| harper-ls               | 1.12.0   | 'Harper Language Server Grammar Checker'                                              |
 | lua-language-server     | 3.15.0   | 'Lua language server'                                                                 |
-| tombi                   | v0.9.5   | "TOML Formatter                                                                       |
+| tombi                   | v0.9.9   | "TOML Formatter                                                                       |
 | mbake                   | v1.4.5   | Makefile formatter and linter                                                         |
 | bash-language-server    | 5.6.0    | A language server for Bash                                                            |
-| copilot                 | 1.0.5    | GitHub Copilot CLI brings the power of Copilot coding agent directly to your terminal. |
-| copilot-language-server | 1.453.0  | Your AI pair programmer                                                               |
+| copilot                 | 1.0.10   | GitHub Copilot CLI brings the power of Copilot coding agent directly to your terminal. |
+| copilot-language-server | 1.457.0  | Your AI pair programmer                                                               |
 | tree-sitter-cli         | 0.26.7   | CLI for generating fast incremental parsers                                           |
 | vscode-langservers      | 4.10.0   | HTML/CSS/JSON/ESLint language servers extracted from [vscode](https://github.com/Microsoft/vscode). |
 | yaml-language-server    | 1.21.0   | YAML language server                                                                  |
