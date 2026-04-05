@@ -23,7 +23,7 @@ The building toolbox container provides three tooling categories
 | gh                      | 2.89.0   | GitHub's official command line tool.                                                  |
 | make                    | 4.4.1    | A GNU tool which simplifies the build process for users                               |
 | stow                    | 2.4.1    | Manage the installation of software packages from source                              |
-| bat                     | 0.25.0   | Cat(1) clone with wings                                                               |
+| bat                     | 0.26.1   | Cat(1) clone with wings                                                               |
 | fd-find                 | 10.4.2   | Fd is a simple, fast and user-friendly alternative to find                            |
 | fzf                     | 0.70.0   | A command-line fuzzy finder written in Go                                             |
 | host-spawn              | 1.6.2    | Run commands on your host from inside your toolbox or flatpak sandbox                 |
@@ -102,15 +102,15 @@ Once inside the toolbox, you can start Using neovim and other installed tools fo
 
 | Name                    | Version  | Summary                                                                               |
 | ----                    | -------  | -------                                                                               |
-| neovim                  | 0.12.0   | Neovim text editor                                                                    |
+| neovim                  | 0.13.0   | Neovim text editor                                                                    |
 | harper-ls               | 1.12.0   | 'Harper Language Server Grammar Checker'                                              |
 | lua-language-server     | 3.15.0   | 'Lua language server'                                                                 |
-| tombi                   | v0.9.10  | "TOML Formatter                                                                       |
-| mbake                   | v1.4.5   | Makefile formatter and linter                                                         |
+| tombi                   | v0.9.14  | "TOML Formatter                                                                       |
+| mbake                   | v1.4.6   | Makefile formatter and linter                                                         |
 | bash-language-server    | 5.6.0    | A language server for Bash                                                            |
-| copilot                 | 1.0.12   | GitHub Copilot CLI brings the power of Copilot coding agent directly to your terminal. |
-| copilot-language-server | 1.459.0  | Your AI pair programmer                                                               |
-| tree-sitter-cli         | 0.26.7   | CLI for generating fast incremental parsers                                           |
+| copilot                 | 1.0.18   | GitHub Copilot CLI brings the power of Copilot coding agent directly to your terminal. |
+| copilot-language-server | 1.464.0  | Your AI pair programmer                                                               |
+| tree-sitter-cli         | 0.26.8   | CLI for generating fast incremental parsers                                           |
 | vscode-langservers      | 4.10.0   | HTML/CSS/JSON/ESLint language servers extracted from [vscode](https://github.com/Microsoft/vscode). |
 | yaml-language-server    | 1.21.0   | YAML language server                                                                  |
 | ShellCheck              | 0.11.0   | Shell script analysis tool                                                            |
