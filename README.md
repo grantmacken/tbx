@@ -70,10 +70,10 @@ It is designed to be a modern alternative to pip and poetry.
 
 | Name                    | Version  | Summary                                                                               |
 | ----                    | -------  | -------                                                                               |
-| erlang                  | 28.4.1   | General-purpose programming language and runtime environment                          |
+| erlang                  | 28.4.2   | General-purpose programming language and runtime environment                          |
 | rebar3                  | 3.27.0   | Tool for working with Erlang projects                                                 |
 | elixir                  | 1.19.5   | A modern approach to programming for the Erlang VM                                    |
-| gleam                   | 1.15.2   | Gleam programming language                                                            |
+| gleam                   | 1.15.3   | Gleam programming language                                                            |
 | golang                  | 1.25.8   | The Go Programming Language                                                           |
 | nodejs                  | 22.22.0  | JavaScript runtime                                                                    |
 | uv                      | 0.10.12  | An extremely fast Python package installer and resolver, written in Rust              |
@@ -103,13 +103,13 @@ Once inside the toolbox, you can start Using neovim and other installed tools fo
 | Name                    | Version  | Summary                                                                               |
 | ----                    | -------  | -------                                                                               |
 | neovim                  | 0.13.0   | Neovim text editor                                                                    |
-| harper-ls               | 1.12.0   | 'Harper Language Server Grammar Checker'                                              |
+| harper-ls               | 2.0.0    | 'Harper Language Server Grammar Checker'                                              |
 | lua-language-server     | 3.15.0   | 'Lua language server'                                                                 |
-| tombi                   | v0.9.14  | "TOML Formatter                                                                       |
+| tombi                   | v0.9.16  | "TOML Formatter                                                                       |
 | mbake                   | v1.4.6   | Makefile formatter and linter                                                         |
 | bash-language-server    | 5.6.0    | A language server for Bash                                                            |
-| copilot                 | 1.0.18   | GitHub Copilot CLI brings the power of Copilot coding agent directly to your terminal. |
-| copilot-language-server | 1.464.0  | Your AI pair programmer                                                               |
+| copilot                 | 1.0.24   | GitHub Copilot CLI brings the power of Copilot coding agent directly to your terminal. |
+| copilot-language-server | 1.467.0  | Your AI pair programmer                                                               |
 | tree-sitter-cli         | 0.26.8   | CLI for generating fast incremental parsers                                           |
 | vscode-langservers      | 4.10.0   | HTML/CSS/JSON/ESLint language servers extracted from [vscode](https://github.com/Microsoft/vscode). |
 | yaml-language-server    | 1.21.0   | YAML language server                                                                  |
