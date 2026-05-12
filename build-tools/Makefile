@@ -34,11 +34,9 @@ latest/fedora-toolbox.json:
 
 init: latest/fedora-toolbox.json
 	FROM_REGISTRY=$$(cat $< | jq -r '.Name')
-	FROM_VERSION=$$(cat $< | jq -r '.Labels.version')
-	FROM_NAME=$$(cat $< | jq -r '.Labels.name')
-	buildah from "$${FROM_REGISTRY}:$${FROM_VERSION}"
+	buildah from "$${FROM_REGISTRY}:latest"
 	buildah config \
-	--label summary='a toolbox with cli tools, neovim' \
+	--label summary='a bespoke toolbox' \
 	--label maintainer='Grant MacKenzie <grantmacken@gmail.com>' \
 	--env lang=C.UTF-8 $(WORKING_CONTAINER)
 	echo '✅ Base image pulled and working container created'
@@ -51,46 +49,3 @@ build-tools: init
 	$(INSTALL) $(TOOLS) &>/dev/null
 	echo '✅ Build tools and CLI tools installed'
 
-
-
-# README.md: info/build-tools.md
-# 	echo '##[ $@ ]##'
-# 	mkdir -p $(dir $@)
-# 	touch $@
-# 	printf "\n$(HEADING1) %s toolbox \n" "$(TBX_NAME)" | tee -a $@
-# 	printf "%s \n\n" "$(TBX_SUMMARY) " | tee -a $@
-# 	printf "Built From: %s" "$(FROM_NAME)" | tee -a $@
-# 	printf "Version:    %s" "$(FROM_VERSION)" | tee -a $@
-# 	printf "Registry:   %s" "$(FROM_REGISTRY)" | tee -a $@
-# 	# description
-# 	cat << EOF | tee -a $@
-# 	This toolbox contains a selection of CLI tools and build tools to help with
-# 	development and building software from source. 
-# 	It is the foundation for other toolboxes I use for development.
-# 	It is the first toolbox I create when setting up a new system.
-# 	EOF
-# 	printf "# %s\n\n" "The toolbox contains ... " | tee -a $@
-# 	printf "\n$(HEADING2) %s\n\n" "Selected CLI Tools" | tee -a $@
-# 	$(call tr,"Name","Version","Summary",$@)
-# 	$(call tr,"----","-------","----------------------------",$@)
-# 	$(RUN) sh -c  'dnf info -q --installed $(TOOLS) | \
-# 	grep -oP "(Name.+:\s\K.+)|(Ver.+:\s\K.+)|(Sum.+:\s\K.+)" | \
-# 	paste  - - -  | sort -u ' | \
-# 	awk -F'\t' '{printf "| %-14s | %-8s | %-83s |\n", $$1, $$2, $$3}' | \
-# 	tee -a $@
-# 	printf "\n$(HEADING2) %s\n\n" "Selected Build Tooling for Make Installs" | tee -a $@
-# 	$(call tr,"Name","Version","Summary",$@)
-# 	$(call tr,"----","-------","----------------------------",$@)
-# 	$(RUN) sh -c  'dnf info -q --installed $(BUILD) | \
-# 	grep -oP "(Name.+:\s\K.+)|(Ver.+:\s\K.+)|(Sum.+:\s\K.+)" | \
-# 	paste  - - -  | sort -u ' | \
-# 	awk -F'\t' '{printf "| %-14s | %-8s | %-83s |\n", $$1, $$2, $$3}' | \
-# 	tee -a $@
-# 	printf "\n$(HEADING2) %s\n\n" "Selected Development files for BUILD" | tee -a $@
-# 	$(call tr,"Name","Version","Summary",$@)
-# 	$(call tr,"----","-------","----------------------------",$@)
-# 	$(RUN) sh -c  'dnf info -q --installed $(DEVEL) | \
-# 	grep -oP "(Name.+:\s\K.+)|(Ver.+:\s\K.+)|(Sum.+:\s\K.+)" | \
-# 	paste  - - -  | sort -u ' | \
-# 	awk -F'\t' '{printf "| %-14s | %-8s | %-83s |\n", $$1, $$2, $$3}' | \
-# 	tee -a $@
