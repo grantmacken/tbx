@@ -28,4 +28,7 @@ jobs:
           git config --local user.email "github-actions[bot]@users.noreply.github.com"
           git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git
       - name: Build
-        run: make
+        run: |
+          make -C build-tools
+          sleep 60
+          make -C runtimes runtimes
