@@ -162,20 +162,22 @@ latest/gleam.json:
 	$(WGET) https://api.github.com/repos/gleam-lang/gleam/releases/latest -O- |
 	jq -r '.assets[] | select(.name | endswith("x86_64-unknown-linux-musl.tar.gz"))' > $@
 
-files/gleam.tar: latest/gleam.json
+files/gleam/gleam: latest/gleam.json
 	echo '##[ $@ ]##'
 	mkdir -p $(dir $@)
 	$(RUN) rm -f /usr/local/bin/gleam
 	SRC=$$(jq -r '.browser_download_url' $<)
-	$(WGET) $${SRC} -O- | gzip -d > $@
+	curl -L "$${SRC}" | tar xz -C $(dir $@)
+	test -f $@
 
-info/gleam.md: files/gleam.tar
+info/gleam.md: files/gleam/gleam
 	echo '##[ $@ ]##'
 	mkdir -p $(dir $@)
-	$(ADD) $< /usr/local/bin/  &>/dev/null
-	## success|failure check
+	$(ADD) files/gleam/gleam /usr/local/bin/gleam &>/dev/null
+	$(RUN) chmod +x /usr/local/bin/gleam
 	$(RUN) gleam --version &>/dev/null
-	## extract version number
+	VER=$$($(RUN) gleam --version | awk '{print $$2}')
+	$(call to_info,gleam,$${VER},Gleam programming language)
 
 golang: info/golang.md
 info/golang.md:
