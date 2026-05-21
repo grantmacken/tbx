@@ -21,7 +21,7 @@ README.md: build-tools
 	do
 	$(call dnf_to_table_row,$${pkg},$@)
 	done
-	cat $@
+	# cat $@
 	echo '✅ README.md created'
 	buildah commit $(WORKING_CONTAINER) $(TBX_IMAGE)
 	buildah push $(TBX_IMAGE):latest

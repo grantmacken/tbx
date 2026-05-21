@@ -19,7 +19,7 @@ HEADING1 := \#
 HEADING2 := $(HEADING1)$(HEADING1)
 
 max_field := $(shell echo -n 'copilot-language-server' | wc -c)
-tr = printf "| %-$(max_field)s | %-8s | %-85s |\n" "$(1)" "$(2)" "$(3)" >> $(4)
+tr = printf "| %-$(max_field)s | %-8s | %-85s |\n" "$(1)" "$(2)" "$(3)" | tee $(4)
 bdu = jq -r ".assets[] | select(.browser_download_url | contains(\"$1\")) | .browser_download_url" $2
 
 ## Helper to write info files in a consistent format
