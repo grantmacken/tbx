@@ -1,7 +1,9 @@
 
 RUN     := buildah run $(WORKING_CONTAINER)
 SH      := $(RUN) sh -c
-INSTALL := $(RUN) dnf install --allowerasing --skip-unavailable --skip-broken --no-allow-downgrade -y
+
+INSTALL := $(RUN) dnf install -y
+# INSTALL := $(RUN) dnf install --allowerasing --skip-unavailable --skip-broken --no-allow-downgrade -y
 INFO    := $(RUN) dnf info
 # LINK    := $(RUN) ln -s $(shell which host-spawn)
 ADD    := buildah add --chmod 755 $(WORKING_CONTAINER)

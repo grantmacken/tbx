@@ -8,7 +8,7 @@ TBX_IMAGE := ghcr.io/grantmacken/$(TBX_NAME)
 
 include ../inc/define.mk
 
-DNF_LIST := golang nodejs uv
+PKGS_LIST := golang nodejs uv
 OTP := erlang erlang-rebar3 elixir gleam
 LUA := luajit luarocks
 
@@ -37,9 +37,10 @@ README.md: runtimes
 	VER=$$(echo $$LINE | cut -d' ' -f2)
 	SUM="Gleam programming language"
 	$(call tr,$${NAME},$${VER},$${SUM},$@)
-	$(call dnf_to_table_row,golang,$@)
-	$(call dnf_to_table_row,nodejs,$@)
-	$(call dnf_to_table_row,uv,$@)
+	for pkg in $(PKGS_LIST)
+	do
+	$(call dnf_to_table_row,$${pkg},$@)
+	done
 	echo '✅ README.md created'
 
 xxx:
@@ -66,12 +67,12 @@ init:
 
 runtimes: init lists
 
-lists: dnf_list otp_list # lua_list
+lists: pkgs_list otp_list # lua_list
 
-dnf_list: init
+pkgs_list: init
 	echo '##[ $@ ]##'
 	$(RUN) dnf update -y &>/dev/null
-	$(INSTALL) $(DNF_LIST) &>/dev/null
+	$(INSTALL) $(PKGS_LIST)  &>/dev/null
 
 otp_list: erlang elixir erlang-rebar3 gleam
 
