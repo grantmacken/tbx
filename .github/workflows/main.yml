@@ -31,4 +31,4 @@ jobs:
         run: |
           make -C build-tools
           sleep 60
-          make -C runtimes runtimes
+          make -C runtimes
