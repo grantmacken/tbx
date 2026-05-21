@@ -37,12 +37,11 @@ define dnf_installed_info
 endef
 
 define dnf_to_table_row
-  	LINES=$$($(RUN) dnf info --installed $(1))
-	# extract 'name', 'version', 'summary'
+	if LINES=$$($(RUN) dnf info --installed $(1) 2>/dev/null); then
 	VER=$$(echo "$${LINES}" | grep -oP '^Version\s+:\s+\K.+' || true)
 	SUM=$$(echo -e "$${LINES}" | grep -oP '^Summary\s+:\s+\K.+' | iconv -f UTF-8 -t ASCII//TRANSLIT || true)
-	# consistent write to file format
 	$(call tr,$(1),$${VER},$${SUM},$(2))
+	fi
 endef
 
 define uv_tool_info
