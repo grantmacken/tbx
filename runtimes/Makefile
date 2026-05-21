@@ -37,17 +37,9 @@ README.md: runtimes
 	VER=$$(echo $$LINE | cut -d' ' -f2)
 	SUM="Gleam programming language"
 	$(call tr,$${NAME},$${VER},$${SUM},$@)
-	for pkg in $(DNF_LIST)
-	$(call tr,$${NAME},$${VER},$${SUM},$@)
-	# for pkg in $(DNF_LIST)
-	# do 
-	# if $(RUN) rpm -q $${pkg} >/dev/null 2>&1
-	# then 
-	# $(call dnf_to_table_row,$${pkg},$@)
-	# else
-	# echo "Skipping $${pkg}: not installed"
-	# fi
-	# done
+	$(call dnf_to_table_row,golang,$@)
+	$(call dnf_to_table_row,nodejs,$@)
+	$(call dnf_to_table_row,uv,$@)
 	echo '✅ README.md created'
 
 xxx:
