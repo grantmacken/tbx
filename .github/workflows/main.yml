@@ -6,14 +6,26 @@ on:
       - main
 
 jobs:
-  build:
+  build-toolboxes:
     runs-on: ubuntu-latest
     timeout-minutes: 30
     continue-on-error: false
+    # https://docs.github.com/en/actions/reference/authentication-in-a-workflow
+    permissions:
+      contents: write
+      packages: write
+      id-token: write
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-      - name: Test workflow
+      - uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.repository_owner }}
+          password: ${{ github.token }}
+      - uses: actions/checkout@v4
+      - name: Set up Git
         run: |
-          echo "Running on branch ${{ github.ref_name }}"
-          make
+          git config --local user.name "github-actions[bot]"
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git
+      - name: Build
+        run: make
