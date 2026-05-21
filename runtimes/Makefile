@@ -38,8 +38,15 @@ README.md: runtimes
 	SUM="Gleam programming language"
 	$(call tr,$${NAME},$${VER},$${SUM},$@)
 	for pkg in $(DNF_LIST)
-	do
+	$(call tr,$${NAME},$${VER},$${SUM},$@)
+	for pkg in $(DNF_LIST)
+	do 
+	if $(RUN) rpm -q $${pkg} >/dev/null 2>&1
+	then 
 	$(call dnf_to_table_row,$${pkg},$@)
+	else
+	echo "Skipping $${pkg}: not installed"
+	fi
 	done
 
 xxx:
