@@ -168,7 +168,7 @@ files/gleam/gleam: latest/gleam.json
 	mkdir -p $(dir $@)
 	$(RUN) rm -f /usr/local/bin/gleam
 	SRC=$$(jq -r '.browser_download_url' $<)
-	curl -L "$${SRC}" | tar xz -C $(dir $@)
+	curl -L "$${SRC}" | tar xz -C $(dir $@) &>/dev/null
 	test -f $@
 
 info/gleam.md: files/gleam/gleam

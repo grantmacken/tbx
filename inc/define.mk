@@ -24,25 +24,28 @@ bdu = jq -r ".assets[] | select(.browser_download_url | contains(\"$1\")) | .bro
 
 ## Helper to write info files in a consistent format
 define to_info
-    printf "Name: %s\n"    "$(1)" >> $@
+	printf "Name: %s\n"    "$(1)" >> $@
 	printf "Version: %s\n" "$(2)" >> $@
 	printf "Summary: %s\n" "$(3)" >> $@
 	printf "✅ %s installed \n" "$(1)"
 endef
 
 define dnf_installed_info
-  	LINES=$$($(RUN) dnf info --installed $(1))
-	# extract 'name', 'version', 'summary'
-	VER=$$(echo "$${LINES}" | grep -oP '^Version\s+:\s+\K.+' || true)
-	SUM=$$(echo -e "$${LINES}" | grep -oP '^Summary\s+:\s+\K.+' || true)
-	$(file >>$(2), printf "| %-$(max_field)s | %-8s | %-85s |\n" "$(1)" "$${VER}" "$${SUM}")
+LINES=$$($(RUN) dnf info --installed $(1))
+# extract 'name', 'version', 'summary'
+VER=$$(echo "$${LINES}" | grep -oP '^Version\s+:\s+\K.+' || true)
+SUM=$$(echo -e "$${LINES}" | grep -oP '^Summary\s+:\s+\K.+' || true)
+$(file >>$(2), printf "| %-$(max_field)s | %-8s | %-85s |\n" "$(1)" "$${VER}" "$${SUM}")
 endef
 
 define dnf_to_table_row
-	if LINES=$$($(RUN) dnf info --installed $(1) 2>/dev/null); then
+if LINES=$$($(RUN) dnf info --installed $(1) 2>/dev/null); then
+	NAME=$$(echo "$${LINES}" | grep -oP '^Name\s+:\s+\K.+' || true)
 	VER=$$(echo "$${LINES}" | grep -oP '^Version\s+:\s+\K.+' || true)
-	SUM=$$(echo -e "$${LINES}" | grep -oP '^Summary\s+:\s+\K.+' | iconv -f UTF-8 -t ASCII//TRANSLIT || true)
+	SUM=$$(echo "$${LINES}" | grep -oP '^Summary\s+:\s+\K.+' | iconv -f UTF-8 -t ASCII//TRANSLIT || true)
 	$(call tr,$(1),$${VER},$${SUM},$(2))
+else 
+	$(call tr,$(1),'Not installed','Not available',$(2))
 	fi
 endef
 
