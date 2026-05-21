@@ -16,4 +16,4 @@ jobs:
       - name: Test workflow
         run: |
           echo "Running on branch ${{ github.ref_name }}"
-          pushd build-tools && make init && popd
+          make
