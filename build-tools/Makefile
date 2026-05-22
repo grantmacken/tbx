@@ -5,7 +5,6 @@ TBX_SUMMARY := A Fedora Toolbox image with CLI tools and build tools
 TBX_IMAGE := ghcr.io/grantmacken/$(TBX_NAME)
 include ../inc/define.mk
 
-# removed eza as no locnger maintained by maintainer
 TOOLS := make stow bat fd-find fzf host-spawn jq ripgrep wl-clipboard zoxide ledger w3m
 BUILD := gcc gcc-c++ pcre2 autoconf pkgconf
 DEVEL := libicu gettext-devel glibc-devel libevent-devel ncurses-devel openssl-devel perl-devel readline-devel zlib-devel
