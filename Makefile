@@ -17,5 +17,5 @@ default:
 	sleep 60
 	$(MAKE) -C runtimes
 	sleep 60
-	$(MAKE) coding
+	$(MAKE) -C coding
 
