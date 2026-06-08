@@ -81,6 +81,11 @@ erlang: info/erlang.md
 latest/erlang.json:
 	echo '##[ $@ ]##'
 	mkdir -p $(dir $@)
+	curl -fsSL 'https://api.github.com/repos/erlang/otp/tags?per_page=100' 
+
+latest/erlang.json:
+	echo '##[ $@ ]##'
+	mkdir -p $(dir $@)
 	$(WGET) https://api.github.com/repos/erlang/otp/releases/latest -O $@
 
 info/erlang.md: latest/erlang.json
@@ -88,7 +93,9 @@ info/erlang.md: latest/erlang.json
 	mkdir -p $(dir $@)
 	mkdir -p files/otp
 	$(RUN) mkdir -p /tmp/otp
-	VER=$$(jq -r '.name' $< | cut -d' ' -f2)
+	VER=$$(jq -r '.[].name' $< | grep '^OTP-' | sed 's/^OTP-//' | sort -V | tail -1)
+	TAG=OTP-$${VER}
+	SRC="https://github.com/erlang/otp/releases/download/$${TAG}/otp_src_$${VER}.tar.gz"
 	echo "Erlang/OTP Version: $${VER}"
 	SRC="https://github.com/erlang/otp/releases/download/OTP-$${VER}/otp_src_$${VER}.tar.gz"
 	echo "Source URL: $${SRC}"
