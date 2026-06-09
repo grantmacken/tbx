@@ -18,10 +18,8 @@ TAR_NO_STRIP := tar xz -C
 HEADING1 := \#
 HEADING2 := $(HEADING1)$(HEADING1)
 
-first_max_field := $(shell echo -n 'copilot-language-server' | wc -c)
-mid_max_field := $(shell echo -n 'OTP-29.0.1' | wc -c)
-last_max_field := $(shell echo -n 'HTML/CSS/JSON/ESLint language servers extracted from [vscode]https://github.com/Microsoft/vscode).' | wc -c)
-tr = printf "| %-$(first_max_field)s | %-$(mid_max_field)s | %-$(last_max_field)s |\n" "$(1)" "$(2)" "$(3)" | tee $(4)
+max_field := $(shell echo -n 'copilot-language-server' | wc -c)
+tr = printf "| %-$(max_field)s | %-8s | %-85s |\n" "$(1)" "$(2)" "$(3)" | tee $(4)
 bdu = jq -r ".assets[] | select(.browser_download_url | contains(\"$1\")) | .browser_download_url" $2
 
 ## Helper to write info files in a consistent format
@@ -43,7 +41,7 @@ endef
 define dnf_to_table_row
 	PKGNAME=$$($(RUN) rpm -q --whatprovides --qf '%{NAME}\n' $(1) 2>/dev/null | head -1 || true)
 	if [ -n "$${PKGNAME}" ] && LINES=$$($(RUN) dnf info --installed $${PKGNAME} 2>/dev/null); then
-	VER=$$(echo "$${LINES}" | grep -oP '^Version\s+:\s+\K(\d+\.){2}\d+' || true)
+	VER=$$(echo "$${LINES}" | grep -oP '^Version\s+:\s+\K\d+.+' || true)
 	SUM=$$(echo "$${LINES}" | grep -oP '^Summary\s+:\s+\K.+' | iconv -f UTF-8 -t ASCII//TRANSLIT || true)
 	$(call tr,$(1),$${VER},$${SUM},$(2))
 	else
