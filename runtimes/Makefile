@@ -88,8 +88,8 @@ info/erlang.md: latest/erlang.json
 	echo '##[ $@ ]##'
 	mkdir -p $(dir $@)
 	mkdir -p files/otp
-	$(RUN) mkdir -p /tmp/otp
-	TAG=$$(jq -r '.[].name' $<)
+	TAG=$$(jq -r '.name' $<)
+	echo $$TAG && false
 	VER=$$(echo $${TAG} | cut -d'-' -f2)
 	SRC="https://github.com/erlang/otp/releases/download/$${TAG}/otp_src_$${VER}.tar.gz"
 	echo "Erlang/OTP Version: $${VER}"
