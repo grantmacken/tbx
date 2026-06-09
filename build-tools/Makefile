@@ -12,7 +12,6 @@ PKGS_LIST := gh $(TOOLS)
 
 README.md: build-tools
 	echo '##[ $@ ]##'
-	pwd && false
 	cat preamble.md > $@
 	$(file >> $@,The following applications are included in this toolbox: )
 	$(call tr,"Name","Version","Summary", $@)
