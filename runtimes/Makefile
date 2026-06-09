@@ -93,7 +93,7 @@ info/erlang.md: latest/erlang.json
 	mkdir -p $(dir $@)
 	mkdir -p files/otp
 	$(RUN) mkdir -p /tmp/otp
-	VER=$$(jq -r '.[].name' $< | grep '^OTP-' | sed 's/^OTP-//' | sort -V | tail -1)
+	VER=$$(jq -r '.tag_name' $< | sed 's/^OTP-//')
 	TAG=OTP-$${VER}
 	SRC="https://github.com/erlang/otp/releases/download/$${TAG}/otp_src_$${VER}.tar.gz"
 	echo "Erlang/OTP Version: $${VER}"
