@@ -19,7 +19,7 @@ HEADING1 := \#
 HEADING2 := $(HEADING1)$(HEADING1)
 
 max_field := $(shell echo -n 'copilot-language-server' | wc -c)
-tr = printf "| %-$(max_field)s | %-8s | %-85s |\n" "$(1)" "$(2)" "$(3)" | tee $(4)
+tr = printf "| %-$(max_field)s | %-8s | %-85s |\n" "$(1)" "$(2)" "$(3)" | tee -a $(4)
 bdu = jq -r ".assets[] | select(.browser_download_url | contains(\"$1\")) | .browser_download_url" $2
 
 ## Helper to write info files in a consistent format
@@ -34,7 +34,7 @@ define dnf_installed_info
 LINES=$$($(RUN) dnf info --installed $(1))
 # extract 'name', 'version', 'summary'
 VER=$$(echo "$${LINES}" | grep -oP '^Version\s+:\s+\K.+' || true)
-SUM=$$(echo -e "$${LINES}" | grep -oP '^Summary\s+:\s+\K.+' || true)
+SUM=$$(echo -e "$${LINES}" | grep -oP '^Summary\s+:\s+\K(\d+\.){1,2}\d+' || true)
 $(file >>$(2), printf "| %-$(max_field)s | %-8s | %-85s |\n" "$(1)" "$${VER}" "$${SUM}")
 endef
 
