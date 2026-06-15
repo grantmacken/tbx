@@ -41,7 +41,7 @@ endef
 define dnf_to_table_row
 	PKGNAME=$$($(RUN) rpm -q --whatprovides --qf '%{NAME}\n' $(1) 2>/dev/null | head -1 || true)
 	if [ -n "$${PKGNAME}" ] && LINES=$$($(RUN) dnf info --installed $${PKGNAME} 2>/dev/null); then
-	VER=$$(echo "$${LINES}" | grep -oP '^Version\s+:\s+\K\d+.+' || true)
+	VER=$$(echo "$${LINES}" | grep -oP '^Version\s+:\s+\K(\d+\.){1,2}\d+' || true)
 	SUM=$$(echo "$${LINES}" | grep -oP '^Summary\s+:\s+\K.+' | iconv -f UTF-8 -t ASCII//TRANSLIT || true)
 	$(call tr,$(1),$${VER},$${SUM},$(2))
 	else
