@@ -56,15 +56,17 @@ xxx:
 	echo '✅ ghcr.io/grantmacken/tbx-runtimes:latest built and pushed'
 
 init:
+	echo '##[ $@ ]##'
+	echo $(WORKING_CONTAINER)
+	# pull the base image and create a working container
 	buildah pull ghcr.io/grantmacken/tbx-build-tools:latest &>/dev/null
-	buildah from ghcr.io/grantmacken/tbx-build-tools:latest --name $(WORKING_CONTAINER) &>/dev/null
+	buildah from ghcr.io/grantmacken/tbx-build-tools:latest &>/dev/null
 	buildah config \
 	--label summary='a toolbox with programming language runtimes' \
 	--label maintainer='Grant MacKenzie <grantmacken@gmail.com>' \
 	--env lang=C.UTF-8 \
 	--env ELIXIR_ERL_OPTIONS="+fnu" $(WORKING_CONTAINER)
 	mkdir -p info
-	echo "$(WORKING_CONTAINER) initialized"
 	# verify that the container is working and has the expected tools
 	$(RUN) which ledger
 	echo '✅ Buildah Working Container initialized and verified'
@@ -76,7 +78,6 @@ lists: pkgs_list otp_list # lua_list
 
 pkgs_list: init
 	echo '##[ $@ ]##'
-	$(RUN) 
 	## check for updates and install packages, suppressing output
 	$(RUN) dnf update -y &>/dev/null
 	$(INSTALL) $(PKGS_LIST)  &>/dev/null
