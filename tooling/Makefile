@@ -1,8 +1,5 @@
 include ../inc/meta.mk
-WORKING_CONTAINER ?= fedora-toolbox-working-container
-TBX_NAME := tbx-build-tools
-TBX_SUMMARY := A Fedora Toolbox image with CLI tools and build tools
-TBX_IMAGE := ghcr.io/grantmacken/$(TBX_NAME)
+WORKING_CONTAINER := fedora-toolbox-working-container
 include ../inc/define.mk
 
 TOOLS := make stow bat fd-find fzf host-spawn jq ripgrep wl-clipboard zoxide ledger w3m
@@ -21,9 +18,9 @@ README.md: build-tools
 	$(call dnf_to_table_row,$${pkg},$@)
 	done
 	echo '✅ README.md created'
-	buildah commit $(WORKING_CONTAINER) $(TBX_IMAGE)
-	buildah push $(TBX_IMAGE):latest
-	echo '✅ Image pushed to $(TBX_IMAGE):latest'
+	buildah commit $(WORKING_CONTAINER) ghcr.io/grantmacken/tbx-build-tools
+	buildah push ghcr.io/grantmacken/tbx-build-tools:latest
+	echo '✅ Image pushed to ghcr.io/grantmacken/tbx-build-tools:latest'
 
 latest/fedora-toolbox.json:
 	echo '##[ $@ ]##'

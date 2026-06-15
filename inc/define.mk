@@ -1,7 +1,5 @@
-
 RUN     := buildah run $(WORKING_CONTAINER)
 SH      := $(RUN) sh -c
-
 INSTALL := $(RUN) dnf install -y
 # INSTALL := $(RUN) dnf install --allowerasing --skip-unavailable --skip-broken --no-allow-downgrade -y
 INFO    := $(RUN) dnf info

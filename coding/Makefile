@@ -18,18 +18,15 @@ PKGS_LIST :=  $(RELEASE_BINARY_LIST) $(UV_TOOL_LIST) $(NPM_LIST)
 
 default: README.md
 	echo '##[ $@ ]##'
-ifeq ($(GITHUB_REF_NAME), main)
 	buildah commit $(WORKING_CONTAINER) ghcr.io/grantmacken/tbx-coding
 	buildah push ghcr.io/grantmacken/tbx-coding:latest
 	echo '✅ ghcr.io/grantmacken/tbx-coding:latest built and pushed'
-else
-	echo " - skipping image push for branch: $(GITHUB_REF_NAME) "
 endif
 
 init:
 	echo '##[ $@ ]##'
-	buildah pull ghcr.io/grantmacken/tbx-runtimes &>/dev/null
-	buildah from ghcr.io/grantmacken/tbx-runtimes &>/dev/null
+	buildah pull ghcr.io/grantmacken/tbx-runtimes:latest &>/dev/null
+	buildah from ghcr.io/grantmacken/tbx-runtimes:latest &>/dev/null
 	$(ADD) scripts/ $(DIR_BIN)/ &>/dev/null
 	buildah config \
 	--label summary='a toolbox with cli tools, neovim' \

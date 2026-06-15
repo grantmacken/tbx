@@ -36,8 +36,8 @@ jobs:
           rm -f README.md # remove if exists to avoid git add errors
           touch README.md
           cat tooling/README.md > README.md
-          # cat runtimes/README.md  >> README.md
-          # cat coding/README.md  >> README.md
+          cat runtimes/README.md  >> README.md
+          cat coding/README.md  >> README.md
           git add README.md
           git commit -m "Update README.md from Makefile build" README.md || echo "No changes to commit"
           git push origin HEAD:${GITHUB_REF#refs/heads/}
