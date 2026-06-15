@@ -13,9 +13,9 @@ MAKEFLAGS += --silent
 unexport MAKEFLAGS
 
 default:
-	$(MAKE) -C build-tools
-	sleep 60
-	$(MAKE) -C runtimes
-	sleep 60
-	$(MAKE) -C coding
+	pushd tooling && $(MAKE) && popd
+	# sleep 10
+	# $(MAKE) -C runtimes
+	# sleep 60
+	# $(MAKE) -C coding
 
