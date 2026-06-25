@@ -1,5 +1,5 @@
 include ../inc/meta.mk
-WORKING_CONTAINER = fedora-toolbox-working-container
+WORKING_CONTAINER := fedora-toolbox-working-container
 include ../inc/define.mk
 TOOLS := make stow bat fd-find fzf host-spawn jq ripgrep wl-clipboard zoxide ledger w3m
 BUILD := gcc gcc-c++ pcre2 autoconf pkgconf
@@ -38,7 +38,7 @@ build-tools: init lists
 	printf '✅ %s toolbox built from: %s\n'  $@ $(WORKING_CONTAINER)
 	buildah commit $(WORKING_CONTAINER) ghcr.io/grantmacken/tbx-$@:latest
 	buildah push ghcr.io/grantmacken/tbx-$@:latest
-	printf '✅ Image pushed to ghcr.io/grantmacken/tbx-%s:latest' $@
+	printf '✅ Image pushed to ghcr.io/grantmacken/tbx-%s:latest\n' $@
 
 lists:
 	$(RUN) dnf config-manager addrepo --from-repofile=https://cli.github.com/packages/rpm/gh-cli.repo &> /dev/null

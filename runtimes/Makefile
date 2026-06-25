@@ -1,7 +1,7 @@
 
 include ../inc/meta.mk
 ## hardcoded working container
-WORKING_CONTAINER = tbx-build-tools-working-container
+WORKING_CONTAINER := tbx-build-tools-working-container
 include ../inc/define.mk
 
 PKGS_LIST := golang nodejs uv
@@ -48,7 +48,6 @@ xxx:
 	$(call tr,$${NAME},$${VER},$${SUM},$@)
 	echo '✅ README.md created'
 
-
 init:
 	echo '##[ $@ ]##'
 	echo $(WORKING_CONTAINER)
@@ -69,9 +68,9 @@ runtimes: init lists
 	$(RUN) which ledger
 	$(RUN) which gleam
 	printf '✅ %s toolbox built from: %s\n'  $@ $(WORKING_CONTAINER)
-	buildah commit $(WORKING_CONTAINER) ghcr.io/grantmacken/tbx-runtimes
-	buildah push ghcr.io/grantmacken/tbx-runtimes:latest
-	echo '✅ ghcr.io/grantmacken/tbx-runtimes:latest built and pushed'printf '✅ Coding toolbox built from: %s\n' $(WORKING_CONTAINER)
+	buildah commit $(WORKING_CONTAINER) ghcr.io/grantmacken/tbx-$@:latest
+	buildah push ghcr.io/grantmacken/tbx-$@:latest
+	printf '✅ Image pushed to ghcr.io/grantmacken/tbx-%s:latest\n' $@
 
 lists: pkgs_list otp_list # lua_list
 
