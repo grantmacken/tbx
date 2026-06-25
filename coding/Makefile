@@ -1,5 +1,5 @@
 include ../inc/meta.mk
-WORKING_CONTAINER := tbx-runtimes-working-container
+WORKING_CONTAINER = tbx-runtimes-working-container
 include ../inc/define.mk
 
 DNF_LIST     :=  ShellCheck shfmt #  google-cloud-cli
@@ -25,7 +25,6 @@ endif
 
 init:
 	echo '##[ $@ ]##'
-	buildah pull ghcr.io/grantmacken/tbx-runtimes:latest &>/dev/null
 	buildah from ghcr.io/grantmacken/tbx-runtimes:latest &>/dev/null
 	$(ADD) scripts/ $(DIR_BIN)/ &>/dev/null
 	buildah config \
@@ -37,6 +36,9 @@ init:
 	--env UV_TOOL_BIN_DIR=/usr/local/bin \
 	--env UV_TOOL_DIR=/var/lib/uv_tools \
 	$(WORKING_CONTAINER)
+	# verify that the container is working and has the expected tools
+	$(RUN) which ledger
+	$(RUN) which gleam
 	mkdir -p info
 	mkdir -p latest
 	# update dnf repos

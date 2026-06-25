@@ -66,7 +66,6 @@ init:
 	$(RUN) which ledger
 	echo '✅ Buildah Working Container initialized and verified'
 
-
 runtimes: init lists
 
 lists: pkgs_list otp_list # lua_list
