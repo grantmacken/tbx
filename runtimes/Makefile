@@ -1,11 +1,7 @@
 
 include ../inc/meta.mk
 ## hardcoded working container
-WORKING_CONTAINER := tbx-build-tools-working-container
-TBX_NAME := tbx-runtimes
-TBX_SUMMARY := A Fedora Toolbox image with runtimes and build tools
-TBX_IMAGE := ghcr.io/grantmacken/$(TBX_NAME)
-
+WORKING_CONTAINER = tbx-build-tools-working-container
 include ../inc/define.mk
 
 PKGS_LIST := golang nodejs uv
@@ -59,7 +55,6 @@ init:
 	echo '##[ $@ ]##'
 	echo $(WORKING_CONTAINER)
 	# pull the base image and create a working container
-	buildah pull ghcr.io/grantmacken/tbx-build-tools:latest &>/dev/null
 	buildah from ghcr.io/grantmacken/tbx-build-tools:latest &>/dev/null
 	buildah config \
 	--label summary='a toolbox with programming language runtimes' \

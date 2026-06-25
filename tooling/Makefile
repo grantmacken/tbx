@@ -18,9 +18,9 @@ README.md: build-tools
 	done
 	echo '✅ README.md created'
 	buildah commit $(WORKING_CONTAINER)
-	#buildah commit $(WORKING_CONTAINER) ghcr.io/grantmacken/tbx-build-tools
-	#buildah push ghcr.io/grantmacken/tbx-build-tools:latest
-	#echo '✅ Image pushed to ghcr.io/grantmacken/tbx-build-tools:latest'
+	buildah commit $(WORKING_CONTAINER) ghcr.io/grantmacken/tbx-build-tools
+	buildah push ghcr.io/grantmacken/tbx-build-tools:latest
+	echo '✅ Image pushed to ghcr.io/grantmacken/tbx-build-tools:latest'
 
 latest/fedora-toolbox.json:
 	echo '##[ $@ ]##'
