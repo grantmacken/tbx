@@ -1,4 +1,6 @@
 include inc/meta.mk
+WORKING_CONTAINER := fedora-toolbox-working-container
+include ../inc/define.mk
 
 default:
 	pushd tooling

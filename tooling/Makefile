@@ -1,7 +1,3 @@
-include ../inc/meta.mk
-WORKING_CONTAINER := fedora-toolbox-working-container
-include ../inc/define.mk
-
 TOOLS := make stow bat fd-find fzf host-spawn jq ripgrep wl-clipboard zoxide ledger w3m
 BUILD := gcc gcc-c++ pcre2 autoconf pkgconf
 DEVEL := libicu gettext-devel glibc-devel libevent-devel ncurses-devel openssl-devel perl-devel readline-devel zlib-devel
@@ -18,9 +14,10 @@ README.md: build-tools
 	$(call dnf_to_table_row,$${pkg},$@)
 	done
 	echo '✅ README.md created'
-	buildah commit $(WORKING_CONTAINER) ghcr.io/grantmacken/tbx-build-tools
-	buildah push ghcr.io/grantmacken/tbx-build-tools:latest
-	echo '✅ Image pushed to ghcr.io/grantmacken/tbx-build-tools:latest'
+	buildah commit $(WORKING_CONTAINER)
+	#buildah commit $(WORKING_CONTAINER) ghcr.io/grantmacken/tbx-build-tools
+	#buildah push ghcr.io/grantmacken/tbx-build-tools:latest
+	#echo '✅ Image pushed to ghcr.io/grantmacken/tbx-build-tools:latest'
 
 latest/fedora-toolbox.json:
 	echo '##[ $@ ]##'
