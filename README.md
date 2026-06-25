@@ -1,4 +1,3 @@
-The following applications are included in this toolbox: 
 ## build tools 
 
 ```
@@ -20,17 +19,19 @@ The building toolbox container provides three tooling categories
 
 | Name                    | Version  | Summary                                                                               |
 | ----                    | -------  | -------                                                                               |
-| gh                      | 2.85.0   | GitHub's official command line tool.                                                  |
+| gh                      | 2.95.0   | GitHub\xe2\x80\x99s official command line tool.                                       |
 | make                    | 4.4.1    | A GNU tool which simplifies the build process for users                               |
 | stow                    | 2.4.1    | Manage the installation of software packages from source                              |
-| bat                     | 0.25.0   | Cat(1) clone with wings                                                               |
-| fd-find                 | 10.3.0   | Fd is a simple, fast and user-friendly alternative to find                            |
-| fzf                     | 0.67.0   | A command-line fuzzy finder written in Go                                             |
+| bat                     | 0.26.1   | Cat(1) clone with wings                                                               |
+| fd-find                 | 10.4.2   | Fd is a simple, fast and user-friendly alternative to find                            |
+| fzf                     | 0.73.1   | A command-line fuzzy finder written in Go                                             |
 | host-spawn              | 1.6.2    | Run commands on your host from inside your toolbox or flatpak sandbox                 |
 | jq                      | 1.8.1    | Command-line JSON processor                                                           |
 | ripgrep                 | 14.1.1   | Line-oriented search tool                                                             |
 | wl-clipboard            | 2.2.1    | Command-line copy/paste utilities for Wayland                                         |
 | zoxide                  | 0.9.8    | Smarter cd command for your terminal                                                  |
+| ledger                  | 3.3.2    | A powerful command-line double-entry accounting system                                |
+| w3m                     | 0.5.3    | Pager with Web browsing abilities                                                     |
 # runtimes
 
 ```
@@ -70,13 +71,13 @@ It is designed to be a modern alternative to pip and poetry.
 
 | Name                    | Version  | Summary                                                                               |
 | ----                    | -------  | -------                                                                               |
-| erlang                  | 28.3.1   | General-purpose programming language and runtime environment                          |
-| rebar3                  | 3.26.0   | Tool for working with Erlang projects                                                 |
-| elixir                  | 1.19.5   | A modern approach to programming for the Erlang VM                                    |
-| gleam                   | 1.14.0   | Gleam programming language                                                            |
-| golang                  | 1.25.5   | The Go Programming Language                                                           |
-| nodejs                  | 22.20.0  | JavaScript runtime                                                                    |
-| uv                      | 0.9.21   | An extremely fast Python package installer and resolver, written in Rust              |
+| erlang                  | OTP-29.0.2 | General-purpose programming language and runtime environment                          |
+| rebar3                  | 3.27.0   | Tool for working with Erlang projects                                                 |
+| elixir                  | 1.20.2   | A modern approach to programming for the Erlang VM                                    |
+| gleam                   | 1.17.0   | Gleam programming language                                                            |
+| golang                  | 1.26.4   | The Go Programming Language                                                           |
+| nodejs                  | 22.22.2  | JavaScript runtime                                                                    |
+| uv                      | 0.11.19  | An extremely fast Python package installer and resolver, written in Rust              |
 # tbx-coding: a toolbox for coding
 
 This tbx-coding toolbox container image is built **from**
@@ -102,18 +103,16 @@ Once inside the toolbox, you can start Using neovim and other installed tools fo
 
 | Name                    | Version  | Summary                                                                               |
 | ----                    | -------  | -------                                                                               |
-| neovim                  | 0.12.0   | Neovim text editor                                                                    |
-| harper-ls               | 1.4.1    | 'Harper Language Server Grammar Checker'                                              |
+| neovim                  | 0.13.0   | Neovim text editor                                                                    |
+| harper-ls               | 2.6.0    | 'Harper Language Server Grammar Checker'                                              |
 | lua-language-server     | 3.15.0   | 'Lua language server'                                                                 |
-| tombi                   | v0.7.19  | "TOML Formatter                                                                       |
-| mbake                   | v1.4.4   | Makefile formatter and linter                                                         |
+| tombi                   | v1.1.5   | "TOML Formatter                                                                       |
+| mbake                   | v1.4.6   | Makefile formatter and linter                                                         |
 | bash-language-server    | 5.6.0    | A language server for Bash                                                            |
-| copilot                 | 0.0.384  | GitHub Copilot CLI brings the power of Copilot coding agent directly to your terminal. |
-| copilot-language-server | 1.411.0  | Your AI pair programmer                                                               |
-| tree-sitter-cli         | 0.26.3   | CLI for generating fast incremental parsers                                           |
+| copilot                 | 1.0.65   | GitHub Copilot CLI brings the power of Copilot coding agent directly to your terminal. |
+| copilot-language-server | 1.511.0  | Your AI pair programmer                                                               |
+| tree-sitter-cli         | 0.26.9   | CLI for generating fast incremental parsers                                           |
 | vscode-langservers      | 4.10.0   | HTML/CSS/JSON/ESLint language servers extracted from [vscode](https://github.com/Microsoft/vscode). |
-| yaml-language-server    | 1.19.2   | YAML language server                                                                  |
-| nvim-plugins            | 1.0.0    | 'Neovim plugins installed via nvim_plugins script'                                    |
-| nvim-treesitters        | 1.0.0    | 'Neovim treesitter parsers installed via nvim_treesitters script'                     |
+| yaml-language-server    | 1.23.0   | YAML language server                                                                  |
 | ShellCheck              | 0.11.0   | Shell script analysis tool                                                            |
 | shfmt                   | 3.7.0    | Shell formatter                                                                       |
