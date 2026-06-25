@@ -47,9 +47,7 @@ xxx:
 	SUM=$$(cat info/luarocks.md | grep -oP '^Summary\s+:\s+\K.+')
 	$(call tr,$${NAME},$${VER},$${SUM},$@)
 	echo '✅ README.md created'
-	buildah commit $(WORKING_CONTAINER) ghcr.io/grantmacken/tbx-runtimes
-	buildah push ghcr.io/grantmacken/tbx-runtimes:latest
-	echo '✅ ghcr.io/grantmacken/tbx-runtimes:latest built and pushed'
+
 
 init:
 	echo '##[ $@ ]##'
@@ -67,6 +65,13 @@ init:
 	echo '✅ Buildah Working Container initialized and verified'
 
 runtimes: init lists
+	# verify that the container is working and has the expected tools
+	$(RUN) which ledger
+	$(RUN) which gleam
+	printf '✅ %s toolbox built from: %s\n'  $@ $(WORKING_CONTAINER)
+	buildah commit $(WORKING_CONTAINER) ghcr.io/grantmacken/tbx-runtimes
+	buildah push ghcr.io/grantmacken/tbx-runtimes:latest
+	echo '✅ ghcr.io/grantmacken/tbx-runtimes:latest built and pushed'printf '✅ Coding toolbox built from: %s\n' $(WORKING_CONTAINER)
 
 lists: pkgs_list otp_list # lua_list
 

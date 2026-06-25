@@ -1,5 +1,5 @@
 include ../inc/meta.mk
-WORKING_CONTAINER = tbx-runtimes-working-container
+WORKING_CONTAINER := tbx-runtimes-working-container
 include ../inc/define.mk
 
 DNF_LIST     :=  ShellCheck shfmt #  google-cloud-cli
@@ -16,12 +16,40 @@ NVIM_PLUGIN_LIST := nvim-mini treesitters
 RELEASE_BINARY_LIST :=  neovim  harper-ls lua-language-server
 PKGS_LIST :=  $(RELEASE_BINARY_LIST) $(UV_TOOL_LIST) $(NPM_LIST)
 
-default: README.md
+README.md: coding
 	echo '##[ $@ ]##'
-	buildah commit $(WORKING_CONTAINER) ghcr.io/grantmacken/tbx-coding
-	buildah push ghcr.io/grantmacken/tbx-coding:latest
-	echo '✅ ghcr.io/grantmacken/tbx-coding:latest built and pushed'
-endif
+	mkdir -p $(dir $@)
+	cat preamble.md > $@
+	echo $@
+	$(file >> $@,the following applications are included in this toolbox: )
+	$(call tr,"Name","Version","Summary", $@)
+	$(call tr,"----","-------","-------", $@)
+	for pkg in $(PKGS_LIST)
+	do
+	NAME=$$(cat info/$${pkg}.md | grep -oP '^Name:\s\K.+' || true)
+	VER=$$(cat info/$${pkg}.md | grep -oP '^Version:\s\K.+' || true)
+	SUM=$$(cat info/$${pkg}.md | grep -oP '^Summary:\s\K.+' || true)
+	$(call tr,$${NAME},$${VER},$${SUM},$@)
+	done
+	for pkg in $(DNF_LIST)
+	do
+	$(call dnf_to_table_row,$${pkg},$@)
+	done
+	echo '✅ README.md created'
+
+coding: init lists # $(NVIM_PLUGIN_LIST)
+	# verify that the container is working and has the expected tools
+	$(RUN) which ledger &> /dev/null
+	$(RUN) which gleam &> /dev/null
+	$(RUN) which nvim &> /dev/null
+	# $(RUN) nvim --headless +MiniInfo +q &> /dev/null
+	# $(RUN) treesitters || true
+	printf '✅ %s toolbox built from: %s\n' $@ $(WORKING_CONTAINER)
+	buildah commit $(WORKING_CONTAINER) ghcr.io/grantmacken/tbx-$@:latest
+	buildah push ghcr.io/grantmacken/tbx-$@:latest
+	printf '✅ Image pushed to ghcr.io/grantmacken/tbx-%s:latest' $@
+
+lists: dnf_list pkgs_list
 
 init:
 	echo '##[ $@ ]##'
@@ -45,25 +73,7 @@ init:
 	$(RUN) dnf update -y &>/dev/null
 	echo '✅ Base image pulled and working container created'
 
-README.md: init dnf_list pkgs_list
-	mkdir -p $(dir $@)
-	cat preamble.md > $@
-	echo $@
-	$(file >> $@,the following applications are included in this toolbox: )
-	$(call tr,"Name","Version","Summary", $@)
-	$(call tr,"----","-------","-------", $@)
-	for pkg in $(PKGS_LIST)
-	do
-	NAME=$$(cat info/$${pkg}.md | grep -oP '^Name:\s\K.+' || true)
-	VER=$$(cat info/$${pkg}.md | grep -oP '^Version:\s\K.+' || true)
-	SUM=$$(cat info/$${pkg}.md | grep -oP '^Summary:\s\K.+' || true)
-	$(call tr,$${NAME},$${VER},$${SUM},$@)
-	done
-	for pkg in $(DNF_LIST)
-	do
-	$(call dnf_to_table_row,$${pkg},$@)
-	done
-	echo '✅ README.md created'
+README.md: 
 
 pkgs_list: $(PKGS_LIST)
 

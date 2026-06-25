@@ -17,10 +17,6 @@ README.md: build-tools
 	$(call dnf_to_table_row,$${pkg},$@)
 	done
 	echo '✅ README.md created'
-	buildah commit $(WORKING_CONTAINER)
-	buildah commit $(WORKING_CONTAINER) ghcr.io/grantmacken/tbx-build-tools
-	buildah push ghcr.io/grantmacken/tbx-build-tools:latest
-	echo '✅ Image pushed to ghcr.io/grantmacken/tbx-build-tools:latest'
 
 latest/fedora-toolbox.json:
 	echo '##[ $@ ]##'
@@ -36,11 +32,18 @@ init: latest/fedora-toolbox.json
 	--env lang=C.UTF-8 $(WORKING_CONTAINER)
 	echo '✅ Base image pulled and working container created'
 
-build-tools: init
+build-tools: init lists
+	# verify that the container is working and has the expected tools
+	$(RUN) which ledger &>/dev/null
+	printf '✅ %s toolbox built from: %s\n'  $@ $(WORKING_CONTAINER)
+	buildah commit $(WORKING_CONTAINER) ghcr.io/grantmacken/tbx-$@:latest
+	buildah push ghcr.io/grantmacken/tbx-$@:latest
+	printf '✅ Image pushed to ghcr.io/grantmacken/tbx-%s:latest' $@
+
+lists:
 	$(RUN) dnf config-manager addrepo --from-repofile=https://cli.github.com/packages/rpm/gh-cli.repo &> /dev/null
 	$(INSTALL) gh --repo gh-cli &>  /dev/null
 	$(INSTALL) $(DEVEL) &>/dev/null
 	$(INSTALL) $(BUILD) &>/dev/null
 	$(INSTALL) $(TOOLS) &>/dev/null
-	echo '✅ Build tools and CLI tools installed'
 
