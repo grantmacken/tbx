@@ -110,7 +110,7 @@ Once inside the toolbox, you can start Using neovim and other installed tools fo
 | mbake                   | v1.4.6   | Makefile formatter and linter                                                         |
 | bash-language-server    | 5.6.0    | A language server for Bash                                                            |
 | copilot                 | 1.0.65   | GitHub Copilot CLI brings the power of Copilot coding agent directly to your terminal. |
-| copilot-language-server | 1.511.0  | Your AI pair programmer                                                               |
+| copilot-language-server | 1.513.0  | Your AI pair programmer                                                               |
 | tree-sitter-cli         | 0.26.9   | CLI for generating fast incremental parsers                                           |
 | vscode-langservers      | 4.10.0   | HTML/CSS/JSON/ESLint language servers extracted from [vscode](https://github.com/Microsoft/vscode). |
 | yaml-language-server    | 1.23.0   | YAML language server                                                                  |
