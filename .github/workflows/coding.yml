@@ -1,0 +1,25 @@
+name: Only coding branch build
+on:
+  # Allow manual triggering
+  workflow_dispatch:
+
+jobs:
+  # First branch build job
+  build-toolboxes:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    continue-on-error: false
+    # https://docs.github.com/en/actions/reference/authentication-in-a-workflow
+    permissions:
+      contents: write
+      packages: write
+      id-token: write
+    steps:
+      - uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.repository_owner }}
+          password: ${{ github.token }}
+      - uses: actions/checkout@v4
+      - name: buildah toolbox build
+        run: make -C coding
