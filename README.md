@@ -106,12 +106,12 @@ Once inside the toolbox, you can start Using neovim and other installed tools fo
 | neovim                  | 0.13.0   | Neovim text editor                                                                    |
 | harper-ls               | 2.6.0    | 'Harper Language Server Grammar Checker'                                              |
 | lua-language-server     | 3.15.0   | 'Lua language server'                                                                 |
-| tombi                   | v1.2.0   | "TOML Formatter                                                                       |
+| tombi                   | v1.2.3   | "TOML Formatter                                                                       |
 | mbake                   | v1.4.6   | Makefile formatter and linter                                                         |
 | bash-language-server    | 5.6.0    | A language server for Bash                                                            |
-| copilot                 | 1.0.70   | GitHub Copilot CLI brings the power of Copilot coding agent directly to your terminal. |
-| copilot-language-server | 1.520.0  | Your AI pair programmer                                                               |
-| tree-sitter-cli         | 0.26.10  | CLI for generating fast incremental parsers                                           |
+| copilot                 | 1.0.71   | GitHub Copilot CLI brings the power of Copilot coding agent directly to your terminal. |
+| copilot-language-server | 1.523.0  | Your AI pair programmer                                                               |
+| tree-sitter-cli         | 0.26.11  | CLI for generating fast incremental parsers                                           |
 | vscode-langservers      | 4.10.0   | HTML/CSS/JSON/ESLint language servers extracted from [vscode](https://github.com/Microsoft/vscode). |
 | yaml-language-server    | 1.24.0   | YAML language server                                                                  |
 | ShellCheck              | 0.11.0   | Shell script analysis tool                                                            |
