@@ -30,7 +30,7 @@ The building toolbox container provides three tooling categories
 | ripgrep                 | 14.1.1   | Line-oriented search tool                                                             |
 | wl-clipboard            | 2.2.1    | Command-line copy/paste utilities for Wayland                                         |
 | zoxide                  | 0.9.8    | Smarter cd command for your terminal                                                  |
-| ledger                  | 3.3.2    | A powerful command-line double-entry accounting system                                |
+| ledger                  | 3.4.1    | A powerful command-line double-entry accounting system                                |
 | w3m                     | 0.5.3    | Pager with Web browsing abilities                                                     |
 # runtimes
 
@@ -77,7 +77,7 @@ It is designed to be a modern alternative to pip and poetry.
 | gleam                   | 1.17.0   | Gleam programming language                                                            |
 | golang                  | 1.26.5   | The Go Programming Language                                                           |
 | nodejs                  | 22.22.2  | JavaScript runtime                                                                    |
-| uv                      | 0.11.26  | An extremely fast Python package installer and resolver, written in Rust              |
+| uv                      | 0.11.28  | An extremely fast Python package installer and resolver, written in Rust              |
 # tbx-coding: a toolbox for coding
 
 This tbx-coding toolbox container image is built **from**
@@ -106,11 +106,11 @@ Once inside the toolbox, you can start Using neovim and other installed tools fo
 | neovim                  | 0.13.0   | Neovim text editor                                                                    |
 | harper-ls               | 2.6.0    | 'Harper Language Server Grammar Checker'                                              |
 | lua-language-server     | 3.15.0   | 'Lua language server'                                                                 |
-| tombi                   | v1.2.3   | "TOML Formatter                                                                       |
+| tombi                   | v1.2.4   | "TOML Formatter                                                                       |
 | mbake                   | v1.4.6   | Makefile formatter and linter                                                         |
 | bash-language-server    | 5.6.0    | A language server for Bash                                                            |
-| copilot                 | 1.0.71   | GitHub Copilot CLI brings the power of Copilot coding agent directly to your terminal. |
-| copilot-language-server | 1.523.0  | Your AI pair programmer                                                               |
+| copilot                 | 1.0.75   | GitHub Copilot CLI brings the power of Copilot coding agent directly to your terminal. |
+| copilot-language-server | 1.526.0  | Your AI pair programmer                                                               |
 | tree-sitter-cli         | 0.26.11  | CLI for generating fast incremental parsers                                           |
 | vscode-langservers      | 4.10.0   | HTML/CSS/JSON/ESLint language servers extracted from [vscode](https://github.com/Microsoft/vscode). |
 | yaml-language-server    | 1.24.0   | YAML language server                                                                  |
