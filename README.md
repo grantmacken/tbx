@@ -19,12 +19,12 @@ The building toolbox container provides three tooling categories
 
 | Name                    | Version  | Summary                                                                               |
 | ----                    | -------  | -------                                                                               |
-| gh                      | 2.96.0   | GitHub\xe2\x80\x99s official command line tool.                                       |
+| gh                      | 2.97.0   | GitHub\xe2\x80\x99s official command line tool.                                       |
 | make                    | 4.4.1    | A GNU tool which simplifies the build process for users                               |
 | stow                    | 2.4.1    | Manage the installation of software packages from source                              |
 | bat                     | 0.26.1   | Cat(1) clone with wings                                                               |
 | fd-find                 | 10.4.2   | Fd is a simple, fast and user-friendly alternative to find                            |
-| fzf                     | 0.74.0   | A command-line fuzzy finder written in Go                                             |
+| fzf                     | 0.74.1   | A command-line fuzzy finder written in Go                                             |
 | host-spawn              | 1.6.2    | Run commands on your host from inside your toolbox or flatpak sandbox                 |
 | jq                      | 1.8.1    | Command-line JSON processor                                                           |
 | ripgrep                 | 14.1.1   | Line-oriented search tool                                                             |
@@ -71,12 +71,12 @@ It is designed to be a modern alternative to pip and poetry.
 
 | Name                    | Version  | Summary                                                                               |
 | ----                    | -------  | -------                                                                               |
-| erlang                  | OTP-29.0.3 | General-purpose programming language and runtime environment                          |
+| erlang                  | OTP-29.0.4 | General-purpose programming language and runtime environment                          |
 | rebar3                  | 3.27.0   | Tool for working with Erlang projects                                                 |
 | elixir                  | 1.20.2   | A modern approach to programming for the Erlang VM                                    |
-| gleam                   | 1.17.0   | Gleam programming language                                                            |
+| gleam                   | 1.18.1   | Gleam programming language                                                            |
 | golang                  | 1.26.5   | The Go Programming Language                                                           |
-| nodejs                  | 22.22.2  | JavaScript runtime                                                                    |
+| nodejs                  | 22.23.1  | JavaScript runtime                                                                    |
 | uv                      | 0.11.28  | An extremely fast Python package installer and resolver, written in Rust              |
 # tbx-coding: a toolbox for coding
 
@@ -104,13 +104,13 @@ Once inside the toolbox, you can start Using neovim and other installed tools fo
 | Name                    | Version  | Summary                                                                               |
 | ----                    | -------  | -------                                                                               |
 | neovim                  | 0.13.0   | Neovim text editor                                                                    |
-| harper-ls               | 2.6.0    | 'Harper Language Server Grammar Checker'                                              |
+| harper-ls               | 2.7.0    | 'Harper Language Server Grammar Checker'                                              |
 | lua-language-server     | 3.15.0   | 'Lua language server'                                                                 |
-| tombi                   | v1.2.4   | "TOML Formatter                                                                       |
+| tombi                   | v1.2.5   | "TOML Formatter                                                                       |
 | mbake                   | v1.4.6   | Makefile formatter and linter                                                         |
 | bash-language-server    | 5.6.0    | A language server for Bash                                                            |
-| copilot                 | 1.0.75   | GitHub Copilot CLI brings the power of Copilot coding agent directly to your terminal. |
-| copilot-language-server | 1.526.0  | Your AI pair programmer                                                               |
+| copilot                 | 1.0.77   | GitHub Copilot CLI brings the power of Copilot coding agent directly to your terminal. |
+| copilot-language-server | 1.527.1  | Your AI pair programmer                                                               |
 | tree-sitter-cli         | 0.26.11  | CLI for generating fast incremental parsers                                           |
 | vscode-langservers      | 4.10.0   | HTML/CSS/JSON/ESLint language servers extracted from [vscode](https://github.com/Microsoft/vscode). |
 | yaml-language-server    | 1.24.0   | YAML language server                                                                  |
