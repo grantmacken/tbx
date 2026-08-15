@@ -32,7 +32,7 @@ init: latest/fedora-toolbox.json
 	--env lang=C.UTF-8 $(WORKING_CONTAINER)
 	echo '✅ Base image pulled and working container created'
 
-build-tools: init lists
+build-tools: init lists gh gcloud
 	# verify that the container is working and has the expected tools
 	$(RUN) which ledger &>/dev/null
 	printf '✅ %s toolbox built from: %s\n'  $@ $(WORKING_CONTAINER)
@@ -41,9 +41,34 @@ build-tools: init lists
 	printf '✅ Image pushed to ghcr.io/grantmacken/tbx-%s:latest\n' $@
 
 lists:
-	$(RUN) dnf config-manager addrepo --from-repofile=https://cli.github.com/packages/rpm/gh-cli.repo &> /dev/null
-	$(INSTALL) gh --repo gh-cli &>  /dev/null
 	$(INSTALL) $(DEVEL) &>/dev/null
 	$(INSTALL) $(BUILD) &>/dev/null
 	$(INSTALL) $(TOOLS) &>/dev/null
+
+gh:
+	$(RUN) dnf config-manager addrepo --from-repofile=https://cli.github.com/packages/rpm/gh-cli.repo &> /dev/null
+	$(INSTALL) gh --repo gh-cli &>  /dev/null
+
+gcloud: google-cloud-sdk.repo
+	$(RUN) mkdir -p /etc/yum.repos.d
+	$(ADD) $< /etc/yum.repos.d/google-cloud-sdk.repo &> /dev/null
+	$(INSTALL) libxcrypt-compat &> /dev/null
+	$(INSTALL) CLOUDSDK_SKIP_PY_COMPILATION=1 $${PKG} &> /dev/null
+	# success|failure check
+	# Note the binary is named 'gcloud'
+	$(RUN) gcloud --version &> /dev/null
+	$(RUN) whereis gcloud &> /dev/null
+	$(RUN) which gcloud &> /dev/null
+
+google-cloud-sdk.repo:
+	cat << EOF | tee $@
+	[google-cloud-cli]
+	name=Google Cloud CLI
+	baseurl=https://packages.cloud.google.com/yum/repos/cloud-sdk-el10-x86_64
+	enabled=1
+	gpgcheck=1
+	repo_gpgcheck=0
+	gpgkey=https://packages.cloud.google.com/yum/doc/rpm-package-key-v10.gpg
+	EOF
+
 
