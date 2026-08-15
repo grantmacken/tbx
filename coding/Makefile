@@ -2,14 +2,15 @@ include ../inc/meta.mk
 WORKING_CONTAINER := tbx-runtimes-working-container
 include ../inc/define.mk
 
-DNF_LIST     :=  ShellCheck shfmt #  google-cloud-cli
+DNF_LIST     :=  ShellCheck shfmt #  
 UV_TOOL_LIST :=  tombi  mbake     # specify-cli
 NPM_LIST := bash-language-server \
 			copilot \
 			copilot-language-server \
 			tree-sitter-cli \
 			vscode-langservers-extracted \
-			yaml-language-server
+			yaml-language-server \
+			pi-coding-agent
 NVIM_PLUGIN_LIST := nvim-mini treesitters
 
 # NOTE: the following lists are used in the README generation
@@ -107,7 +108,6 @@ info/nvim-mini.md: latest/nvim-mini.json
 	VER=$$(jq -r '.tag_name' $< | sed 's/^v//')
 	SUM='40+ independent Lua modules for Neovim'
 	$(call to_info,mini.nvim,$${VER},$${SUM})
-
 
 treesitters:  info/treesitters.md
 info/treesitters.md:
@@ -255,6 +255,22 @@ info/bash-language-server.md:
 	$(RUN) $${PKG} --version &> /dev/null
 	$(call to_info,$${NAME},$${VER},$${SUM})
 
+
+pi-coding-agent: info/pi-coding-agent.md
+info/pi-coding-agentt.md:
+	# echo '##[ $(basename $(notdir $@)) ]##'
+	PKG=$(basename $(notdir $@))
+	JSON=$$($(RUN) npm view --json @earendil-works/pi-coding-agent | jq '.')
+	# extract 'name', 'version', 'description' into to a table row
+	NAME=$$(echo $$JSON | jq -r '.name')
+	VER=$$(echo $$JSON | jq -r '."dist-tags".latest')
+	SUM='minimal agent harness'
+	$(RUN) npm install --global --ignore-scripts $${NAME} &> /dev/null
+	# success|failure check
+	$(RUN) $${PKG} --version &> /dev/null
+	$(call to_info,$${PKG},$${VER},$${SUM})
+
+
 copilot: info/copilot.md
 info/copilot.md:
 	# echo '##[ $(basename $(notdir $@)) ]##'
@@ -352,28 +368,11 @@ info/yaml-language-server.md:
 	# TODO
 	$(call to_info,$${NAME},$${VER},$${SUM})
 
+
+
 # dnf packages:
-# google-cloud-cli
 # ShellCheck
 # shfmt
-#
-google-cloud-cli: info/google-cloud-cli.md
-info/google-cloud-cli.md:
-	# echo '##[ $(basename $(notdir $@)) ]##'
-	PKG=$(basename $(notdir $@))
-	# add the repo
-	$(RUN) mkdir -p /etc/yum.repos.d
-	$(ADD) files/google-cloud-sdk.repo /etc/yum.repos.d/google-cloud-sdk.repo &> /dev/null
-	$(INSTALL) libxcrypt-compat $${PKG} &> /dev/null
-	# success|failure check
-	# Note the binary is named 'gcloud'
-	$(RUN) gcloud --version &> /dev/null
-	$(RUN) whereis gcloud &> /dev/null
-	$(RUN) which gcloud &> /dev/null
-	$(call dnf_installed_info,$${PKG})
-
-
-
 
 # ShellCheck: info/ShellCheck.md
 # info/ShellCheck.md:
