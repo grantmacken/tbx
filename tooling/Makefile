@@ -1,10 +1,11 @@
 include ../inc/meta.mk
 WORKING_CONTAINER := fedora-toolbox-working-container
 include ../inc/define.mk
-TOOLS := make stow bat fd-find fzf host-spawn jq ripgrep wl-clipboard zoxide ledger w3m
+TOOLS := make stow bat fd-find fzf host-spawn jq ripgrep wl-clipboard zoxide ledger w3m 
+# atuin
 BUILD := gcc gcc-c++ pcre2 autoconf pkgconf
 DEVEL := libicu gettext-devel glibc-devel libevent-devel ncurses-devel openssl-devel perl-devel readline-devel zlib-devel
-PKGS_LIST := gh $(TOOLS)
+PKGS_LIST := gh google-cloud-cli $(TOOLS)
 
 README.md: build-tools
 	echo '##[ $@ ]##'
@@ -49,11 +50,11 @@ gh:
 	$(RUN) dnf config-manager addrepo --from-repofile=https://cli.github.com/packages/rpm/gh-cli.repo &> /dev/null
 	$(INSTALL) gh --repo gh-cli &>  /dev/null
 
-gcloud: google-cloud-sdk.repo
+google-cloud-cli: google-cloud-sdk.repo
 	$(RUN) mkdir -p /etc/yum.repos.d
 	$(ADD) $< /etc/yum.repos.d/google-cloud-sdk.repo &> /dev/null
 	$(INSTALL) libxcrypt-compat &> /dev/null
-	$(INSTALL) CLOUDSDK_SKIP_PY_COMPILATION=1 $${PKG} &> /dev/null
+	$(INSTALL) CLOUDSDK_SKIP_PY_COMPILATION=1 $@ &> /dev/null
 	# success|failure check
 	# Note the binary is named 'gcloud'
 	$(RUN) gcloud --version &> /dev/null
