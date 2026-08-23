@@ -50,29 +50,21 @@ gh:
 	$(RUN) dnf config-manager addrepo --from-repofile=https://cli.github.com/packages/rpm/gh-cli.repo &> /dev/null
 	$(INSTALL) gh --repo gh-cli &>  /dev/null
 
-google-cloud-cli: files/google-cloud-sdk.repo
-	$(INSTALL) dnf-utils libxcrypt-compat
-	$(RUN) mkdir -p /etc/yum.repos.d
-	$(ADD) $< /etc/yum.repos.d/google-cloud-sdk.repo &> /dev/null
-	$(INSTALL) $@ &> /dev/null
+google-cloud-cli: files/google-cloud-cli.tar.gz
+	mkdir -p $(dir $@)
+	$(TAR) files/google-cloud-cli -f $<
+	$(ADD) files/otp /tmp/otp &>/dev/null
+	$(ADD) files/google-cloud-cli /usr/local/google-cloud-cli
+	$(RUN) /usr/local/google-cloud-cli/install.sh --quiet
 	# success|failure check
 	# Note the binary is named 'gcloud'
 	$(RUN) gcloud --version &> /dev/null
 	$(RUN) whereis gcloud &> /dev/null
 	$(RUN) which gcloud &> /dev/null
 
-files/google-cloud-sdk.repo:
+files/google-cloud-cli.tar.gz:
 	mkdir -p $(dir $@)
-	cat << EOF | tee $@
-	# Add the Cloud SDK repositore
-	sudo tee -a /etc/yum.repos.d/google-cloud-sdk.repo << EOM
-	[google-cloud-cli]
-	name=Google Cloud CLI
-	baseurl=https://packages.cloud.google.com/yum/repos/cloud-sdk-el10-x86_64
-	enabled=1
-	gpgcheck=1
-	repo_gpgcheck=0
-	gpgkey=https://packages.cloud.google.com/yum/doc/yum-key.gpg
-		https://packages.cloud.google.com/yum/doc/rpm-package-key.gpg
-	EOM
-
+	SRC="https://dl.google.com/dl/cloudsdk/channels/rapid/downloads/google-cloud-cli-linux-x86_64.tar.gz"
+	echo "Source URL: $${SRC}"
+	# wget the file and save it to the specified location. use progress bar and retry on failure. suppress output except for errors.
+	$(WGET) $${SRC} -O $@
