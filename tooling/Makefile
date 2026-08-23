@@ -33,7 +33,7 @@ init: latest/fedora-toolbox.json
 	--env lang=C.UTF-8 $(WORKING_CONTAINER)
 	echo '✅ Base image pulled and working container created'
 
-build-tools: init lists gh gcloud
+build-tools: init lists gh google-cloud-cli
 	# verify that the container is working and has the expected tools
 	$(RUN) which ledger &>/dev/null
 	printf '✅ %s toolbox built from: %s\n'  $@ $(WORKING_CONTAINER)
