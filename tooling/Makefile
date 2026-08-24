@@ -60,7 +60,6 @@ google-cloud-cli: files/google-cloud-cli.tar.gz
 	$(RUN) whereis gcloud &> /dev/null
 	$(RUN) which gcloud &> /dev/null
 
-cd files && tar xz --strip-components=1 -C google-cloud-cli -f google-cloud-cli.tar.gz
 
 	$(TAR) files/google-cloud-cli.tar.gz /files/google-cloud-cli
 	ls -l /files/google-cloud-cli
