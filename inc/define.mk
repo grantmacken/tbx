@@ -6,7 +6,7 @@ INFO    := $(RUN) dnf info
 # LINK    := $(RUN) ln -s $(shell which host-spawn)
 ADD    := buildah add --chmod 755 $(WORKING_CONTAINER)
 RW_ADD := buildah add --chmod  644 $(WORKING_CONTAINER)
-WGET   := wget -q --no-check-certificate --timeout=10 --tries=3
+WGET   := wget -q --no-check-certificate --timeout=10 --tries=3 --waitretry=5
 # everything is site dir
 # DIR_SITE   := /usr/share/nvim/site
 DIR_BIN    := /usr/local/bin

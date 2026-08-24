@@ -52,18 +52,13 @@ gh:
 
 google-cloud-cli: files/google-cloud-cli.tar.gz
 	mkdir -p files/google-cloud-cli
-	$(TAR) google-cloud-cli -f $<
+	$(TAR) files/google-cloud-cli -f $<
 	$(ADD) files/google-cloud-cli /usr/local/share/google-cloud-cli
 	$(RUN) /usr/local/share/google-cloud-cli/install.sh --quiet
 	# success|failure check
 	$(RUN) gcloud --version &> /dev/null
 	$(RUN) whereis gcloud &> /dev/null
 	$(RUN) which gcloud &> /dev/null
-
-
-	$(TAR) files/google-cloud-cli.tar.gz /files/google-cloud-cli
-	ls -l /files/google-cloud-cli
-	false
 	# $(ADD) files/google-cloud-cli /usr/local/share/google-cloud-cli
 	# $(RUN) /usr/local/google-cloud-cli/install.sh --quiet
 	# # success|failure check
