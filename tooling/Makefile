@@ -50,11 +50,10 @@ gh:
 	$(RUN) dnf config-manager addrepo --from-repofile=https://cli.github.com/packages/rpm/gh-cli.repo &> /dev/null
 	$(INSTALL) gh --repo gh-cli &>  /dev/null
 
-google-cloud-cli:
-	mkdir -p files
-	SRC="https://dl.google.com/dl/cloudsdk/channels/rapid/downloads/google-cloud-cli-linux-x86_64.tar.gz"
-	$(WGET) $${SRC} -O- | $(TAR) files/google-cloud-cli
-	$(ADD) files/google-cloud-cli /usr/local/share/google-cloud-cli
+google-cloud-cli: files/google-cloud-cli.tar.gz
+	$(TAR) files/google-cloud-cli.tar.gz /files/google-cloud-cli
+	ls -l /files/google-cloud-cli
+	# $(ADD) files/google-cloud-cli /usr/local/share/google-cloud-cli
 	# $(RUN) /usr/local/google-cloud-cli/install.sh --quiet
 	# # success|failure check
 	# # Note the binary is named 'gcloud'
