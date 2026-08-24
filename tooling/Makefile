@@ -52,10 +52,9 @@ gh:
 
 google-cloud-cli:
 	mkdir -p files
+	SRC="https://dl.google.com/dl/cloudsdk/channels/rapid/downloads/google-cloud-cli-linux-x86_64.tar.gz"
 	$(WGET) $${SRC} -O- | $(TAR) files/google-cloud-cli
-	$(RUN) ls -l files/google-cloud-cli
-	false
-	# $(ADD) files/google-cloud-cli /usr/local/google-cloud-cli
+	$(ADD) files/google-cloud-cli /usr/local/share/google-cloud-cli
 	# $(RUN) /usr/local/google-cloud-cli/install.sh --quiet
 	# # success|failure check
 	# # Note the binary is named 'gcloud'
@@ -63,3 +62,9 @@ google-cloud-cli:
 	# $(RUN) whereis gcloud &> /dev/null
 	# $(RUN) which gcloud &> /dev/null
 
+files/google-cloud-cli.tar.gz:
+	mkdir -p $(dir $@)
+	SRC="https://dl.google.com/dl/cloudsdk/channels/rapid/downloads/google-cloud-cli-linux-x86_64.tar.gz"
+	echo "Source URL: $${SRC}"
+	# wget the file and save it to the specified location. use progress bar and retry on failure. suppress output except for errors.
+	$(WGET) $${SRC} -O $@
