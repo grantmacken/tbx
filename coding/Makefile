@@ -257,7 +257,7 @@ info/bash-language-server.md:
 
 
 pi-coding-agent: info/pi-coding-agent.md
-info/pi-coding-agent.md
+info/pi-coding-agent.md:
 	# echo '##[ $(basename $(notdir $@)) ]##'
 	PKG=$(basename $(notdir $@))
 	JSON=$$($(RUN) npm view --json @earendil-works/pi-coding-agent | jq '.')
