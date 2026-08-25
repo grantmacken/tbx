@@ -257,7 +257,7 @@ info/bash-language-server.md:
 
 
 pi-coding-agent: info/pi-coding-agent.md
-info/pi-coding-agentt.md:
+info/pi-coding-agent.md
 	# echo '##[ $(basename $(notdir $@)) ]##'
 	PKG=$(basename $(notdir $@))
 	JSON=$$($(RUN) npm view --json @earendil-works/pi-coding-agent | jq '.')
@@ -269,7 +269,6 @@ info/pi-coding-agentt.md:
 	# success|failure check
 	$(RUN) $${PKG} --version &> /dev/null
 	$(call to_info,$${PKG},$${VER},$${SUM})
-
 
 copilot: info/copilot.md
 info/copilot.md:
