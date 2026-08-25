@@ -259,16 +259,16 @@ info/bash-language-server.md:
 pi-coding-agent: info/pi-coding-agent.md
 info/pi-coding-agent.md:
 	# echo '##[ $(basename $(notdir $@)) ]##'
-	PKG=$(basename $(notdir $@))
 	JSON=$$($(RUN) npm view --json @earendil-works/pi-coding-agent | jq '.')
+	npm view --json @earendil-works/pi-coding-agent | jq '.name'
 	# extract 'name', 'version', 'description' into to a table row
-	NAME=$$(echo $$JSON | jq -r '.name')
+	NAME=$(basename $(notdir $@))
 	VER=$$(echo $$JSON | jq -r '."dist-tags".latest')
 	SUM='minimal agent harness'
-	$(RUN) npm install --global --ignore-scripts $${NAME} &> /dev/null
+	$(RUN) npm install --global --ignore-scripts @earendil-works/pi-coding-agent
 	# success|failure check
-	$(RUN) $${PKG} --version &> /dev/null
-	$(call to_info,$${PKG},$${VER},$${SUM})
+	$(RUN) pi --version &> /dev/null
+	$(call to_info,$${NAME},$${VER},$${SUM})
 
 copilot: info/copilot.md
 info/copilot.md:
