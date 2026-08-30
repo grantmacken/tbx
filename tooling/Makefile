@@ -50,16 +50,22 @@ gh:
 	$(RUN) dnf config-manager addrepo --from-repofile=https://cli.github.com/packages/rpm/gh-cli.repo &> /dev/null
 	$(INSTALL) gh --repo gh-cli &>  /dev/null
 
-google-cloud-cli: files/google-cloud-cli.tar.gz
+
+google-cloud-cli: info/google-cloud-cli.md
+info/google-cloud-cli.md: files/google-cloud-cli.tar.gz
 	mkdir -p files/google-cloud-cli
 	$(TAR) files/google-cloud-cli -f $<
 	$(ADD) files/google-cloud-cli /usr/local/share/google-cloud-cli
 	$(RUN) ls -al /usr/local/share/google-cloud-cli
-	$(RUN) /usr/local/share/google-cloud-cli/install.sh --quiet
+	$(RUN) /usr/local/share/google-cloud-cli/install.sh --quiet | tee $@
 	# success|failure check
-	$(RUN) bash -lc 'source /usr/local/share/google-cloud-cli/path.bash.inc && gcloud --version'
 	$(RUN) bash -lc 'source /usr/local/share/google-cloud-cli/path.bash.inc && whereis gcloud'
 	$(RUN) bash -lc 'source /usr/local/share/google-cloud-cli/path.bash.inc && which gcloud'
+	NAME=google-cloud-cli
+	VER=$$(grep -oP 'Your current Google Cloud CLI version is: \K.*' $@)
+	SUM='Google Cloud CLI'
+	echo "Name: $${NAME}, Version: $${VER}, Summary: $${SUM}"
+	$(call to_info,$${PKG},$${VER},$${SUM})
 
 
 files/google-cloud-cli.tar.gz:
