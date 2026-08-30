@@ -66,6 +66,7 @@ info/google-cloud-cli.md: files/google-cloud-cli.tar.gz
 	SUM='Google Cloud CLI'
 	echo "Name: $${NAME}, Version: $${VER}, Summary: $${SUM}"
 	$(call to_info,$${PKG},$${VER},$${SUM})
+	false
 
 
 files/google-cloud-cli.tar.gz:
