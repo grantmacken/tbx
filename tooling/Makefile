@@ -57,13 +57,12 @@ info/google-cloud-cli.md: files/google-cloud-cli.tar.gz
 	$(TAR) files/google-cloud-cli -f $<
 	$(ADD) files/google-cloud-cli /usr/local/share/google-cloud-cli
 	$(RUN) ls -al /usr/local/share/google-cloud-cli
-	$(RUN) /usr/local/share/google-cloud-cli/install.sh --quiet | tee $@
-	# success|failure check
-	$(RUN) bash -lc 'source /usr/local/share/google-cloud-cli/path.bash.inc && whereis gcloud'
-	$(RUN) bash -lc 'source /usr/local/share/google-cloud-cli/path.bash.inc && which gcloud'
 	NAME=google-cloud-cli
-	VER=$$(grep -oP 'Your current Google Cloud CLI version is: \K.*' $@)
-	SUM='Google Cloud CLI'
+	VER=$$($(RUN) cat /usr/local/share/google-cloud-cli/VERSION)
+	SUM='gcloud command line interface'
+	# $(RUN) /usr/local/share/google-cloud-cli/install.sh --quiet
+	# success|failure check
+	#$(RUN) bash -lc 'source /usr/local/share/google-cloud-cli/path.bash.inc && which gcloud'
 	echo "Name: $${NAME}, Version: $${VER}, Summary: $${SUM}"
 	$(call to_info,$${PKG},$${VER},$${SUM})
 	false
