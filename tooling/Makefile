@@ -61,6 +61,7 @@ gh:
 # NOTE: install from toolbox container. 
 google-cloud-cli: info/google-cloud-cli.md
 info/google-cloud-cli.md: files/google-cloud-cli.tar.gz
+	mkdir -p $(dir $@)
 	mkdir -p files/google-cloud-cli
 	$(TAR) files/google-cloud-cli -f $<
 	rm -f $<
