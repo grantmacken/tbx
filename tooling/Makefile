@@ -70,8 +70,9 @@ info/google-cloud-cli.md: files/google-cloud-cli.tar.gz
 	NAME=google-cloud-cli
 	VER=$$($(RUN) cat /usr/local/share/google-cloud-cli/VERSION)
 	SUM='gcloud command line interface'
-	echo "Name: $${NAME}, Version: $${VER}, Summary: $${SUM}"
-	$(call to_info,$${NAME},$${VER},$${SUM})
+	echo "Name: $${NAME}" > $@
+	echo "Version: $${VER}" >> $@
+	echo "Summary: $${SUM}" >> $@
 
 
 files/google-cloud-cli.tar.gz:
