@@ -57,9 +57,10 @@ google-cloud-cli: files/google-cloud-cli.tar.gz
 	$(RUN) ls -al /usr/local/share/google-cloud-cli
 	$(RUN) /usr/local/share/google-cloud-cli/install.sh --quiet
 	# success|failure check
-	$(RUN) gcloud --version
-	$(RUN) whereis gcloud
-	$(RUN) which gcloud
+	$(RUN) bash -lc 'source /usr/local/share/google-cloud-cli/path.bash.inc && gcloud --version'
+	$(RUN) bash -lc 'source /usr/local/share/google-cloud-cli/path.bash.inc && whereis gcloud'
+	$(RUN) bash -lc 'source /usr/local/share/google-cloud-cli/path.bash.inc && which gcloud'
+
 
 files/google-cloud-cli.tar.gz:
 	mkdir -p $(dir $@)
