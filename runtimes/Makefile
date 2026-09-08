@@ -137,10 +137,9 @@ info/elixir.md: latest/elixir.json
 	TARBALL_URL=$$(jq -r '.tarball_url' $<)
 	# SRC=https://github.com/elixir-lang/elixir/archive/$${TAGNAME}.tar.gz
 	mkdir -p files/elixir && $(WGET) $${TARBALL_URL} -O- | $(TAR) files/elixir &>/dev/null
-	ls -al files/elixir
 	$(RUN) mkdir -p /tmp/elixir
 	$(ADD) files/elixir /tmp/elixir &>/dev/null
-	$(RUN) sh -c 'cd /tmp/elixir && make && make install'
+	$(RUN) sh -c 'cd /tmp/elixir && make && make install' &>/dev/null
 	$(RUN) rm -fR /tmp/elixir
 	# success|failure check
 	$(RUN) elixir --version
