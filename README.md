@@ -32,7 +32,7 @@ The building toolbox container provides three tooling categories
 | zoxide                  | 0.9.8    | Smarter cd command for your terminal                                                  |
 | ledger                  | 3.4.1    | A powerful command-line double-entry accounting system                                |
 | w3m                     | 0.5.3    | Pager with Web browsing abilities                                                     |
-| google-cloud-cli        | 583.0.0  | gcloud command line interface                                                         |
+| google-cloud-cli        | 584.0.0  | gcloud command line interface                                                         |
 # runtimes
 
 ```
@@ -105,13 +105,13 @@ Once inside the toolbox, you can start Using neovim and other installed tools fo
 | Name                    | Version  | Summary                                                                               |
 | ----                    | -------  | -------                                                                               |
 | neovim                  | 0.13.0   | Neovim text editor                                                                    |
-| harper-ls               | 2.9.1    | 'Harper Language Server Grammar Checker'                                              |
+| harper-ls               | 2.10.0   | 'Harper Language Server Grammar Checker'                                              |
 | lua-language-server     | 3.15.0   | 'Lua language server'                                                                 |
-| tombi                   | v1.5.2   | "TOML Formatter                                                                       |
+| tombi                   | v1.5.5   | "TOML Formatter                                                                       |
 | mbake                   | v1.4.6   | Makefile formatter and linter                                                         |
 | bash-language-server    | 5.6.0    | A language server for Bash                                                            |
 | copilot                 | 1.0.83   | GitHub Copilot CLI brings the power of Copilot coding agent directly to your terminal. |
-| copilot-language-server | 1.543.0  | Your AI pair programmer                                                               |
+| copilot-language-server | 1.545.0  | Your AI pair programmer                                                               |
 | tree-sitter-cli         | 0.27.0   | CLI for generating fast incremental parsers                                           |
 | vscode-langservers      | 4.10.0   | HTML/CSS/JSON/ESLint language servers extracted from [vscode](https://github.com/Microsoft/vscode). |
 | yaml-language-server    | 1.24.0   | YAML language server                                                                  |
