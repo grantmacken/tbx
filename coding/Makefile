@@ -178,7 +178,7 @@ latest/harper-ls.json:
 
 info/harper-ls.md: latest/harper-ls.json
 	PKG=$(basename $(notdir $@))
-	SRC=$(shell $(call bdu,"harper-ls-x86_64-unknown-linux-gnu.tar.gz",$<))
+	SRC=$(shell $(call bduName,"harper-ls-x86_64-unknown-linux-gnu.tar.gz",$<))
 	TARGET="files/$${PKG}/usr/local/bin"
 	mkdir -p $${TARGET}
 	$(WGET) $${SRC} -O- | $(TAR_NO_STRIP) $${TARGET} &> /dev/null

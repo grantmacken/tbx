@@ -156,7 +156,7 @@ latest/erlang-rebar3.json:
 
 info/erlang-rebar3.md: latest/erlang-rebar3.json
 	echo '##[ $(basename $(notdir $@)) ]##'
-	SRC=$(shell $(call bdu,rebar3,$<))
+	SRC=$(shell $(call bduName,rebar3,$<))
 	$(ADD) $${SRC} /usr/local/bin/rebar3 &>/dev/null
 	# success|failure check
 	$(RUN) rebar3 --version &>/dev/null
