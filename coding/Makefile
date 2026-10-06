@@ -147,12 +147,12 @@ latest/lua-language-server.json:
 # @see isssue https://github.com/LuaLS/lua-language-server/issues/3301
 # latest/lua-language-server.json
 
-info/lua-language-server.md:
+info/lua-language-server.md: latest/lua-language-server.json
 	# echo '##[ $(basename $(notdir $@)) ]##'
 	PKG=$(basename $(notdir $@))
 	# echo " - Binary Name:  $${PKG}"
-	# SRC=$(shell $(call bdu,linux-x64.tar.gz,$<))
-	SRC="https://github.com/LuaLS/lua-language-server/releases/download/3.15.0/lua-language-server-3.15.0-linux-x64.tar.gz"
+	SRC=$(shell $(call bduContains,linux-x64.tar.gz,$<))
+	# SRC="https://github.com/LuaLS/lua-language-server/releases/download/3.15.0/lua-language-server-3.15.0-linux-x64.tar.gz"
 	# echo " - Download Url: $${SRC}"
 	TARGET="files/$${PKG}/usr/local/$${PKG}"
 	mkdir -p "$${TARGET}"
@@ -178,7 +178,7 @@ latest/harper-ls.json:
 
 info/harper-ls.md: latest/harper-ls.json
 	PKG=$(basename $(notdir $@))
-	SRC=$(shell $(call bdu,"harper-ls-x86_64-unknown-linux-gnu",$<))
+	SRC=$(shell $(call bdu,"harper-ls-x86_64-unknown-linux-gnu.tar.gz",$<))
 	TARGET="files/$${PKG}/usr/local/bin"
 	mkdir -p $${TARGET}
 	$(WGET) $${SRC} -O- | $(TAR_NO_STRIP) $${TARGET} &> /dev/null
