@@ -32,7 +32,7 @@ The building toolbox container provides three tooling categories
 | zoxide                  | 0.9.8    | Smarter cd command for your terminal                                                  |
 | ledger                  | 3.4.1    | A powerful command-line double-entry accounting system                                |
 | w3m                     | 0.5.3    | Pager with Web browsing abilities                                                     |
-| google-cloud-cli        | 587.0.0  | gcloud command line interface                                                         |
+| google-cloud-cli        | 588.0.0  | gcloud command line interface                                                         |
 # runtimes
 
 ```
@@ -75,8 +75,8 @@ It is designed to be a modern alternative to pip and poetry.
 | erlang                  | OTP-29.1.1 | General-purpose programming language and runtime environment                          |
 | rebar3                  | 3.27.1   | Tool for working with Erlang projects                                                 |
 | elixir                  | 1.20.4   | A modern approach to programming for the Erlang VM                                    |
-| gleam                   | 1.19.0   | Gleam programming language                                                            |
-| golang                  | 1.26.8   | The Go Programming Language                                                           |
+| gleam                   | 1.19.1   | Gleam programming language                                                            |
+| golang                  | 1.26.9   | The Go Programming Language                                                           |
 | nodejs                  | 22.23.1  | JavaScript runtime                                                                    |
 | uv                      | 0.12.19  | An extremely fast Python package installer and resolver, written in Rust              |
 # tbx-coding: a toolbox for coding
@@ -107,14 +107,14 @@ Once inside the toolbox, you can start Using neovim and other installed tools fo
 | neovim                  | 0.13.0   | Neovim text editor                                                                    |
 | harper-ls               | 2.12.0   | 'Harper Language Server Grammar Checker'                                              |
 | lua-language-server     | 3.19.1   | 'Lua language server'                                                                 |
-| tombi                   | v1.7.2   | "TOML Formatter                                                                       |
+| tombi                   | v1.8.0   | "TOML Formatter                                                                       |
 | mbake                   | v1.4.6   | Makefile formatter and linter                                                         |
 | bash-language-server    | 5.8.1    | A language server for Bash                                                            |
-| copilot                 | 1.0.92   | GitHub Copilot CLI brings the power of Copilot coding agent directly to your terminal. |
-| copilot-language-server | 1.551.2  | Your AI pair programmer                                                               |
-| tree-sitter-cli         | 0.27.0   | CLI for generating fast incremental parsers                                           |
+| copilot                 | 1.0.95   | GitHub Copilot CLI brings the power of Copilot coding agent directly to your terminal. |
+| copilot-language-server | 1.552.0  | Your AI pair programmer                                                               |
+| tree-sitter-cli         | 0.27.1   | CLI for generating fast incremental parsers                                           |
 | vscode-langservers      | 4.10.0   | HTML/CSS/JSON/ESLint language servers extracted from [vscode](https://github.com/Microsoft/vscode). |
-| yaml-language-server    | 1.24.0   | YAML language server                                                                  |
-| pi-coding-agent         | 1.0.4    | minimal agent harness                                                                 |
+| yaml-language-server    | 1.25.0   | YAML language server                                                                  |
+| pi-coding-agent         | 1.1.0    | minimal agent harness                                                                 |
 | ShellCheck              | 0.11.0   | Shell script analysis tool                                                            |
 | shfmt                   | 3.7.0    | Shell formatter                                                                       |
