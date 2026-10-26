@@ -10,18 +10,16 @@ DEVEL := libicu gettext-devel glibc-devel libevent-devel ncurses-devel openssl-d
 DNF_LIST := gh $(TOOLS)
 MD_LIST = google-cloud-cli
 
-default: build-tools
+default: build-tools tooling-README.md
 	# verify that the container is working and has the expected tools
 	$(RUN) which ledger &>/dev/null
-	printf '✅ %s toolbox built from: %s\n' $@ $(WORKING_CONTAINER)
+	# printf '✅ %s toolbox built from: %s\n' $@ $(WORKING_CONTAINER)
 	# buildah commit $(WORKING_CONTAINER) ghcr.io/grantmacken/tbx:latest
 	# buildah push ghcr.io/grantmacken/tbx-$@:latest
 	# printf '✅ Image pushed to ghcr.io/grantmacken/tbx-%s:latest\n' $@
-
-
-tooling/README.md: build-tools
+tooling-README.md: build-tools
 	echo '##[ $@ ]##'
-	cat tooling/preamble.md > $@
+	cat tooling-preable.md > $@
 	$(file >> $@,The following applications are included in this toolbox: )
 	$(call tr,"Name","Version","Summary", $@)
 	$(call tr,"----","-------","-------", $@)
@@ -31,19 +29,19 @@ tooling/README.md: build-tools
 	done
 	for app in $(MD_LIST)
 	do
-	NAME=$$(cat tooling/info/$${app}.md | grep -oP '^Name:\s\K.+' || true)
-	VER=$$(cat tooling/info/$${app}.md | grep -oP '^Version:\s\K.+' || true)
-	SUM=$$(cat tooling/info/$${app}.md | grep -oP '^Summary:\s\K.+' || true)
+	NAME=$$(cat info/$${app}.md | grep -oP '^Name:\s\K.+' || true)
+	VER=$$(cat info/$${app}.md | grep -oP '^Version:\s\K.+' || true)
+	SUM=$$(cat info/$${app}.md | grep -oP '^Summary:\s\K.+' || true)
 	$(call tr,$${NAME},$${VER},$${SUM},$@)
 	done
-	echo '✅ README.md created'
+	echo '✅ tooling-README.md created'
 
-tooling/latest/fedora-toolbox.json:
+latest/fedora-toolbox.json:
 	echo '##[ $@ ]##'
 	mkdir -p $(dir $@)
 	skopeo inspect docker://registry.fedoraproject.org/fedora-toolbox:latest | jq '.' > $@
 
-init: tooling/latest/fedora-toolbox.json
+init: latest/fedora-toolbox.json
 	FROM_REGISTRY=$$(cat $< | jq -r '.Name')
 	buildah from "$${FROM_REGISTRY}:latest"
 	buildah config \
@@ -53,6 +51,7 @@ init: tooling/latest/fedora-toolbox.json
 	echo '✅ Base image pulled and working container created'
 
 build-tools: init lists gh google-cloud-cli
+
 
 lists:
 	$(INSTALL) $(DEVEL) &>/dev/null
@@ -64,13 +63,13 @@ gh:
 	$(INSTALL) gh --repo gh-cli &> /dev/null
 
 # NOTE: install from toolbox container.
-google-cloud-cli: tooling/info/google-cloud-cli.md
-tooling/info/google-cloud-cli.md: tooling/files/google-cloud-cli.tar.gz
+google-cloud-cli: info/google-cloud-cli.md
+info/google-cloud-cli.md: files/google-cloud-cli.tar.gz
 	mkdir -p $(dir $@)
-	mkdir -p tooling/files/google-cloud-cli
-	$(TAR) tooling/files/google-cloud-cli -f $<
+	mkdir -p files/google-cloud-cli
+	$(TAR) files/google-cloud-cli -f $<
 	rm -f $<
-	$(ADD) tooling/files/google-cloud-cli /usr/local/share/google-cloud-cli
+	$(ADD) files/google-cloud-cli /usr/local/share/google-cloud-cli
 	$(RUN) ls -al /usr/local/share/google-cloud-cli
 	NAME=google-cloud-cli
 	VER=$$($(RUN) cat /usr/local/share/google-cloud-cli/VERSION)
@@ -78,7 +77,7 @@ tooling/info/google-cloud-cli.md: tooling/files/google-cloud-cli.tar.gz
 	echo "Name: $${NAME}, Version: $${VER}, Summary: $${SUM}"
 	$(call to_info,$${NAME},$${VER},$${SUM})
 
-tooling/files/google-cloud-cli.tar.gz:
+files/google-cloud-cli.tar.gz:
 	mkdir -p $(dir $@)
 	SRC="https://dl.google.com/dl/cloudsdk/channels/rapid/downloads/google-cloud-cli-linux-x86_64.tar.gz"
 	echo "Source URL: $${SRC}"
