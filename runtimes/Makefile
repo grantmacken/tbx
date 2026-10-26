@@ -39,14 +39,6 @@ README.md: runtimes
 	done
 	echo '✅ README.md created'
 
-xxx:
-	# luarocks
-	LINE=$$($(RUN) luarocks | grep -oP '^Lua.+')
-	NAME=$$(cat info/luarocks.md | grep -oP '^Name\s+:\s+\K.+')
-	VER=$$($(RUN) luarocks --version | head -1 | cut -d' ' -f2)
-	SUM=$$(cat info/luarocks.md | grep -oP '^Summary\s+:\s+\K.+')
-	$(call tr,$${NAME},$${VER},$${SUM},$@)
-	echo '✅ README.md created'
 
 init:
 	echo '##[ $@ ]##'
@@ -88,15 +80,19 @@ latest/erlang.json:
 	echo '##[ $@ ]##'
 	mkdir -p $(dir $@)
 	# select tags that start with OTP- and sort by version, then take the first one
-	curl -fsSL 'https://api.github.com/repos/erlang/otp/tags?per_page=100' | jq -r '[.[] | select(.name | startswith("OTP-"))][0]' > $@
+	#otp_src_29.1.2.tar.gz OTP-29.1.2" 
+	$(WGET) https://api.github.com/repos/erlang/otp/releases/latest -O $@
+	# curl -fsSL 'https://api.github.com/repos/erlang/otp/tags?per_page=100' | jq -r '[.[] | select(.name | startswith("OTP-"))][0]' > $@
 
 info/erlang.md: latest/erlang.json
 	echo '##[ $@ ]##'
 	mkdir -p $(dir $@)
 	mkdir -p files/otp
-	TAG=$$(jq -r '.name' $<)
-	VER=$$(echo $${TAG} | cut -d'-' -f2)
-	SRC="https://github.com/erlang/otp/releases/download/$${TAG}/otp_src_$${VER}.tar.gz"
+	TAG_NAME=$$(jq -r '.tag_name' $<)
+	VER=$$(echo $${TAG_NAME} | cut -d'-' -f2)
+	NAME="otp_src_$${VER}.tar.gz"
+	SRC=$(shell $(call bduName,$${NAME},$<))
+	# SRC="https://github.com/erlang/otp/releases/download/$${TAG}/otp_src_$${VER}.tar.gz"
 	echo "Erlang/OTP Version: $${VER}"
 	echo "Source URL: $${SRC}"
 	$(WGET) $${SRC} -O- | $(TAR) files/otp &>/dev/null
@@ -196,45 +192,6 @@ info/golang.md:
 	# verify installation
 	$(RUN) go version &> /dev/null
 	$(INFO) --installed golang > $@
-
-lua_list: luajit luarocks
-
-luajit: info/luajit.md
-info/luajit.md:
-	echo '##[ $@ ]##'
-	mkdir -p $(dir $@)
-	$(INSTALL) luajit-devel luajit &>/dev/null
-	# success|failure check
-	$(RUN) luajit -v &>/dev/null
-	$(INFO) --installed luajit > $@
-
-##[[ LUAROCKS ]]##
-luarocks: info/luarocks.md
-latest/luarocks.json:
-	echo '##[ $@ ]##'
-	mkdir -p $(dir $@)
-	$(WGET) https://api.github.com/repos/luarocks/luarocks/tags -o- | jq '.[0]' > $@
-
-info/luarocks.md: latest/luarocks.json
-	echo '##[ $@ ]##'
-	mkdir -p $(dir $@)
-	mkdir -p files/luarocks
-	SRC=$$(jq -r '.tarball_url' $<)
-	$(RUN) mkdir -p 	/tmp/luarocks /etc/xdg/luarocks
-	$(WGET) $${SRC} -O- | tar xz --strip-components=1 -C files/luarocks &>/dev/null
-	$(ADD) files/luarocks /tmp/luarocks &>/dev/null
-	$(RUN) sh -c 'cd /tmp/luarocks && ./configure \
-		--lua-version=5.1 \
-		--with-lua-interpreter=luajit \
-		--sysconfdir=/etc/xdg \
-		--force-config \
-		--with-lua-include=/usr/include/luajit-2.1' &>/dev/null
-	# $(RUN) sh -c 'cd /tmp && make bootstrap' &>/dev/null
-	$(RUN) sh -c 'cd /tmp/luarocks && make && make install' &>/dev/null
-	$(RUN) rm -fR tmp/luarocks
-	# success|failure check
-	$(RUN) luarocks --version &>/dev/null
-	$(INFO) luarocks > $@
 
 # rust:
 # 	echo '##[ $@ ]##'
