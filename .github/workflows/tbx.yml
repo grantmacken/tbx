@@ -22,3 +22,5 @@ jobs:
           username: ${{ github.repository_owner }}
           password: ${{ github.token }}
       - uses: actions/checkout@v4
+      - name: buildah toolbox build
+        run: make
