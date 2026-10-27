@@ -183,132 +183,6 @@ info/neovim.md:
 	VER=$$($(RUN) nvim -v | grep -oP 'NVIM v\K\d+\.\d+\.\d+' )
 	$(call to_info,$${PKG},$${VER},Neovim text editor)
 
-
-
-# # NOTE: install from toolbox container.
-# google-cloud-cli: info/google-cloud-cli.md
-# info/google-cloud-cli.md: files/google-cloud-cli.tar.gz
-# 	mkdir -p $(dir $@)
-# 	mkdir -p files/google-cloud-cli
-# 	$(TAR) files/google-cloud-cli -f $<
-# 	rm -f $<
-# 	$(ADD) files/google-cloud-cli /usr/local/share/google-cloud-cli
-# 	$(RUN) ls -al /usr/local/share/google-cloud-cli
-# 	NAME=google-cloud-cli
-# 	VER=$$($(RUN) cat /usr/local/share/google-cloud-cli/VERSION)
-# 	SUM='gcloud command line interface'
-# 	echo "Name: $${NAME}, Version: $${VER}, Summary: $${SUM}"
-# 	$(call to_info,$${NAME},$${VER},$${SUM})
-#
-# files/google-cloud-cli.tar.gz:
-# 	mkdir -p $(dir $@)
-# 	SRC="https://dl.google.com/dl/cloudsdk/channels/rapid/downloads/google-cloud-cli-linux-x86_64.tar.gz"
-# 	echo "Source URL: $${SRC}"
-# 	# wget the file and save it to the specified location. use progress bar and retry on failure. suppress output except for errors.
-# 	$(WGET) $${SRC} -O $@
-#
-#
-# otp_list: erlang elixir erlang-rebar3 gleam
-#
-# erlang: info/erlang.md
-#
-# latest/erlang.json:
-# 	echo '##[ $@ ]##'
-# 	mkdir -p $(dir $@)
-# 	$(WGET) https://api.github.com/repos/erlang/otp/releases/latest -O $@
-#
-# info/erlang.md: latest/erlang.json
-# 	echo '##[ $@ ]##'
-# 	mkdir -p $(dir $@)
-# 	mkdir -p files/otp
-# 	TAG_NAME=$$(jq -r '.tag_name' $<)
-# 	VER=$$(echo $${TAG_NAME} | cut -d'-' -f2)
-# 	NAME="otp_src_$${VER}.tar.gz"
-# 	SRC=$(shell $(call bduName,$${NAME},$<))
-# 	echo "Erlang/OTP Version: $${VER}"
-# 	echo "Source URL: $${SRC}"
-# 	$(WGET) $${SRC} -O- | $(TAR) files/otp &>/dev/null
-# 	$(ADD) files/otp /tmp/otp &>/dev/null
-# 	$(RUN) sh -c 'cd /tmp/otp && ./configure \
-# 		--prefix=/usr/local \
-# 		--enable-threads \
-# 		--enable-shared-zlib \
-# 		--enable-ssl=dynamic-ssl-lib \
-# 		--enable-jit \
-# 		--enable-kernel-poll \
-# 		--without-debugger \
-# 		--without-observer \
-# 		--without-wx \
-# 		--without-et \
-# 		--without-megaco \
-# 		--without-cosEvent \
-# 		--without-odbc' &>/dev/null
-# 	$(RUN) sh -c 'cd /tmp/otp && make && make install' &>/dev/null
-# 	$(RUN) erl -eval 'erlang:display(erlang:system_info(otp_release)), halt().' -noshell &>/dev/null
-# 	$(RUN) rm -fR /tmp/otp
-# 	$(INFO) erlang > $@
-#
-# elixir: info/elixir.md
-#
-# latest/elixir.json:
-# 	echo '##[ $@ ]##'
-# 	mkdir -p $(dir $@)
-# 	$(WGET) https://api.github.com/repos/elixir-lang/elixir/releases/latest -O $@
-#
-# info/elixir.md: latest/elixir.json
-# 	echo '##[ $@ ]##'
-# 	mkdir -p $(dir $@)
-# 	TAGNAME=$$(jq -r '.tag_name' $<)
-# 	TARBALL_URL=$$(jq -r '.tarball_url' $<)
-# 	mkdir -p files/elixir && $(WGET) $${TARBALL_URL} -O- | $(TAR) files/elixir &>/dev/null
-# 	$(RUN) mkdir -p /tmp/elixir
-# 	$(ADD) files/elixir /tmp/elixir &>/dev/null
-# 	$(RUN) sh -c 'cd /tmp/elixir && make && make install' &>/dev/null
-# 	$(RUN) rm -fR /tmp/elixir
-# 	$(RUN) elixir --version
-# 	$(RUN) mix --version
-# 	$(INFO) elixir > $@
-#
-# erlang-rebar3: info/erlang-rebar3.md
-#
-# latest/erlang-rebar3.json:
-# 	echo '##[ $@ ]##'
-# 	mkdir -p $(dir $@)
-# 	$(WGET) https://api.github.com/repos/erlang/rebar3/releases/latest -O $@
-#
-# info/erlang-rebar3.md: latest/erlang-rebar3.json
-# 	echo '##[ $(basename $(notdir $@)) ]##'
-# 	mkdir -p $(dir $@)
-# 	SRC=$(shell $(call bduName,rebar3,$<))
-# 	$(ADD) $${SRC} /usr/local/bin/rebar3 &>/dev/null
-# 	$(RUN) rebar3 --version &>/dev/null
-# 	$(INFO) erlang-rebar3 > $@
-#
-# gleam: info/gleam.md
-#
-# latest/gleam.json:
-# 	echo '##[ $@ ]##'
-# 	mkdir -p $(dir $@)
-# 	$(WGET) https://api.github.com/repos/gleam-lang/gleam/releases/latest -O- |
-# 	jq -r '.assets[] | select(.name | endswith("x86_64-unknown-linux-musl.tar.gz"))' > $@
-#
-# files/gleam/gleam: latest/gleam.json
-# 	echo '##[ $@ ]##'
-# 	mkdir -p $(dir $@)
-# 	$(RUN) rm -f /usr/local/bin/gleam
-# 	SRC=$$(jq -r '.browser_download_url' $<)
-# 	curl -L "$${SRC}" | tar xz -C $(dir $@) &>/dev/null
-# 	test -f $@
-#
-# info/gleam.md: files/gleam/gleam
-# 	echo '##[ $@ ]##'
-# 	mkdir -p $(dir $@)
-# 	$(ADD) files/gleam/gleam /usr/local/bin/gleam &>/dev/null
-# 	$(RUN) chmod +x /usr/local/bin/gleam
-# 	$(RUN) gleam --version &>/dev/null
-# 	VER=$$($(RUN) gleam --version | awk '{print $$2}')
-# 	$(call to_info,gleam,$${VER},Gleam programming language)
-
 # harper-ls
 harper-ls: info/harper-ls.md
 
@@ -340,15 +214,13 @@ latest/lua-language-server.json:
 info/lua-language-server.md: latest/lua-language-server.json
 	# echo '##[ $(basename $(notdir $@)) ]##'
 	PKG=$(basename $(notdir $@))
-	# echo " - Binary Name:  $${PKG}"
 	SRC=$(shell $(call bduContains,linux-x64.tar.gz,$<))
-	# SRC="https://github.com/LuaLS/lua-language-server/releases/download/3.15.0/lua-language-server-3.15.0-linux-x64.tar.gz"
-	# echo " - Download Url: $${SRC}"
 	TARGET="files/$${PKG}/usr/local/$${PKG}"
 	mkdir -p "$${TARGET}"
 	$(WGET) $${SRC} -O- | $(TAR_NO_STRIP) $${TARGET}
-	$(ADD) files/$${PKG} &> /dev/null
-	# note the lua-language-server binary is in /usr/local/$${PKG}/bin/ subdir
+	$(RUN) echo '#!/usr/bin/bash > /dev/null' > /usr/local/bin/lua-language-server
+	$(RUN) echo 'exec "/usr/local/lua-language-server/bin/lua-language-server" "$@" > /dev/null' >> /usr/local/bin/lua-language-server
+	$(RUN) chmod +x /usr/local/bin/lua-language-server
 	# the exec script in /usr/local/bin/lua-language-server will point to it
 	# these scripts are added in init target
 	# # success|failure check
