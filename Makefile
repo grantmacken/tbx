@@ -9,11 +9,9 @@ DEVEL := libicu gettext-devel glibc-devel libevent-devel ncurses-devel openssl-d
 
 # packages installed via dnf - these are listed in the README.md table
 DNF_LIST := $(TOOLS) gh golang nodejs uv ShellCheck shfmt
-
-LANG_SERVERS := bash-language-server copilot-language-server vscode-langservers-extracted yaml-language-server
-NPM_LIST :=  $(LANG_SERVERS) pi-coding-agent tree-sitter-cli
+NPM_LIST :=  bash-language-server copilot-language-server vscode-langservers-extracted \
+			 yaml-language-server pi-coding-agent tree-sitter-cli
 RELEASE_BINARY_LIST := neovim harper-ls lua-language-server
-
 PKGS_LIST := $(NPM_LIST) $(RELEASE_BINARY_LIST)
 # MD_LIST = google-cloud-cli
 # OTP := erlang erlang-rebar3 elixir gleam
@@ -219,7 +217,6 @@ info/lua-language-server.md: latest/lua-language-server.json
 	TARGET="files/$${PKG}/usr/local/$${PKG}"
 	mkdir -p "$${TARGET}"
 	$(WGET) $${SRC} -O- | $(TAR_NO_STRIP) $${TARGET}
-	$(ADD) files/$${PKG} &> /dev/null
 	# the exec script in /usr/local/bin/lua-language-server will point to it
 	# these scripts are added in init target
 	# # success|failure check
