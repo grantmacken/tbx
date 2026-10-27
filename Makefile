@@ -11,7 +11,8 @@ DEVEL := libicu gettext-devel glibc-devel libevent-devel ncurses-devel openssl-d
 DNF_LIST := $(TOOLS) gh golang nodejs uv ShellCheck shfmt
 NPM_LIST :=  bash-language-server copilot-language-server vscode-langservers-extracted \
 			 yaml-language-server pi-coding-agent tree-sitter-cli
-RELEASE_BINARY_LIST := neovim harper-ls lua-language-server
+RELEASE_BINARY_LIST := neovim harper-ls # lua-language-server
+UV_TOOL_LIST :=  tombi  mbake
 PKGS_LIST := $(NPM_LIST) $(RELEASE_BINARY_LIST)
 # MD_LIST = google-cloud-cli
 # OTP := erlang erlang-rebar3 elixir gleam
@@ -22,7 +23,7 @@ default: TBX-README.md
 	# buildah push ghcr.io/grantmacken/tbx-$@:latest
 	# printf '✅ Image pushed to ghcr.io/grantmacken/tbx-%s:latest\n' $@
 
-TBX-README.md: init dnf_installs npm_installs binary_installs
+TBX-README.md: init dnf_installs npm_installs binary_installs uv_installs
 	echo '##[ $@ ]##'
 	$(file >> $@,The following applications are included in this toolbox: )
 	$(call tr,"Name","Version","Summary", $@)
@@ -74,9 +75,9 @@ runtime_list:
 coding_list:
 	$(INSTALL) ShellCheck shfmt &>/dev/null
 
+##########################################################################
+
 npm_installs: $(NPM_LIST)
-
-
 
 bash-language-server: info/bash-language-server.md
 info/bash-language-server.md:
@@ -211,6 +212,7 @@ latest/lua-language-server.json:
 	$(WGET) https://api.github.com/repos/LuaLS/lua-language-server/releases/latest -O- | jq '.' > $@
 
 info/lua-language-server.md: latest/lua-language-server.json
+	mkdir -p $(dir $@)
 	# echo '##[ $(basename $(notdir $@)) ]##'
 	PKG=$(basename $(notdir $@))
 	SRC=$(shell $(call bduContains,linux-x64.tar.gz,$<))
@@ -227,3 +229,54 @@ info/lua-language-server.md: latest/lua-language-server.json
 	# get version from the binary
 	VER=$$($(RUN) lua-language-server --version)
 	$(call to_info,$${PKG},$${VER},'Lua language server')
+
+tombi: info/tombi.md
+info/tombi.md:
+	# echo '##[ $(basename $(notdir $@)) ]##'
+	PKG=$(basename $(notdir $@))
+	$(RUN) uv tool install $${PKG} &> /dev/null
+	# success|failure check
+	$(RUN) which $${PKG} &> /dev/null
+	$(RUN) $${PKG} --version &> /dev/null
+	# $(RUN) uv tool list | grep $${PKG}
+	$(call uv_tool_info,$${PKG},"TOML Formatter, Linter, and Language Server")
+
+# specify-cli: info/specify-cli.md
+# info/specify-cli.md:
+# 	# echo '##[ $(basename $(notdir $@)) ]##'
+# 	PKG=$(basename $(notdir $@)) 
+# 	$(RUN) uv tool install $${PKG} --from git+https://github.com/github/spec-kit.git &> /dev/null
+# 	# success|failure check
+# 	# Note: the binary is named 'specify' not 'specify-cli'
+# 	$(RUN) which specify &> /dev/null
+# 	$(RUN) whereis specify &> /dev/null
+# 	$(call uv_tool_info,$${PKG},GitHub Spec Tool)
+#
+
+##########################################################################
+
+uv_installs:  $(UV_TOOL_LIST)
+
+mbake: info/mbake.md
+info/mbake.md:
+	# echo '##[ $(basename $(notdir $@)) ]##'
+	PKG=$(basename $(notdir $@)) 
+	$(RUN) uv tool install $${PKG} &> /dev/null
+	# success|failure check
+	$(RUN) which $${PKG} &> /dev/null
+	$(RUN) $${PKG} --version &> /dev/null
+	# extract 'name', 'version', 'summary'
+	$(call uv_tool_info,$${PKG},Makefile formatter and linter)
+
+
+tombi: info/tombi.md
+info/tombi.md:
+	# echo '##[ $(basename $(notdir $@)) ]##'
+	PKG=$(basename $(notdir $@))
+	$(RUN) uv tool install $${PKG} &> /dev/null
+	# success|failure check
+	$(RUN) which $${PKG} &> /dev/null
+	$(RUN) $${PKG} --version &> /dev/null
+	# $(RUN) uv tool list | grep $${PKG}
+	$(call uv_tool_info,$${PKG},"TOML Formatter, Linter, and Language Server")
+
