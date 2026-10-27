@@ -9,12 +9,9 @@ DEVEL := libicu gettext-devel glibc-devel libevent-devel ncurses-devel openssl-d
 
 # packages installed via dnf - these are listed in the README.md table
 DNF_LIST := $(TOOLS) gh golang nodejs uv ShellCheck shfmt
-NPM_LIST := bash-language-server
- copilot-language-server \
- tree-sitter-cli \
- vscode-langservers-extracted \
- yaml-language-server \
- pi-coding-agent
+
+LANG_SERVERS := bash-language-server copilot-language-server vscode-langservers-extracted yaml-language-server
+NPM_LIST :=  $(LANG_SERVERS) pi-coding-agent tree-sitter-cli
 
 
 RELEASE_BINARY_LIST := neovim harper-ls lua-language-server
