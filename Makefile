@@ -12,7 +12,7 @@ DNF_LIST := $(TOOLS) gh golang nodejs uv ShellCheck shfmt
 
 LANG_SERVERS := bash-language-server copilot-language-server vscode-langservers-extracted yaml-language-server
 NPM_LIST :=  $(LANG_SERVERS) pi-coding-agent tree-sitter-cli
-RELEASE_BINARY_LIST := neovim # harper-ls lua-language-server
+RELEASE_BINARY_LIST := neovim harper-ls lua-language-server
 
 PKGS_LIST := $(NPM_LIST) $(RELEASE_BINARY_LIST)
 # MD_LIST = google-cloud-cli
@@ -309,4 +309,53 @@ info/neovim.md:
 # 	VER=$$($(RUN) gleam --version | awk '{print $$2}')
 # 	$(call to_info,gleam,$${VER},Gleam programming language)
 
+# harper-ls
+harper-ls: info/harper-ls.md
 
+latest/harper-ls.json:
+	$(WGET) https://api.github.com/repos/Automattic/harper/releases/latest -O- | jq '.' > $@
+
+info/harper-ls.md: latest/harper-ls.json
+	PKG=$(basename $(notdir $@))
+	SRC=$(shell $(call bduName,"harper-ls-x86_64-unknown-linux-gnu.tar.gz",$<))
+	TARGET="files/$${PKG}/usr/local/bin"
+	mkdir -p $${TARGET}
+	$(WGET) $${SRC} -O- | $(TAR_NO_STRIP) $${TARGET} &> /dev/null
+	$(ADD) files/$${PKG} &> /dev/null
+	# success|failure caheck
+	$(RUN) which $${PKG} &> /dev/null
+	$(RUN) whereis $${PKG} &> /dev/null
+	$(RUN) $${PKG} --version &> /dev/null
+	# extract 'name', 'version', 'summary'
+	# get version from the binary
+	VER=$$($(RUN) harper-ls --version | cut -d' ' -f2)
+	$(call to_info,$${PKG},$${VER},'Harper Language Server Grammar Checker')
+
+lua-language-server: info/lua-language-server.md
+
+latest/lua-language-server.json:
+	mkdir -p $(dir $@)
+	$(WGET) https://api.github.com/repos/LuaLS/lua-language-server/releases/latest -O- | jq '.' > $@
+
+info/lua-language-server.md: latest/lua-language-server.json
+	# echo '##[ $(basename $(notdir $@)) ]##'
+	PKG=$(basename $(notdir $@))
+	# echo " - Binary Name:  $${PKG}"
+	SRC=$(shell $(call bduContains,linux-x64.tar.gz,$<))
+	# SRC="https://github.com/LuaLS/lua-language-server/releases/download/3.15.0/lua-language-server-3.15.0-linux-x64.tar.gz"
+	# echo " - Download Url: $${SRC}"
+	TARGET="files/$${PKG}/usr/local/$${PKG}"
+	mkdir -p "$${TARGET}"
+	$(WGET) $${SRC} -O- | $(TAR_NO_STRIP) $${TARGET}
+	$(ADD) files/$${PKG} &> /dev/null
+	# note the lua-language-server binary is in /usr/local/$${PKG}/bin/ subdir
+	# the exec script in /usr/local/bin/lua-language-server will point to it
+	# these scripts are added in init target
+	# # success|failure check
+	$(RUN) which $${PKG} &> /dev/null
+	$(RUN) whereis $${PKG} &> /dev/null
+	$(RUN) $${PKG} --version &> /dev/null
+	# extract 'name', 'version', 'summary'
+	# get version from the binary
+	VER=$$($(RUN) lua-language-server --version)
+	$(call to_info,$${PKG},$${VER},'Lua language server')
