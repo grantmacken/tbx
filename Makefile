@@ -55,7 +55,8 @@ init: latest/fedora-toolbox.json
 	--env lang=C.UTF-8 \
 	--env ELIXIR_ERL_OPTIONS="+fnu" $(WORKING_CONTAINER)
 	echo '✅ Base image pulled and working container created'
-	mkdir -p {info,files}
+	mkdir -p inf
+	$(ADD) files/ $(DIR_BIN)/ &>/dev/null
 
 dnf_installs: tool_lists gh runtime_list coding_list
 
@@ -218,9 +219,7 @@ info/lua-language-server.md: latest/lua-language-server.json
 	TARGET="files/$${PKG}/usr/local/$${PKG}"
 	mkdir -p "$${TARGET}"
 	$(WGET) $${SRC} -O- | $(TAR_NO_STRIP) $${TARGET}
-	$(RUN) echo '#!/usr/bin/bash > /dev/null' > /usr/local/bin/lua-language-server
-	$(RUN) echo 'exec "/usr/local/lua-language-server/bin/lua-language-server" "$@" > /dev/null' >> /usr/local/bin/lua-language-server
-	$(RUN) chmod +x /usr/local/bin/lua-language-server
+	$(ADD) files/$${PKG} &> /dev/null
 	# the exec script in /usr/local/bin/lua-language-server will point to it
 	# these scripts are added in init target
 	# # success|failure check
