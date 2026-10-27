@@ -48,6 +48,7 @@ TBX-README.md: init dnf_installs npm_installs
 	done
 	
 latest/fedora-toolbox.json:
+	mkdir -p $(dir $@)
 	echo '##[ $@ ]##'
 	skopeo inspect docker://registry.fedoraproject.org/fedora-toolbox:latest | jq '.' > $@
 
@@ -60,7 +61,7 @@ init: latest/fedora-toolbox.json
 	--env lang=C.UTF-8 \
 	--env ELIXIR_ERL_OPTIONS="+fnu" $(WORKING_CONTAINER)
 	echo '✅ Base image pulled and working container created'
-	mkdir -p {info,files,latest}
+	mkdir -p {info,files}
 
 dnf_installs: tool_lists gh runtime_list coding_list
 
