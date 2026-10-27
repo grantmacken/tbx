@@ -3,7 +3,6 @@ include inc/meta.mk
 WORKING_CONTAINER := fedora-toolbox-working-container
 include inc/define.mk
 
-
 TOOLS := make stow bat fd-find fzf host-spawn jq ripgrep wl-clipboard zoxide ledger sqlite # w3m
 BUILD := gcc gcc-c++ pcre2 autoconf pkgconf
 DEVEL := libicu gettext-devel glibc-devel libevent-devel ncurses-devel openssl-devel perl-devel readline-devel zlib-devel
@@ -11,11 +10,11 @@ DEVEL := libicu gettext-devel glibc-devel libevent-devel ncurses-devel openssl-d
 # packages installed via dnf - these are listed in the README.md table
 DNF_LIST := $(TOOLS) gh golang nodejs uv ShellCheck shfmt
 NPM_LIST := bash-language-server
- # copilot-language-server \
- # tree-sitter-cli \
- # vscode-langservers-extracted \
- # yaml-language-server \
- # pi-coding-agent
+ copilot-language-server \
+ tree-sitter-cli \
+ vscode-langservers-extracted \
+ yaml-language-server \
+ pi-coding-agent
 
 
 RELEASE_BINARY_LIST := neovim harper-ls lua-language-server
@@ -81,24 +80,92 @@ runtime_list:
 coding_list:
 	$(INSTALL) ShellCheck shfmt &>/dev/null
 
-npm_installs: bash-language-server
+npm_installs: $(NPM_LIST)
 
 bash-language-server: info/bash-language-server.md
 info/bash-language-server.md:
 	# echo '##[ $(basename $(notdir $@)) ]##'
 	PKG=$(basename $(notdir $@))
-	JSON=$$($(RUN) npm view --json $${PKG} | jq '.')
+	JSON=$$($(RUN) $(NPM_VIEW) $${PKG} | jq '.')
 	# From the veiw extract 'name', 'version', 'description'
 	NAME=$$(echo $$JSON | jq -r '.name')
 	VER=$$(echo $$JSON | jq -r '."dist-tags".latest')
 	SUM=$$(echo $$JSON | jq -r '.description')
 	# install the package globally and use the latest version
-	$(RUN) npm install --global $${NAME}@$${VER} &> /dev/null
+	$(NPM_INSTALL) $${NAME}@$${VER} &> /dev/null
 	# success|failure check
 	$(RUN) $${PKG} --version &> /dev/null
 	$(call to_info,$${NAME},$${VER},$${SUM})
 
-	
+pi-coding-agent: info/pi-coding-agent.md
+info/pi-coding-agent.md:
+	JSON=$$($(RUN) $(NPM_VIEW) @earendil-works/pi-coding-agent | jq '.')
+	$(NPM_VIEW) @earendil-works/pi-coding-agent | jq '.name'
+	NAME=$(basename $(notdir $@))
+	VER=$$(echo $$JSON | jq -r '."dist-tags".latest')
+	SUM='minimal agent harness'
+	$(RUN) $(NPM_INSTALL) --ignore-scripts @earendil-works/pi-coding-agent
+	# success|failure check
+	$(RUN) pi --version &> /dev/null
+	$(call to_info,$${NAME},$${VER},$${SUM})
+
+copilot-language-server: info/copilot-language-server.md
+info/copilot-language-server.md:
+	PKG=$(basename $(notdir $@))
+	JSON=$$($(NPM_VIEW) @github/copilot-language-server | jq '.')
+	NAME=$$(echo $$JSON | jq -r '.name')
+	VER=$$(echo $$JSON | jq -r '."dist-tags".latest')
+	SUM=$$(echo $$JSON | jq -r '.description')
+	$(NPM_INSTALL) $${NAME}@$${VER} &> /dev/null
+	# success|failure check
+	# TODO
+	$(call to_info,$${PKG},$${VER},$${SUM})
+
+tree-sitter-cli: info/tree-sitter-cli.md
+info/tree-sitter-cli.md:
+	# echo '##[ $(basename $(notdir $@)) ]##'
+	PKG=$(basename $(notdir $@))
+	JSON=$$($(NPM_VIEW) $${PKG} | jq '.')
+	NAME=$$(echo $$JSON | jq -r '.name')
+	VER=$$(echo $$JSON | jq -r '."dist-tags".latest')
+	SUM=$$(echo $$JSON | jq -r '.description')
+	$(NPM_INSTALL) $${NAME}@$${VER} &> /dev/null
+	# success|failure check
+	# Note: the binary is named `tree-sitter` not the package name
+	$(RUN) tree-sitter --version &> /dev/null
+	$(call to_info,$${NAME},$${VER},$${SUM})
+
+vscode-langservers-extracted: info/vscode-langservers-extracted.md
+info/vscode-langservers-extracted.md:
+	# echo '##[ $(basename $(notdir $@)) ]##'
+	PKG=$(basename $(notdir $@))
+	JSON=$$($(NPM_VIEW) $${PKG} | jq '.')
+	NAME=$$(echo $$JSON | jq -r '.name')
+	VER=$$(echo $$JSON | jq -r '."dist-tags".latest')
+	SUM=$$(echo $$JSON | jq -r '.description')
+	$(NPM_INSTALL) $${NAME}@$${VER} &> /dev/null
+	# success|failure check
+	#  "vscode-css-language-server": "bin/vscode-css-language-server",
+	#  "vscode-eslint-language-server": "bin/vscode-eslint-language-server",
+	#  "vscode-html-language-server": "bin/vscode-html-language-server",
+	#  "vscode-json-language-server": "bin/vscode-json-language-server",
+	#  "vscode-markdown-language-server": "bin/vscode-markdown-language-server"
+	$(call to_info,vscode-langservers,$${VER},$${SUM})
+
+yaml-language-server: info/yaml-language-server.md
+info/yaml-language-server.md:
+	# echo '##[ $(basename $(notdir $@)) ]##'
+	PKG=$(basename $(notdir $@))
+	JSON=$$($(NPM_VIEW) $${PKG} | jq '.')
+	NAME=$$(echo $$JSON | jq -r '.name')
+	VER=$$(echo $$JSON | jq -r '."dist-tags".latest')
+	SUM=$$(echo $$JSON | jq -r '.description')
+	$(NPM_INSTALL) $${NAME}@$${VER} &> /dev/null
+	# success|failure check
+	# TODO
+	$(call to_info,$${NAME},$${VER},$${SUM})
+
+
 
 # # NOTE: install from toolbox container.
 # google-cloud-cli: info/google-cloud-cli.md
