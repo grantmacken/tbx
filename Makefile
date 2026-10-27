@@ -1,5 +1,4 @@
 include inc/meta.mk
-
 WORKING_CONTAINER := fedora-toolbox-working-container
 include inc/define.mk
 
@@ -236,7 +235,8 @@ uv_installs:  $(UV_TOOL_LIST)
 
 mbake: info/mbake.md
 info/mbake.md:
-	# echo '##[ $(basename $(notdir $@)) ]##'
+	PKG=$(basename $(notdir $@))
+	echo '##[ $$PKG ]##'
 	$(RUN) uv tool install $${PKG} &> /dev/null
 	# success|failure check
 	$(RUN) which $${PKG} &> /dev/null
