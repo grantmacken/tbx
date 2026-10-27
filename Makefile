@@ -101,7 +101,7 @@ info/pi-coding-agent.md:
 	NAME=$(basename $(notdir $@))
 	VER=$$(echo $$JSON | jq -r '."dist-tags".latest')
 	SUM='minimal agent harness'
-	$(NPM_INSTALL) --ignore-scripts @earendil-works/pi-coding-agent
+	$(NPM_INSTALL) --ignore-scripts @earendil-works/pi-coding-agent &> /dev/null
 	# success|failure check
 	$(RUN) pi --version &> /dev/null
 	$(call to_info,$${NAME},$${VER},$${SUM})
@@ -230,29 +230,6 @@ info/lua-language-server.md: latest/lua-language-server.json
 	VER=$$($(RUN) lua-language-server --version)
 	$(call to_info,$${PKG},$${VER},'Lua language server')
 
-tombi: info/tombi.md
-info/tombi.md:
-	# echo '##[ $(basename $(notdir $@)) ]##'
-	PKG=$(basename $(notdir $@))
-	$(RUN) uv tool install $${PKG} &> /dev/null
-	# success|failure check
-	$(RUN) which $${PKG} &> /dev/null
-	$(RUN) $${PKG} --version &> /dev/null
-	# $(RUN) uv tool list | grep $${PKG}
-	$(call uv_tool_info,$${PKG},"TOML Formatter, Linter, and Language Server")
-
-# specify-cli: info/specify-cli.md
-# info/specify-cli.md:
-# 	# echo '##[ $(basename $(notdir $@)) ]##'
-# 	PKG=$(basename $(notdir $@)) 
-# 	$(RUN) uv tool install $${PKG} --from git+https://github.com/github/spec-kit.git &> /dev/null
-# 	# success|failure check
-# 	# Note: the binary is named 'specify' not 'specify-cli'
-# 	$(RUN) which specify &> /dev/null
-# 	$(RUN) whereis specify &> /dev/null
-# 	$(call uv_tool_info,$${PKG},GitHub Spec Tool)
-#
-
 ##########################################################################
 
 uv_installs:  $(UV_TOOL_LIST)
@@ -260,7 +237,6 @@ uv_installs:  $(UV_TOOL_LIST)
 mbake: info/mbake.md
 info/mbake.md:
 	# echo '##[ $(basename $(notdir $@)) ]##'
-	PKG=$(basename $(notdir $@)) 
 	$(RUN) uv tool install $${PKG} &> /dev/null
 	# success|failure check
 	$(RUN) which $${PKG} &> /dev/null
@@ -271,7 +247,6 @@ info/mbake.md:
 
 tombi: info/tombi.md
 info/tombi.md:
-	# echo '##[ $(basename $(notdir $@)) ]##'
 	PKG=$(basename $(notdir $@))
 	$(RUN) uv tool install $${PKG} &> /dev/null
 	# success|failure check
