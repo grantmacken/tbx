@@ -8,13 +8,7 @@ DEVEL := libicu gettext-devel glibc-devel libevent-devel ncurses-devel openssl-d
 DNF_LIST := gh  $(TOOLS)
 MD_LIST = google-cloud-cli
 
-README.md: build-tools
-	echo '##[ $@ ]##'
-	cat preamble.md > $@
-	$(file >> $@,The following applications are included in this toolbox: )
-	$(call tr,"Name","Version","Summary", $@)
-	$(call tr,"----","-------","-------", $@)
-	for pkg in $(DNF_LIST)
+README.md: build-tool
 	do
 	$(call dnf_to_table_row,$${pkg},$@)
 	done
@@ -72,7 +66,6 @@ info/google-cloud-cli.md: files/google-cloud-cli.tar.gz
 	SUM='gcloud command line interface'
 	echo "Name: $${NAME}, Version: $${VER}, Summary: $${SUM}"
 	$(call to_info,$${NAME},$${VER},$${SUM}) 
-
 
 files/google-cloud-cli.tar.gz:
 	mkdir -p $(dir $@)
