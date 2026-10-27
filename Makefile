@@ -53,7 +53,7 @@ init: latest/fedora-toolbox.json
 	--env lang=C.UTF-8 \
 	--env ELIXIR_ERL_OPTIONS="+fnu" $(WORKING_CONTAINER)
 	echo '✅ Base image pulled and working container created'
-	mkdir -p inf
+	mkdir -p info
 	$(ADD) files/ $(DIR_BIN)/ &>/dev/null
 
 dnf_installs: tool_lists gh runtime_list coding_list
