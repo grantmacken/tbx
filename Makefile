@@ -12,11 +12,9 @@ DNF_LIST := $(TOOLS) gh golang nodejs uv ShellCheck shfmt
 
 LANG_SERVERS := bash-language-server copilot-language-server vscode-langservers-extracted yaml-language-server
 NPM_LIST :=  $(LANG_SERVERS) pi-coding-agent tree-sitter-cli
+RELEASE_BINARY_LIST := neovim # harper-ls lua-language-server
 
-
-RELEASE_BINARY_LIST := neovim harper-ls lua-language-server
-
-PKGS_LIST := $(NPM_LIST) # $(RELEASE_BINARY_LIST)
+PKGS_LIST := $(NPM_LIST) $(RELEASE_BINARY_LIST)
 # MD_LIST = google-cloud-cli
 # OTP := erlang erlang-rebar3 elixir gleam
 
@@ -26,7 +24,7 @@ default: TBX-README.md
 	# buildah push ghcr.io/grantmacken/tbx-$@:latest
 	# printf '✅ Image pushed to ghcr.io/grantmacken/tbx-%s:latest\n' $@
 
-TBX-README.md: init dnf_installs npm_installs
+TBX-README.md: init dnf_installs npm_installs binary_installs
 	echo '##[ $@ ]##'
 	$(file >> $@,The following applications are included in this toolbox: )
 	$(call tr,"Name","Version","Summary", $@)
@@ -78,6 +76,8 @@ coding_list:
 	$(INSTALL) ShellCheck shfmt &>/dev/null
 
 npm_installs: $(NPM_LIST)
+
+
 
 bash-language-server: info/bash-language-server.md
 info/bash-language-server.md:
@@ -161,6 +161,27 @@ info/yaml-language-server.md:
 	# success|failure check
 	# TODO
 	$(call to_info,$${NAME},$${VER},$${SUM})
+
+####################################################
+
+binary_installs: $(RELEASE_BINARY_LIST)
+
+neovim: info/neovim.md
+info/neovim.md:
+	# echo '##[ $(basename $(notdir $@)) ]##'
+	PKG=$(basename $(notdir $@))
+	TARGET=files/$${PKG}/usr/local
+	mkdir -p $${TARGET}
+	SRC='https://github.com/neovim/neovim/releases/download/nightly/nvim-linux-x86_64.tar.gz'
+	$(WGET) $${SRC} -O- | $(TAR) $${TARGET} &> /dev/null
+	$(ADD) files/$${PKG} &> /dev/null
+	# success|failure check
+	$(RUN) nvim --version &> /dev/null
+	$(RUN) whereis nvim &> /dev/null
+	$(RUN) which nvim &> /dev/null
+	# get version from the binary
+	VER=$$($(RUN) nvim -v | grep -oP 'NVIM v\K\d+\.\d+\.\d+' )
+	$(call to_info,$${PKG},$${VER},Neovim text editor)
 
 
 
