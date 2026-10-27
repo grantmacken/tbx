@@ -18,12 +18,9 @@ NPM_LIST := bash-language-server
  # pi-coding-agent
 
 
-RELEASE_BINARY_LIST :=  \
- neovim \
- harper-ls \
- lua-language-server
+RELEASE_BINARY_LIST := neovim harper-ls lua-language-server
 
-PKGS_LIST := $(NPM_LIST)
+PKGS_LIST := $(NPM_LIST) # $(RELEASE_BINARY_LIST)
 # MD_LIST = google-cloud-cli
 # OTP := erlang erlang-rebar3 elixir gleam
 
@@ -34,7 +31,6 @@ default: TBX-README.md
 	# printf '✅ Image pushed to ghcr.io/grantmacken/tbx-%s:latest\n' $@
 
 TBX-README.md: init dnf_installs npm_installs
-RELEASE_BINARY_LIST :=  neovim  harper-ls lua-language-server
 	echo '##[ $@ ]##'
 	$(file >> $@,The following applications are included in this toolbox: )
 	$(call tr,"Name","Version","Summary", $@)
