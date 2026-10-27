@@ -96,12 +96,12 @@ info/bash-language-server.md:
 
 pi-coding-agent: info/pi-coding-agent.md
 info/pi-coding-agent.md:
-	JSON=$$($(RUN) $(NPM_VIEW) @earendil-works/pi-coding-agent | jq '.')
+	JSON=$$($(NPM_VIEW) @earendil-works/pi-coding-agent | jq '.')
 	$(NPM_VIEW) @earendil-works/pi-coding-agent | jq '.name'
 	NAME=$(basename $(notdir $@))
 	VER=$$(echo $$JSON | jq -r '."dist-tags".latest')
 	SUM='minimal agent harness'
-	$(RUN) $(NPM_INSTALL) --ignore-scripts @earendil-works/pi-coding-agent
+	$(NPM_INSTALL) --ignore-scripts @earendil-works/pi-coding-agent
 	# success|failure check
 	$(RUN) pi --version &> /dev/null
 	$(call to_info,$${NAME},$${VER},$${SUM})
