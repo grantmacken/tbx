@@ -83,7 +83,7 @@ bash-language-server: info/bash-language-server.md
 info/bash-language-server.md:
 	# echo '##[ $(basename $(notdir $@)) ]##'
 	PKG=$(basename $(notdir $@))
-	JSON=$$($(RUN) $(NPM_VIEW) $${PKG} | jq '.')
+	JSON=$$($(NPM_VIEW) $${PKG} | jq '.')
 	# From the veiw extract 'name', 'version', 'description'
 	NAME=$$(echo $$JSON | jq -r '.name')
 	VER=$$(echo $$JSON | jq -r '."dist-tags".latest')
