@@ -3,26 +3,25 @@ include inc/meta.mk
 WORKING_CONTAINER := fedora-toolbox-working-container
 include inc/define.mk
 
+
 TOOLS := make stow bat fd-find fzf host-spawn jq ripgrep wl-clipboard zoxide ledger sqlite # w3m
-# atuin
 BUILD := gcc gcc-c++ pcre2 autoconf pkgconf
 DEVEL := libicu gettext-devel glibc-devel libevent-devel ncurses-devel openssl-devel perl-devel readline-devel zlib-devel
-DNF_LIST := gh $(TOOLS)
+
+# packages installed via dnf - these are listed in the README.md table
+DNF_LIST := $(TOOLS) gh golang nodejs uv 
+
 MD_LIST = google-cloud-cli
-PKGS_LIST := golang nodejs uv
 OTP := erlang erlang-rebar3 elixir gleam
 
-default: build-tools runtimes tooling-README.md
-	cat tooling-README.md
+default: TBX-README.md
 	# printf '✅ %s toolbox built from: %s\n' $@ $(WORKING_CONTAINER)
 	# buildah commit $(WORKING_CONTAINER) ghcr.io/grantmacken/tbx:latest
 	# buildah push ghcr.io/grantmacken/tbx-$@:latest
 	# printf '✅ Image pushed to ghcr.io/grantmacken/tbx-%s:latest\n' $@
-	#
 
-tooling-README.md: build-tools runtimes
+TBX-README.md: init dnf_installs
 	echo '##[ $@ ]##'
-	cat tooling-preable.md > $@
 	$(file >> $@,The following applications are included in this toolbox: )
 	$(call tr,"Name","Version","Summary", $@)
 	$(call tr,"----","-------","-------", $@)
@@ -30,36 +29,7 @@ tooling-README.md: build-tools runtimes
 	do
 	$(call dnf_to_table_row,$${pkg},$@)
 	done
-	for pkg in $(PKGS_LIST)
-	do
-	$(call dnf_to_table_row,$${pkg},$@)
-	done
-	for app in $(MD_LIST)
-	do
-	NAME=$$(cat info/$${app}.md | grep -oP '^Name:\s\K.+' || true)
-	VER=$$(cat info/$${app}.md | grep -oP '^Version:\s\K.+' || true)
-	SUM=$$(cat info/$${app}.md | grep -oP '^Summary:\s\K.+' || true)
-	$(call tr,$${NAME},$${VER},$${SUM},$@)
-	done
-	NAME=$$(cat info/erlang.md | grep -oP '^Name\s+:\s+\K.+')
-	VER=$$(jq -r '.name' latest/erlang.json | cut -d' ' -f2)
-	SUM=$$(cat info/erlang.md | grep -oP '^Summary\s+:\s+\K.+')
-	$(call tr,$${NAME},$${VER},$${SUM},$@)
-	NAME=rebar3
-	VER=$$(jq -r '.tag_name' latest/erlang-rebar3.json | cut -d'v' -f2)
-	SUM=$$(cat info/erlang-rebar3.md | grep -oP '^Summary\s+:\s+\K.+')
-	$(call tr,$${NAME},$${VER},$${SUM},$@)
-	NAME=$$(cat info/elixir.md | grep -oP '^Name\s+:\s+\K.+')
-	VER=$$(jq -r '.tag_name' latest/elixir.json | cut -d'v' -f2)
-	SUM=$$(cat info/elixir.md | grep -oP '^Summary\s+:\s+\K.+')
-	$(call tr,$${NAME},$${VER},$${SUM},$@)
-	LINE=$$($(RUN) gleam --version)
-	NAME=$$(echo $$LINE | cut -d' ' -f1)
-	VER=$$(echo $$LINE | cut -d' ' -f2)
-	SUM="Gleam programming language"
-	$(call tr,$${NAME},$${VER},$${SUM},$@)
-	echo '✅ tooling-README.md created'
-
+	
 latest/fedora-toolbox.json:
 	echo '##[ $@ ]##'
 	mkdir -p $(dir $@)
@@ -75,10 +45,10 @@ init: latest/fedora-toolbox.json
 	--env ELIXIR_ERL_OPTIONS="+fnu" $(WORKING_CONTAINER)
 	echo '✅ Base image pulled and working container created'
 
-build-tools: init lists gh google-cloud-cli
+dnf_installs: tool_lists gh runtime_list
 
-
-lists:
+tool_lists:
+	$(RUN) dnf update -y &>/dev/null
 	$(INSTALL) $(DEVEL) &>/dev/null
 	$(INSTALL) $(BUILD) &>/dev/null
 	$(INSTALL) $(TOOLS) &>/dev/null
@@ -86,6 +56,12 @@ lists:
 gh:
 	$(RUN) dnf config-manager addrepo --from-repofile=https://cli.github.com/packages/rpm/gh-cli.repo &> /dev/null
 	$(INSTALL) gh --repo gh-cli &> /dev/null
+
+runtime_list:
+	$(INSTALL) golang nodejs uv &>/dev/null
+
+
+
 
 # NOTE: install from toolbox container.
 google-cloud-cli: info/google-cloud-cli.md
