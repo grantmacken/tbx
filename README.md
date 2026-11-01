@@ -19,7 +19,7 @@ The building toolbox container provides three tooling categories
 
 | Name                    | Version  | Summary                                                                               |
 | ----                    | -------  | -------                                                                               |
-| gh                      | 2.103.2  | GitHub\xe2\x80\x99s official command line tool.                                       |
+| gh                      | 2.103.3  | GitHub\xe2\x80\x99s official command line tool.                                       |
 | make                    | 4.4.1    | A GNU tool which simplifies the build process for users                               |
 | stow                    | 2.4.1    | Manage the installation of software packages from source                              |
 | bat                     | 0.26.1   | Cat(1) clone with wings                                                               |
@@ -32,7 +32,7 @@ The building toolbox container provides three tooling categories
 | zoxide                  | 0.9.8    | Smarter cd command for your terminal                                                  |
 | ledger                  | 3.4.1    | A powerful command-line double-entry accounting system                                |
 | w3m                     | 0.5.3    | Pager with Web browsing abilities                                                     |
-| google-cloud-cli        | 590.0.1  | gcloud command line interface                                                         |
+| google-cloud-cli        | 591.0.0  | gcloud command line interface                                                         |
 # runtimes
 
 ```
@@ -74,7 +74,7 @@ It is designed to be a modern alternative to pip and poetry.
 | ----                    | -------  | -------                                                                               |
 | erlang                  | OTP-29.1.2 | General-purpose programming language and runtime environment                          |
 | rebar3                  | 3.28.0   | Tool for working with Erlang projects                                                 |
-| elixir                  | 1.20.4   | A modern approach to programming for the Erlang VM                                    |
+| elixir                  | 1.20.5   | A modern approach to programming for the Erlang VM                                    |
 | gleam                   | 1.19.2   | Gleam programming language                                                            |
 | golang                  | 1.26.10  | The Go Programming Language                                                           |
 | nodejs                  | 22.23.1  | JavaScript runtime                                                                    |
@@ -105,13 +105,13 @@ Once inside the toolbox, you can start Using neovim and other installed tools fo
 | Name                    | Version  | Summary                                                                               |
 | ----                    | -------  | -------                                                                               |
 | neovim                  | 0.13.0   | Neovim text editor                                                                    |
-| harper-ls               | 2.13.0   | 'Harper Language Server Grammar Checker'                                              |
+| harper-ls               | 3.0.0    | 'Harper Language Server Grammar Checker'                                              |
 | lua-language-server     | 3.19.2   | 'Lua language server'                                                                 |
-| tombi                   | v1.9.4   | "TOML Formatter                                                                       |
-| mbake                   | v1.4.6   | Makefile formatter and linter                                                         |
+| tombi                   | v1.9.8   | "TOML Formatter                                                                       |
+| mbake                   | v1.5.0   | Makefile formatter and linter                                                         |
 | bash-language-server    | 5.8.1    | A language server for Bash                                                            |
-| copilot                 | 1.0.103  | GitHub Copilot CLI brings the power of Copilot coding agent directly to your terminal. |
-| copilot-language-server | 1.561.0  | Your AI pair programmer                                                               |
+| copilot                 | 1.0.105  | GitHub Copilot CLI brings the power of Copilot coding agent directly to your terminal. |
+| copilot-language-server | 1.565.1  | Your AI pair programmer                                                               |
 | tree-sitter-cli         | 0.27.1   | CLI for generating fast incremental parsers                                           |
 | vscode-langservers      | 4.10.0   | HTML/CSS/JSON/ESLint language servers extracted from [vscode](https://github.com/Microsoft/vscode). |
 | yaml-language-server    | 2.0.0    | YAML language server                                                                  |
