@@ -17,9 +17,9 @@ default: TBX-README.md
 	# buildah push ghcr.io/grantmacken/tbx-$@:latest
 	# printf '✅ Image pushed to ghcr.io/grantmacken/tbx-%s:latest\n' $@
 
-.PHONY: tools_list runtimes_list otp_list coding_list
+.PHONY: tools_list # runtimes_list otp_list coding_list
 
-TBX-README.md: init tools_list runtimes_list otp_list coding_list
+TBX-README.md: init tools_list # runtimes_list otp_list coding_list
 	echo '##[ $@ ]##'
 	$(file >> $@,The following applications are included in this toolbox: )
 	$(call tr,"Name","Version","Summary", $@)
@@ -56,12 +56,13 @@ init: latest/fedora-toolbox.json
 	$(ADD) files/ $(DIR_BIN)/ &>/dev/null
 
 tools_list:
-	echo '##[ $($@) ]##'
-	$(RUN) dnf update -y &>/dev/null
-	$(INSTALL) $(DEVEL) &>/dev/null
-	$(INSTALL) $(BUILD) &>/dev/null
-	$(RUN) dnf config-manager addrepo --from-repofile=https://cli.github.com/packages/rpm/gh-cli.repo &> /dev/null
-	$(INSTALL) gh --repo gh-cli &> /dev/null
+	echo '##[ $@ ]##'
+	$(RUN) dnf update -y
+	$(INSTALL) $(DEVEL)
+	$(INSTALL) $(BUILD)
+	$(INSTALL) $(TOOLS)
+	# $(RUN) dnf config-manager addrepo --from-repofile=https://cli.github.com/packages/rpm/gh-cli.repo &> /dev/null
+	# $(INSTALL) gh --repo gh-cli &> /dev/null
 
 runtimes_list:
 	echo '##[ $($@) ]##'
