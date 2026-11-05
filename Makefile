@@ -17,6 +17,8 @@ default: TBX-README.md
 	# buildah push ghcr.io/grantmacken/tbx-$@:latest
 	# printf '✅ Image pushed to ghcr.io/grantmacken/tbx-%s:latest\n' $@
 
+.PHONY: tools_list runtimes_list otp_list coding_list
+
 TBX-README.md: init tools_list runtimes_list otp_list coding_list
 	echo '##[ $@ ]##'
 	$(file >> $@,The following applications are included in this toolbox: )
