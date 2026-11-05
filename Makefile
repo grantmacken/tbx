@@ -5,14 +5,8 @@ include inc/define.mk
 TOOLS := make stow bat fd-find fzf host-spawn jq ripgrep wl-clipboard zoxide ledger sqlite # w3m
 BUILD := gcc gcc-c++ pcre2 autoconf pkgconf
 DEVEL := libicu gettext-devel glibc-devel libevent-devel ncurses-devel openssl-devel perl-devel readline-devel zlib-devel
-
 # packages installed via dnf - these are listed in the README.md table
 DNF_LIST := $(TOOLS) gh golang nodejs uv ShellCheck shfmt
-NPM_LIST :=  bash-language-server copilot-language-server vscode-langservers-extracted \
-			 yaml-language-server pi-coding-agent tree-sitter-cli # harper-ls # lua-language-server
-# UV_TOOL_LIST :=  tombi  mbake
-# PKGS_LIST := $(NPM_LIST) $(RELEASE_BINARY_LIST)
-# OTP_LIST  :=  erlang elixir erlang-rebar3 gleam
 
 # MD_LIST = google-cloud-cli
 # OTP := erlang erlang-rebar3 elixir gleam
@@ -23,7 +17,7 @@ default: TBX-README.md
 	# buildah push ghcr.io/grantmacken/tbx-$@:latest
 	# printf '✅ Image pushed to ghcr.io/grantmacken/tbx-%s:latest\n' $@
 
-TBX-README.md: init dnf_installs  binary_installs # uv_installs npm_installs
+TBX-README.md: init tools_list runtimes_list otp_list coding_list
 	echo '##[ $@ ]##'
 	$(file >> $@,The following applications are included in this toolbox: )
 	$(call tr,"Name","Version","Summary", $@)
@@ -32,12 +26,12 @@ TBX-README.md: init dnf_installs  binary_installs # uv_installs npm_installs
 	do
 	$(call dnf_to_table_row,$${pkg},$@)
 	done
-	for pkg in $(PKGS_LIST)
-	do
-	NAME=$$(cat info/$${pkg}.md | grep -oP '^Name:\s\K.+' || true)
-	VER=$$(cat info/$${pkg}.md | grep -oP '^Version:\s\K.+' || true)
-	SUM=$$(cat info/$${pkg}.md | grep -oP '^Summary:\s\K.+' || true)
-	$(call tr,$${NAME},$${VER},$${SUM},$@)
+	# for pkg in $(PKGS_LIST)
+	# do
+	# NAME=$$(cat info/$${pkg}.md | grep -oP '^Name:\s\K.+' || true)
+	# VER=$$(cat info/$${pkg}.md | grep -oP '^Version:\s\K.+' || true)
+	# SUM=$$(cat info/$${pkg}.md | grep -oP '^Summary:\s\K.+' || true)
+	# $(call tr,$${NAME},$${VER},$${SUM},$@)
 	done
 	
 latest/fedora-toolbox.json:
@@ -59,9 +53,7 @@ init: latest/fedora-toolbox.json
 	mkdir -p info
 	$(ADD) files/ $(DIR_BIN)/ &>/dev/null
 
-dnf_installs: tool_lists runtime_list otp_list coding_list
-
-tool_lists:
+tools_list:
 	echo '##[ $($@) ]##'
 	$(RUN) dnf update -y &>/dev/null
 	$(INSTALL) $(DEVEL) &>/dev/null
@@ -69,7 +61,7 @@ tool_lists:
 	$(RUN) dnf config-manager addrepo --from-repofile=https://cli.github.com/packages/rpm/gh-cli.repo &> /dev/null
 	$(INSTALL) gh --repo gh-cli &> /dev/null
 
-runtime_list:
+runtimes_list:
 	echo '##[ $($@) ]##'
 	$(INSTALL) golang nodejs uv &>/dev/null
 
