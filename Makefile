@@ -9,10 +9,11 @@ DEVEL := libicu gettext-devel glibc-devel libevent-devel ncurses-devel openssl-d
 # packages installed via dnf - these are listed in the README.md table
 DNF_LIST := $(TOOLS) gh golang nodejs uv ShellCheck shfmt
 NPM_LIST :=  bash-language-server copilot-language-server vscode-langservers-extracted \
-			 yaml-language-server pi-coding-agent tree-sitter-cli
-RELEASE_BINARY_LIST := neovim harper-ls # lua-language-server
-UV_TOOL_LIST :=  tombi  mbake
-PKGS_LIST := $(NPM_LIST) $(RELEASE_BINARY_LIST)
+			 yaml-language-server pi-coding-agent tree-sitter-cli # harper-ls # lua-language-server
+# UV_TOOL_LIST :=  tombi  mbake
+# PKGS_LIST := $(NPM_LIST) $(RELEASE_BINARY_LIST)
+# OTP_LIST  :=  erlang elixir erlang-rebar3 gleam
+
 # MD_LIST = google-cloud-cli
 # OTP := erlang erlang-rebar3 elixir gleam
 
@@ -22,7 +23,7 @@ default: TBX-README.md
 	# buildah push ghcr.io/grantmacken/tbx-$@:latest
 	# printf '✅ Image pushed to ghcr.io/grantmacken/tbx-%s:latest\n' $@
 
-TBX-README.md: init dnf_installs npm_installs binary_installs uv_installs
+TBX-README.md: init dnf_installs  binary_installs # uv_installs npm_installs
 	echo '##[ $@ ]##'
 	$(file >> $@,The following applications are included in this toolbox: )
 	$(call tr,"Name","Version","Summary", $@)
@@ -52,122 +53,37 @@ init: latest/fedora-toolbox.json
 	--label maintainer='Grant MacKenzie <grantmacken@gmail.com>' \
 	--env lang=C.UTF-8 \
 	--env ELIXIR_ERL_OPTIONS="+fnu" $(WORKING_CONTAINER)
+	# --env UV_TOOL_BIN_DIR=/usr/local/bin \
+	# --env UV_TOOL_DIR=/var/lib/uv_tools 
 	echo '✅ Base image pulled and working container created'
 	mkdir -p info
 	$(ADD) files/ $(DIR_BIN)/ &>/dev/null
 
-dnf_installs: tool_lists gh runtime_list coding_list
+dnf_installs: tool_lists runtime_list otp_list coding_list
 
 tool_lists:
+	echo '##[ $($@) ]##'
 	$(RUN) dnf update -y &>/dev/null
 	$(INSTALL) $(DEVEL) &>/dev/null
 	$(INSTALL) $(BUILD) &>/dev/null
-	$(INSTALL) $(TOOLS) &>/dev/null
-
-gh:
 	$(RUN) dnf config-manager addrepo --from-repofile=https://cli.github.com/packages/rpm/gh-cli.repo &> /dev/null
 	$(INSTALL) gh --repo gh-cli &> /dev/null
 
 runtime_list:
+	echo '##[ $($@) ]##'
 	$(INSTALL) golang nodejs uv &>/dev/null
 
-coding_list:
-	$(INSTALL) ShellCheck shfmt &>/dev/null
+coding_list: neovim
+	echo '##[ $($@) ]##'
+	$(INSTALL)  ShellCheck shfmt &>/dev/null
 
-##########################################################################
-
-npm_installs: $(NPM_LIST)
-
-bash-language-server: info/bash-language-server.md
-info/bash-language-server.md:
-	# echo '##[ $(basename $(notdir $@)) ]##'
-	PKG=$(basename $(notdir $@))
-	JSON=$$($(NPM_VIEW) $${PKG} | jq '.')
-	# From the veiw extract 'name', 'version', 'description'
-	NAME=$$(echo $$JSON | jq -r '.name')
-	VER=$$(echo $$JSON | jq -r '."dist-tags".latest')
-	SUM=$$(echo $$JSON | jq -r '.description')
-	# install the package globally and use the latest version
-	$(NPM_INSTALL) $${NAME}@$${VER} &> /dev/null
-	# success|failure check
-	$(RUN) $${PKG} --version &> /dev/null
-	$(call to_info,$${NAME},$${VER},$${SUM})
-
-pi-coding-agent: info/pi-coding-agent.md
-info/pi-coding-agent.md:
-	JSON=$$($(NPM_VIEW) @earendil-works/pi-coding-agent | jq '.')
-	$(NPM_VIEW) @earendil-works/pi-coding-agent | jq '.name'
-	NAME=$(basename $(notdir $@))
-	VER=$$(echo $$JSON | jq -r '."dist-tags".latest')
-	SUM='minimal agent harness'
-	$(NPM_INSTALL) --ignore-scripts @earendil-works/pi-coding-agent &> /dev/null
-	# success|failure check
-	$(RUN) pi --version &> /dev/null
-	$(call to_info,$${NAME},$${VER},$${SUM})
-
-copilot-language-server: info/copilot-language-server.md
-info/copilot-language-server.md:
-	PKG=$(basename $(notdir $@))
-	JSON=$$($(NPM_VIEW) @github/copilot-language-server | jq '.')
-	NAME=$$(echo $$JSON | jq -r '.name')
-	VER=$$(echo $$JSON | jq -r '."dist-tags".latest')
-	SUM=$$(echo $$JSON | jq -r '.description')
-	$(NPM_INSTALL) $${NAME}@$${VER} &> /dev/null
-	# success|failure check
-	# TODO
-	$(call to_info,$${PKG},$${VER},$${SUM})
-
-tree-sitter-cli: info/tree-sitter-cli.md
-info/tree-sitter-cli.md:
-	# echo '##[ $(basename $(notdir $@)) ]##'
-	PKG=$(basename $(notdir $@))
-	JSON=$$($(NPM_VIEW) $${PKG} | jq '.')
-	NAME=$$(echo $$JSON | jq -r '.name')
-	VER=$$(echo $$JSON | jq -r '."dist-tags".latest')
-	SUM=$$(echo $$JSON | jq -r '.description')
-	$(NPM_INSTALL) $${NAME}@$${VER} &> /dev/null
-	# success|failure check
-	# Note: the binary is named `tree-sitter` not the package name
-	$(RUN) tree-sitter --version &> /dev/null
-	$(call to_info,$${NAME},$${VER},$${SUM})
-
-vscode-langservers-extracted: info/vscode-langservers-extracted.md
-info/vscode-langservers-extracted.md:
-	# echo '##[ $(basename $(notdir $@)) ]##'
-	PKG=$(basename $(notdir $@))
-	JSON=$$($(NPM_VIEW) $${PKG} | jq '.')
-	NAME=$$(echo $$JSON | jq -r '.name')
-	VER=$$(echo $$JSON | jq -r '."dist-tags".latest')
-	SUM=$$(echo $$JSON | jq -r '.description')
-	$(NPM_INSTALL) $${NAME}@$${VER} &> /dev/null
-	# success|failure check
-	#  "vscode-css-language-server": "bin/vscode-css-language-server",
-	#  "vscode-eslint-language-server": "bin/vscode-eslint-language-server",
-	#  "vscode-html-language-server": "bin/vscode-html-language-server",
-	#  "vscode-json-language-server": "bin/vscode-json-language-server",
-	#  "vscode-markdown-language-server": "bin/vscode-markdown-language-server"
-	$(call to_info,vscode-langservers,$${VER},$${SUM})
-
-yaml-language-server: info/yaml-language-server.md
-info/yaml-language-server.md:
-	# echo '##[ $(basename $(notdir $@)) ]##'
-	PKG=$(basename $(notdir $@))
-	JSON=$$($(NPM_VIEW) $${PKG} | jq '.')
-	NAME=$$(echo $$JSON | jq -r '.name')
-	VER=$$(echo $$JSON | jq -r '."dist-tags".latest')
-	SUM=$$(echo $$JSON | jq -r '.description')
-	$(NPM_INSTALL) $${NAME}@$${VER} &> /dev/null
-	# success|failure check
-	# TODO
-	$(call to_info,$${NAME},$${VER},$${SUM})
+otp_list: erlang elixir erlang-rebar3 gleam
 
 ####################################################
 
-binary_installs: $(RELEASE_BINARY_LIST)
-
 neovim: info/neovim.md
 info/neovim.md:
-	# echo '##[ $(basename $(notdir $@)) ]##'
+	echo '##[ $(basename $(notdir $@)) ]##'
 	PKG=$(basename $(notdir $@))
 	TARGET=files/$${PKG}/usr/local
 	mkdir -p $${TARGET}
@@ -182,76 +98,48 @@ info/neovim.md:
 	VER=$$($(RUN) nvim -v | grep -oP 'NVIM v\K\d+\.\d+\.\d+' )
 	$(call to_info,$${PKG},$${VER},Neovim text editor)
 
-# harper-ls
-harper-ls: info/harper-ls.md
+####################################################
 
-latest/harper-ls.json:
-	$(WGET) https://api.github.com/repos/Automattic/harper/releases/latest -O- | jq '.' > $@
+erlang-rebar3: info/erlang-rebar3.md
 
-info/harper-ls.md: latest/harper-ls.json
-	PKG=$(basename $(notdir $@))
-	SRC=$(shell $(call bduName,"harper-ls-x86_64-unknown-linux-gnu.tar.gz",$<))
-	TARGET="files/$${PKG}/usr/local/bin"
-	mkdir -p $${TARGET}
-	$(WGET) $${SRC} -O- | $(TAR_NO_STRIP) $${TARGET} &> /dev/null
-	$(ADD) files/$${PKG} &> /dev/null
-	# success|failure caheck
-	$(RUN) which $${PKG} &> /dev/null
-	$(RUN) whereis $${PKG} &> /dev/null
-	$(RUN) $${PKG} --version &> /dev/null
-	# extract 'name', 'version', 'summary'
-	# get version from the binary
-	VER=$$($(RUN) harper-ls --version | cut -d' ' -f2)
-	$(call to_info,$${PKG},$${VER},'Harper Language Server Grammar Checker')
-
-lua-language-server: info/lua-language-server.md
-
-latest/lua-language-server.json:
+latest/erlang-rebar3.json:
+	# echo '##[ $@ ]##'
 	mkdir -p $(dir $@)
-	$(WGET) https://api.github.com/repos/LuaLS/lua-language-server/releases/latest -O- | jq '.' > $@
+	$(WGET) https://api.github.com/repos/erlang/rebar3/releases/latest -O $@
 
-info/lua-language-server.md: latest/lua-language-server.json
+info/erlang-rebar3.md: latest/erlang-rebar3.json
+	echo '##[ $(basename $(notdir $@)) ]##'
+	SRC=$(shell $(call bduName,rebar3,$<))
+	$(ADD) $${SRC} /usr/local/bin/rebar3 &>/dev/null
+	# success|failure check
+	$(RUN) rebar3 --version &>/dev/null
+	$(INFO) erlang-rebar3 > $@
+
+##[[ GLEAM ]]##
+gleam: info/gleam.md
+
+latest/gleam.json:
+	echo '##[ $@ ]##'
 	mkdir -p $(dir $@)
-	# echo '##[ $(basename $(notdir $@)) ]##'
-	PKG=$(basename $(notdir $@))
-	SRC=$(shell $(call bduContains,linux-x64.tar.gz,$<))
-	TARGET="files/$${PKG}/usr/local/$${PKG}"
-	mkdir -p "$${TARGET}"
-	$(WGET) $${SRC} -O- | $(TAR_NO_STRIP) $${TARGET}
-	# the exec script in /usr/local/bin/lua-language-server will point to it
-	# these scripts are added in init target
-	# # success|failure check
-	$(RUN) which $${PKG} &> /dev/null
-	$(RUN) whereis $${PKG} &> /dev/null
-	$(RUN) $${PKG} --version &> /dev/null
-	# extract 'name', 'version', 'summary'
-	# get version from the binary
-	VER=$$($(RUN) lua-language-server --version)
-	$(call to_info,$${PKG},$${VER},'Lua language server')
+	$(WGET) https://api.github.com/repos/gleam-lang/gleam/releases/latest -O- |
+	jq -r '.assets[] | select(.name | endswith("x86_64-unknown-linux-musl.tar.gz"))' > $@
 
-##########################################################################
+files/gleam/gleam: latest/gleam.json
+	echo '##[ $@ ]##'
+	mkdir -p $(dir $@)
+	$(RUN) rm -f /usr/local/bin/gleam
+	SRC=$$(jq -r '.browser_download_url' $<)
+	curl -L "$${SRC}" | tar xz -C $(dir $@) &>/dev/null
+	test -f $@
 
-uv_installs:  $(UV_TOOL_LIST)
+####################################################
 
-mbake: info/mbake.md
-info/mbake.md:
-	PKG=$(basename $(notdir $@))
-	echo '##[ $$PKG ]##'
-	$(RUN) uv tool install $${PKG} &> /dev/null
-	# success|failure check
-	$(RUN) which $${PKG} &> /dev/null
-	$(RUN) $${PKG} --version &> /dev/null
-	# extract 'name', 'version', 'summary'
-	$(call uv_tool_info,$${PKG},Makefile formatter and linter)
-
-
-tombi: info/tombi.md
-info/tombi.md:
-	PKG=$(basename $(notdir $@))
-	$(RUN) uv tool install $${PKG} &> /dev/null
-	# success|failure check
-	$(RUN) which $${PKG} &> /dev/null
-	$(RUN) $${PKG} --version &> /dev/null
-	# $(RUN) uv tool list | grep $${PKG}
-	$(call uv_tool_info,$${PKG},"TOML Formatter, Linter, and Language Server")
+info/gleam.md: files/gleam/gleam
+	echo '##[ $@ ]##'
+	mkdir -p $(dir $@)
+	$(ADD) files/gleam/gleam /usr/local/bin/gleam &>/dev/null
+	$(RUN) chmod +x /usr/local/bin/gleam
+	$(RUN) gleam --version &>/dev/null
+	VER=$$($(RUN) gleam --version | awk '{print $$2}')
+	$(call to_info,gleam,$${VER},Gleam programming language)
 

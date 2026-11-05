@@ -1,3 +1,25 @@
+
+<!-- TODOs for this branch:
+scope: new podman toolbox container image for coding; `grantmacken/tbx`
+contains only essential binaries
+
+do not include stuff which can be install by the user in by tooling run time.
+set runtime ENV variables to set global package install directories to $HOME/ for each language runtime.
+   node: => set up nodejs and npm and set global npm packages install directory to $HOME/
+   python: => set up uv package manager for python and set global pip packages install directory to $HOME/
+   rust: => set up rustup and cargo and set global cargo packages install directory to $HOME/
+   go: => set up go and set global go packages install directory to $HOME/
+   elixir: => set up mix and set global mix packages install directory to $HOME/
+
+lsp servers, linters, or formatters in this image
+
+
+
+
+-->
+
+
+
 The following applications are included in this toolbox: 
 ## build tools 
 
