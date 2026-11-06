@@ -2,9 +2,16 @@ include inc/meta.mk
 WORKING_CONTAINER := fedora-toolbox-working-container
 include inc/define.mk
 
-TOOLS := make stow bat fd-find fzf host-spawn jq ripgrep wl-clipboard zoxide ledger sqlite # w3m
+TOOLS := make \
+bat fd-find fzf gh host-spawn jq ledger ripgrep shfmt stow wl-clipboard zoxide \
+ ShellCheck 
+
 BUILD := gcc gcc-c++ pcre2 autoconf pkgconf
-DEVEL := libicu gettext-devel glibc-devel libevent-devel ncurses-devel openssl-devel perl-devel readline-devel zlib-devel
+DEVEL := libicu gettext-devel glibc-devel libevent-devel ncurses-devel openssl-devel perl-devel \
+ readline-devel zlib-devel
+RUNTIMES := golang nodejs uv
+DB := sqlite
+
 # packages installed via dnf - these are listed in the README.md table
 DNF_LIST := $(TOOLS) gh golang nodejs uv ShellCheck shfmt
 
@@ -61,16 +68,11 @@ install:
 	$(INSTALL) $(DEVEL)
 	$(INSTALL) $(BUILD)
 	$(INSTALL) $(TOOLS)
+	$(INSTALL) $(RUNTIMES) $(DB)
+
 	# $(RUN) dnf config-manager addrepo --from-repofile=https://cli.github.com/packages/rpm/gh-cli.repo &> /dev/null
 	# $(INSTALL) gh --repo gh-cli &> /dev/null
 
-runtimes_list:
-	echo '##[ $($@) ]##'
-	$(INSTALL) golang nodejs uv &>/dev/null
-
-coding_list: neovim
-	echo '##[ $($@) ]##'
-	$(INSTALL)  ShellCheck shfmt &>/dev/null
 
 otp_list: erlang elixir erlang-rebar3 gleam
 
