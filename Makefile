@@ -11,16 +11,14 @@ DB := sqlite
 # packages installed via dnf - these are listed in the README.md table
 DNF_LIST := $(TOOLS) gh golang nodejs uv ShellCheck
 
-# MD_LIST = google-cloud-cli
-# OTP := erlang erlang-rebar3 elixir gleam
+.PHONY: init install neovim # runtimes_list otp_list coding_list
 
-default: init tools_list TBX-README.md
+default: init
 	# printf '✅ %s toolbox built from: %s\n' $@ $(WORKING_CONTAINER)
 	# buildah commit $(WORKING_CONTAINER) ghcr.io/grantmacken/tbx:latest
 	# buildah push ghcr.io/grantmacken/tbx-$@:latest
 	# printf '✅ Image pushed to ghcr.io/grantmacken/tbx-%s:latest\n' $@
 
-.PHONY: tools_list # runtimes_list otp_list coding_list
 
 TBX-README.md: # init tools_list # runtimes_list otp_list coding_list
 	echo '##[ $@ ]##'
@@ -69,7 +67,9 @@ install:
 ####################################################
 
 neovim: info/neovim.md
+
 info/neovim.md:
+	mkdir -p $(dir $@)
 	echo '##[ $(basename $(notdir $@)) ]##'
 	PKG=$(basename $(notdir $@))
 	TARGET=files/$${PKG}/usr/local
