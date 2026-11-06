@@ -26,11 +26,11 @@ TBX-README.md: # init tools_list # runtimes_list otp_list coding_list
 	$(call tr,"Name","Version","Summary", $@)
 	$(call tr,"----","-------","-------", $@)
 	for pkg in $(DNF_LIST)
-		do
-		$(call dnf_to_table_row,$${pkg},$@)
-		done
+	do
+	$(call dnf_to_table_row,$${pkg},$@)
 	done
-	
+	done
+
 latest/fedora-toolbox.json:
 	mkdir -p $(dir $@)
 	echo '##[ $@ ]##'
