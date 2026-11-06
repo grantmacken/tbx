@@ -34,9 +34,9 @@ TBX-README.md: # init tools_list # runtimes_list otp_list coding_list
 	# for files in info/*.md; do
 	for file in info/*.md
 	do
-	NAME=$$(grep -oP '^Name:\s\K.+' file  )|| true)
-	VER=$$(grep -oP '^Version:\s\K.+' file ) || true)
-	SUM=$$(grep -oP '^Summary:\s\K.+' file ) ||
+	NAME=$$(grep -oP '^Name:\s\K.+' $$file  )|| true)
+	VER=$$(grep -oP '^Version:\s\K.+' $$file ) || true)
+	SUM=$$(grep -oP '^Summary:\s\K.+' $$file ) ||
 	$(call tr,$${NAME},$${VER},$${SUM},$@)
 	done
 
