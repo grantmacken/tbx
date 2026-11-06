@@ -66,7 +66,7 @@ install:
 	$(INSTALL) $(TOOLS)
 	$(INSTALL) $(RUNTIMES) $(DB)
 
-otp_list: erlang elixir erlang-rebar3 gleam
+otp: erlang elixir erlang-rebar3 gleam
 
 ####################################################
 
