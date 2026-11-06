@@ -25,7 +25,7 @@ bduName = jq -r ".assets[] | select(.name == \"$1\") | .browser_download_url" $2
 bduContains = jq -r ".assets[] | select(.browser_download_url | contains(\"$1\")) | .browser_download_url" $2
 
 ## Helper to write info files in a consistent format
-define to_info
+define to_info  
 	printf "Name: %s\n"    "$(1)" >> $@
 	printf "Version: %s\n" "$(2)" >> $@
 	printf "Summary: %s\n" "$(3)" >> $@

@@ -31,11 +31,12 @@ TBX-README.md: # init tools_list # runtimes_list otp_list coding_list
 	do
 	$(call dnf_to_table_row,$${pkg},$@)
 	done
-	for pkg in $(INFO_LIST)
+	# for files in info/*.md; do
+	for file in info/*.md
 	do
-	NAME=$$(cat info/$${pkg}.md | grep -oP '^Name:\s\K.+' || true)
-	VER=$$(cat info/$${pkg}.md | grep -oP '^Version:\s\K.+' || true)
-	SUM=$$(cat info/$${pkg}.md | grep -oP '^Summary:\s\K.+' || true)
+	NAME=$$(grep -oP '^Name:\s\K.+' file  )|| true)
+	VER=$$(grep -oP '^Version:\s\K.+' file ) || true)
+	SUM=$$(grep -oP '^Summary:\s\K.+' file ) ||
 	$(call tr,$${NAME},$${VER},$${SUM},$@)
 	done
 
@@ -86,7 +87,9 @@ info/neovim.md:
 	$(RUN) which nvim &> /dev/null
 	# get version from the binary
 	VER=$$($(RUN) nvim -v | grep -oP 'NVIM v\K\d+\.\d+\.\d+' )
-	$(call to_info,$${PKG},$${VER},Neovim text editor)
+	$(file > $@,Name: $${PKG})
+	$(file >> $@,Version: $${VER})
+	$(file >> $@,Summary: Neovim text editor)
 
 
 ####################################################
@@ -154,7 +157,6 @@ info/elixir.md: latest/elixir.json
 	$(RUN) elixir --version &>/dev/null
 	$(RUN) mix --version &>/dev/null
 	$(call to_info,elixir,$${TAGNAME},elixir programming language)
-	$(INFO) elixir > $@
 
 erlang-rebar3: info/erlang-rebar3.md
 latest/erlang-rebar3.json:
