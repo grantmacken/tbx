@@ -7,9 +7,11 @@ BUILD := gcc gcc-c++ pcre2 make autoconf pkgconf
 DEVEL := libicu gettext-devel glibc-devel libevent-devel ncurses-devel openssl-devel perl-devel readline-devel zlib-devel
 RUNTIMES := golang nodejs uv
 DB := sqlite
-
-# packages installed via dnf - these are listed in the README.md table
+# - these are listed in the README.md table
+# packages installed via dnf 
 DNF_LIST := $(TOOLS) gh golang nodejs uv ShellCheck
+# other installed apps that write to the info dir
+$(INFO_LIST) := neovim # erlang erlang-rebar3 elixir gleam
 
 .PHONY: init install neovim # runtimes_list otp_list coding_list
 
@@ -29,6 +31,12 @@ TBX-README.md: # init tools_list # runtimes_list otp_list coding_list
 	do
 	$(call dnf_to_table_row,$${pkg},$@)
 	done
+	for pkg in $(INFO_LIST)
+	do
+	NAME=$$(cat info/$${pkg}.md | grep -oP '^Name:\s\K.+' || true)
+	VER=$$(cat info/$${pkg}.md | grep -oP '^Version:\s\K.+' || true)
+	SUM=$$(cat info/$${pkg}.md | grep -oP '^Summary:\s\K.+' || true)
+	$(call tr,$${NAME},$${VER},$${SUM},$@)
 	done
 
 latest/fedora-toolbox.json:
