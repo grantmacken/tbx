@@ -11,7 +11,7 @@ DB := sqlite
 # packages installed via dnf 
 DNF_LIST := $(TOOLS) gh golang nodejs uv ShellCheck
 # other installed apps that write to the info dir
-$(INFO_LIST) := neovim # erlang erlang-rebar3 elixir gleam
+INFO_LIST := neovim erlang elixir erlang-rebar3 gleam
 
 .PHONY: init install neovim # runtimes_list otp_list coding_list
 
@@ -88,6 +88,7 @@ info/neovim.md:
 	VER=$$($(RUN) nvim -v | grep -oP 'NVIM v\K\d+\.\d+\.\d+' )
 	$(call to_info,$${PKG},$${VER},Neovim text editor)
 
+
 ####################################################
 
 otp: erlang elixir erlang-rebar3 gleam
@@ -100,7 +101,6 @@ latest/erlang.json:
 	# select tags that start with OTP- and sort by version, then take the first one
 	#otp_src_29.1.2.tar.gz OTP-29.1.2" 
 	$(WGET) https://api.github.com/repos/erlang/otp/releases/latest -O $@
-	# curl -fsSL 'https://api.github.com/repos/erlang/otp/tags?per_page=100' | jq -r '[.[] | select(.name | startswith("OTP-"))][0]' > $@
 
 info/erlang.md: latest/erlang.json
 	echo '##[ $@ ]##'
@@ -131,8 +131,7 @@ info/erlang.md: latest/erlang.json
 	# success|failure check
 	$(RUN) erl -eval 'erlang:display(erlang:system_info(otp_release)), halt().'  -noshell &>/dev/null
 	$(RUN) rm -fR /tmp/otp
-	$(INFO) erlang > $@
-	# extract name, version, summary
+	$(call to_info,Erlang/OTP,$${VER},erlang programming language and runtime system)
 
 ##[[ ELIXIR ]]##
 elixir: info/elixir.md
@@ -154,6 +153,7 @@ info/elixir.md: latest/elixir.json
 	# success|failure check
 	$(RUN) elixir --version &>/dev/null
 	$(RUN) mix --version &>/dev/null
+	$(call to_info,elixir,$${TAGNAME},elixir programming language)
 	$(INFO) elixir > $@
 
 erlang-rebar3: info/erlang-rebar3.md
@@ -167,8 +167,8 @@ info/erlang-rebar3.md: latest/erlang-rebar3.json
 	SRC=$(shell $(call bduName,rebar3,$<))
 	$(ADD) $${SRC} /usr/local/bin/rebar3 &>/dev/null
 	# success|failure check
-	$(RUN) rebar3 --version &>/dev/null
-	$(INFO) erlang-rebar3 > $@
+	VER=$$($(RUN) rebar3 --version | awk '{print $$2}') 
+	$(call to_info,rebar3,$${VER},a tool for working with Erlang projects)
 
 ##[[ GLEAM ]]##
 gleam: info/gleam.md
