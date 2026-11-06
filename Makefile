@@ -60,13 +60,11 @@ init: latest/fedora-toolbox.json
 
 install:
 	echo '##[ $@ ]##'
-	$(RUN) dnf update -y
-	$(INSTALL) $(DEVEL)
-	$(INSTALL) $(BUILD)
-	$(INSTALL) $(TOOLS)
-	$(INSTALL) $(RUNTIMES) $(DB)
-
-otp: erlang elixir erlang-rebar3 gleam
+	$(RUN) dnf update -y &>/dev/null
+	$(INSTALL) $(DEVEL) &>/dev/null
+	$(INSTALL) $(BUILD) &>/dev/null
+	$(INSTALL) $(TOOLS) &>/dev/null
+	$(INSTALL) $(RUNTIMES) $(DB) &>/dev/null
 
 ####################################################
 
@@ -89,6 +87,8 @@ info/neovim.md:
 
 ####################################################
 
+otp: erlang elixir erlang-rebar3 gleam
+
 erlang: info/erlang.md
 
 latest/erlang.json:
@@ -105,9 +105,9 @@ info/erlang.md: latest/erlang.json
 	mkdir -p files/otp
 	TAG_NAME=$$(jq -r '.tag_name' $<)
 	VER=$$(echo $${TAG_NAME} | cut -d'-' -f2)
-	NAME="otp_src_$${VER}.tar.gz"
-	SRC=$(shell $(call bduName,$${NAME},$<))
-	# SRC="https://github.com/erlang/otp/releases/download/$${TAG}/otp_src_$${VER}.tar.gz"
+	# NAME="otp_src_$${VER}.tar.gz"
+	# SRC=$(shell $(call bduName,$${NAME},$<))
+	SRC="https://github.com/erlang/otp/releases/download/$${TAG_NAME}/otp_src_$${VER}.tar.gz"
 	echo "Erlang/OTP Version: $${VER}"
 	echo "Source URL: $${SRC}"
 	$(WGET) $${SRC} -O- | $(TAR) files/otp &>/dev/null
