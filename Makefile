@@ -89,8 +89,74 @@ info/neovim.md:
 
 ####################################################
 
-erlang-rebar3: info/erlang-rebar3.md
+erlang: info/erlang.md
 
+latest/erlang.json:
+	echo '##[ $@ ]##'
+	mkdir -p $(dir $@)
+	# select tags that start with OTP- and sort by version, then take the first one
+	#otp_src_29.1.2.tar.gz OTP-29.1.2" 
+	$(WGET) https://api.github.com/repos/erlang/otp/releases/latest -O $@
+	# curl -fsSL 'https://api.github.com/repos/erlang/otp/tags?per_page=100' | jq -r '[.[] | select(.name | startswith("OTP-"))][0]' > $@
+
+info/erlang.md: latest/erlang.json
+	echo '##[ $@ ]##'
+	mkdir -p $(dir $@)
+	mkdir -p files/otp
+	TAG_NAME=$$(jq -r '.tag_name' $<)
+	VER=$$(echo $${TAG_NAME} | cut -d'-' -f2)
+	NAME="otp_src_$${VER}.tar.gz"
+	SRC=$(shell $(call bduName,$${NAME},$<))
+	# SRC="https://github.com/erlang/otp/releases/download/$${TAG}/otp_src_$${VER}.tar.gz"
+	echo "Erlang/OTP Version: $${VER}"
+	echo "Source URL: $${SRC}"
+	$(WGET) $${SRC} -O- | $(TAR) files/otp &>/dev/null
+	$(ADD) files/otp /tmp/otp &>/dev/null
+	$(RUN) sh -c 'cd /tmp/otp && ./configure \
+		--prefix=/usr/local \
+		--enable-threads \
+		--enable-shared-zlib \
+		--enable-ssl=dynamic-ssl-lib \
+		--enable-jit \
+		--enable-kernel-poll \
+		--without-debugger \
+		--without-observer \
+		--without-wx \
+		--without-et \
+		--without-megaco \
+		--without-cosEvent \
+		--without-odbc' &>/dev/null
+	$(RUN) sh -c 'cd /tmp/otp && make && make install' &>/dev/null
+	# success|failure check
+	$(RUN) erl -eval 'erlang:display(erlang:system_info(otp_release)), halt().'  -noshell &>/dev/null
+	$(RUN) rm -fR /tmp/otp
+	$(INFO) erlang > $@
+	# extract name, version, summary
+
+##[[ ELIXIR ]]##
+elixir: info/elixir.md
+latest/elixir.json:
+	echo '##[ $@ ]##'
+	mkdir -p $(dir $@)
+	$(WGET) https://api.github.com/repos/elixir-lang/elixir/releases/latest -O $@
+
+info/elixir.md: latest/elixir.json
+	echo '##[ $@ ]##'
+	mkdir -p $(dir $@)
+	TAGNAME=$$(jq -r '.tag_name' $<)
+	TARBALL_URL=$$(jq -r '.tarball_url' $<)
+	# SRC=https://github.com/elixir-lang/elixir/archive/$${TAGNAME}.tar.gz
+	mkdir -p files/elixir && $(WGET) $${TARBALL_URL} -O- | $(TAR) files/elixir &>/dev/null
+	$(RUN) mkdir -p /tmp/elixir
+	$(ADD) files/elixir /tmp/elixir &>/dev/null
+	$(RUN) sh -c 'cd /tmp/elixir && make && make install' &>/dev/null
+	$(RUN) rm -fR /tmp/elixir
+	# success|failure check
+	$(RUN) elixir --version
+	$(RUN) mix --version
+	$(INFO) elixir > $@
+
+erlang-rebar3: info/erlang-rebar3.md
 latest/erlang-rebar3.json:
 	# echo '##[ $@ ]##'
 	mkdir -p $(dir $@)
