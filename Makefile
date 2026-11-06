@@ -11,7 +11,7 @@ DNF_LIST := $(TOOLS) gh golang nodejs uv ShellCheck shfmt
 # MD_LIST = google-cloud-cli
 # OTP := erlang erlang-rebar3 elixir gleam
 
-default: TBX-README.md
+default: init tools_list TBX-README.md
 	# printf '✅ %s toolbox built from: %s\n' $@ $(WORKING_CONTAINER)
 	# buildah commit $(WORKING_CONTAINER) ghcr.io/grantmacken/tbx:latest
 	# buildah push ghcr.io/grantmacken/tbx-$@:latest
@@ -19,7 +19,7 @@ default: TBX-README.md
 
 .PHONY: tools_list # runtimes_list otp_list coding_list
 
-TBX-README.md: init tools_list # runtimes_list otp_list coding_list
+TBX-README.md: # init tools_list # runtimes_list otp_list coding_list
 	echo '##[ $@ ]##'
 	$(file >> $@,The following applications are included in this toolbox: )
 	$(call tr,"Name","Version","Summary", $@)

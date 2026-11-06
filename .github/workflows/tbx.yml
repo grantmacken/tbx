@@ -23,4 +23,5 @@ jobs:
           password: ${{ github.token }}
       - uses: actions/checkout@v4
       - name: buildah toolbox build
-        run: make
+        run: |
+          make init
