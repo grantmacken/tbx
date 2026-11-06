@@ -2,18 +2,14 @@ include inc/meta.mk
 WORKING_CONTAINER := fedora-toolbox-working-container
 include inc/define.mk
 
-TOOLS := make \
-bat fd-find fzf gh host-spawn jq ledger ripgrep shfmt stow wl-clipboard zoxide \
- ShellCheck 
-
-BUILD := gcc gcc-c++ pcre2 autoconf pkgconf
-DEVEL := libicu gettext-devel glibc-devel libevent-devel ncurses-devel openssl-devel perl-devel \
- readline-devel zlib-devel
+TOOLS := bat fd-find fzf gh host-spawn jq ledger ripgrep stow wl-clipboard zoxide ShellCheck 
+BUILD := gcc gcc-c++ pcre2 make autoconf pkgconf
+DEVEL := libicu gettext-devel glibc-devel libevent-devel ncurses-devel openssl-devel perl-devel readline-devel zlib-devel
 RUNTIMES := golang nodejs uv
 DB := sqlite
 
 # packages installed via dnf - these are listed in the README.md table
-DNF_LIST := $(TOOLS) gh golang nodejs uv ShellCheck shfmt
+DNF_LIST := $(TOOLS) gh golang nodejs uv ShellCheck
 
 # MD_LIST = google-cloud-cli
 # OTP := erlang erlang-rebar3 elixir gleam
@@ -69,10 +65,6 @@ install:
 	$(INSTALL) $(BUILD)
 	$(INSTALL) $(TOOLS)
 	$(INSTALL) $(RUNTIMES) $(DB)
-
-	# $(RUN) dnf config-manager addrepo --from-repofile=https://cli.github.com/packages/rpm/gh-cli.repo &> /dev/null
-	# $(INSTALL) gh --repo gh-cli &> /dev/null
-
 
 otp_list: erlang elixir erlang-rebar3 gleam
 
