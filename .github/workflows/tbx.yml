@@ -26,6 +26,6 @@ jobs:
         run: |
           make init
           make install
-          make TBX-README
+          make TBX-README.md
           # make neovim
           # make otp
