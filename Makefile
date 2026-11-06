@@ -26,15 +26,9 @@ TBX-README.md: # init tools_list # runtimes_list otp_list coding_list
 	$(call tr,"Name","Version","Summary", $@)
 	$(call tr,"----","-------","-------", $@)
 	for pkg in $(DNF_LIST)
-	do
-	$(call dnf_to_table_row,$${pkg},$@)
-	done
-	# for pkg in $(PKGS_LIST)
-	# do
-	# NAME=$$(cat info/$${pkg}.md | grep -oP '^Name:\s\K.+' || true)
-	# VER=$$(cat info/$${pkg}.md | grep -oP '^Version:\s\K.+' || true)
-	# SUM=$$(cat info/$${pkg}.md | grep -oP '^Summary:\s\K.+' || true)
-	# $(call tr,$${NAME},$${VER},$${SUM},$@)
+		do
+		$(call dnf_to_table_row,$${pkg},$@)
+		done
 	done
 	
 latest/fedora-toolbox.json:
@@ -57,12 +51,13 @@ init: latest/fedora-toolbox.json
 	# $(ADD) files/ $(DIR_BIN)/ &>/dev/null
 
 install:
-	echo '##[ $@ ]##'
+	# echo '##[ $@ ]##'
 	$(RUN) dnf update -y &>/dev/null
 	$(INSTALL) $(DEVEL) &>/dev/null
 	$(INSTALL) $(BUILD) &>/dev/null
 	$(INSTALL) $(TOOLS) &>/dev/null
 	$(INSTALL) $(RUNTIMES) $(DB) &>/dev/null
+	printf '✅ dnf installs completed \n'
 
 ####################################################
 
@@ -70,7 +65,7 @@ neovim: info/neovim.md
 
 info/neovim.md:
 	mkdir -p $(dir $@)
-	echo '##[ $(basename $(notdir $@)) ]##'
+	# echo '##[ $(basename $(notdir $@)) ]##'
 	PKG=$(basename $(notdir $@))
 	TARGET=files/$${PKG}/usr/local
 	mkdir -p $${TARGET}
@@ -105,11 +100,9 @@ info/erlang.md: latest/erlang.json
 	mkdir -p files/otp
 	TAG_NAME=$$(jq -r '.tag_name' $<)
 	VER=$$(echo $${TAG_NAME} | cut -d'-' -f2)
-	# NAME="otp_src_$${VER}.tar.gz"
-	# SRC=$(shell $(call bduName,$${NAME},$<))
 	SRC="https://github.com/erlang/otp/releases/download/$${TAG_NAME}/otp_src_$${VER}.tar.gz"
-	echo "Erlang/OTP Version: $${VER}"
-	echo "Source URL: $${SRC}"
+	# echo "Erlang/OTP Version: $${VER}"
+	# echo "Source URL: $${SRC}" 
 	$(WGET) $${SRC} -O- | $(TAR) files/otp &>/dev/null
 	$(ADD) files/otp /tmp/otp &>/dev/null
 	$(RUN) sh -c 'cd /tmp/otp && ./configure \
@@ -145,15 +138,14 @@ info/elixir.md: latest/elixir.json
 	mkdir -p $(dir $@)
 	TAGNAME=$$(jq -r '.tag_name' $<)
 	TARBALL_URL=$$(jq -r '.tarball_url' $<)
-	# SRC=https://github.com/elixir-lang/elixir/archive/$${TAGNAME}.tar.gz
 	mkdir -p files/elixir && $(WGET) $${TARBALL_URL} -O- | $(TAR) files/elixir &>/dev/null
 	$(RUN) mkdir -p /tmp/elixir
 	$(ADD) files/elixir /tmp/elixir &>/dev/null
 	$(RUN) sh -c 'cd /tmp/elixir && make && make install' &>/dev/null
 	$(RUN) rm -fR /tmp/elixir
 	# success|failure check
-	$(RUN) elixir --version
-	$(RUN) mix --version
+	$(RUN) elixir --version &>/dev/null
+	$(RUN) mix --version &>/dev/null
 	$(INFO) elixir > $@
 
 erlang-rebar3: info/erlang-rebar3.md
@@ -163,7 +155,7 @@ latest/erlang-rebar3.json:
 	$(WGET) https://api.github.com/repos/erlang/rebar3/releases/latest -O $@
 
 info/erlang-rebar3.md: latest/erlang-rebar3.json
-	echo '##[ $(basename $(notdir $@)) ]##'
+	# echo '##[ $(basename $(notdir $@)) ]##'
 	SRC=$(shell $(call bduName,rebar3,$<))
 	$(ADD) $${SRC} /usr/local/bin/rebar3 &>/dev/null
 	# success|failure check
