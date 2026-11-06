@@ -11,7 +11,7 @@ DB := sqlite
 # packages installed via dnf 
 DNF_LIST := $(TOOLS) gh golang nodejs uv ShellCheck
 # other installed apps that write to the info dir
-INFO_LIST := neovim erlang elixir erlang-rebar3 gleam
+INFO_LIST := neovim # erlang elixir erlang-rebar3 gleam
 
 .PHONY: init install neovim # runtimes_list otp_list coding_list
 
@@ -34,9 +34,9 @@ TBX-README.md: # init tools_list # runtimes_list otp_list coding_list
 	# for files in info/*.md; do
 	for file in info/*.md
 	do
-	NAME=$$(grep -oP '^Name:\s\K.+' $$file  )|| true)
-	VER=$$(grep -oP '^Version:\s\K.+' $$file ) || true)
-	SUM=$$(grep -oP '^Summary:\s\K.+' $$file ) ||
+	NAME=$$(grep -oP '^Name:\s\K.+' $$file  ) || true
+	VER=$$(grep -oP '^Version:\s\K.+' $$file ) || true
+	SUM=$$(grep -oP '^Summary:\s\K.+' $$file ) || true
 	$(call tr,$${NAME},$${VER},$${SUM},$@)
 	done
 
