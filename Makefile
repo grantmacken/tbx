@@ -52,10 +52,10 @@ init: latest/fedora-toolbox.json
 	# --env UV_TOOL_BIN_DIR=/usr/local/bin \
 	# --env UV_TOOL_DIR=/var/lib/uv_tools 
 	echo '✅ Base image pulled and working container created'
-	mkdir -p info
-	$(ADD) files/ $(DIR_BIN)/ &>/dev/null
+	# mkdir -p info
+	# $(ADD) files/ $(DIR_BIN)/ &>/dev/null
 
-tools_list:
+install:
 	echo '##[ $@ ]##'
 	$(RUN) dnf update -y
 	$(INSTALL) $(DEVEL)

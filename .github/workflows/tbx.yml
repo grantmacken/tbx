@@ -25,3 +25,4 @@ jobs:
       - name: buildah toolbox build
         run: |
           make init
+          make install

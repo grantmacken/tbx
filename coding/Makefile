@@ -74,8 +74,6 @@ init:
 	$(RUN) dnf update -y &>/dev/null
 	echo '✅ Base image pulled and working container created'
 
-README.md: 
-
 pkgs_list: $(PKGS_LIST)
 
 dnf_list:
