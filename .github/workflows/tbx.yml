@@ -2,7 +2,7 @@ name: tbx_build
 on:
   push:
     branches:
-      - tbx_conslolidate
+      - tbx_consolidate
   # Allow manual triggering
   workflow_dispatch:
 jobs:
