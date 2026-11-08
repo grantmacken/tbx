@@ -8,21 +8,20 @@ DEVEL := libicu gettext-devel glibc-devel libevent-devel ncurses-devel openssl-d
 RUNTIMES := golang nodejs uv
 DB := sqlite
 # - these are listed in the README.md table
-# packages installed via dnf 
-DNF_LIST := $(TOOLS) $(RUNTIMES)
+# packages installed via dnf excluse devlopment packages
+DNF_LIST := $(TOOLS) $(RUNTIMES) $(DB) $(BUILD) 
 # other installed apps that write to the info dir
 INFO_LIST := neovim # erlang elixir erlang-rebar3 gleam
 
 .PHONY: TBX-README.md
 
-default: init
+default: init 
 	# printf '✅ %s toolbox built from: %s\n' $@ $(WORKING_CONTAINER)
 	# buildah commit $(WORKING_CONTAINER) ghcr.io/grantmacken/tbx:latest
 	# buildah push ghcr.io/grantmacken/tbx-$@:latest
 	# printf '✅ Image pushed to ghcr.io/grantmacken/tbx-%s:latest\n' $@
 
-
-TBX-README.md:
+TBX-README.md: 
 	echo '##[ $@ ]##'
 	printf '%s\n' 'The following applications are included in this toolbox:' > "$@"
 	$(call tr,"Name","Version","Summary", $@)
@@ -134,16 +133,17 @@ info/erlang.md: latest/erlang.json
 	$(RUN) erl -eval 'erlang:display(erlang:system_info(otp_release)), halt().'  -noshell &>/dev/null
 	$(RUN) rm -fR /tmp/otp
 	$(call to_info,Erlang/OTP,$${VER},erlang programming language and runtime system)
+	printf '✅ erlang install completed \n'
 
 ##[[ ELIXIR ]]##
-elixir: info/elixir.md
+elixir: info/elixir.md info/mix.md
 latest/elixir.json:
-	echo '##[ $@ ]##'
+	# echo '##[ $@ ]##'
 	mkdir -p $(dir $@)
 	$(WGET) https://api.github.com/repos/elixir-lang/elixir/releases/latest -O $@
 
 info/elixir.md: latest/elixir.json
-	echo '##[ $@ ]##'
+	# echo '##[ $@ ]##'
 	mkdir -p $(dir $@)
 	TAGNAME=$$(jq -r '.tag_name' $<)
 	TARBALL_URL=$$(jq -r '.tarball_url' $<)
@@ -156,6 +156,14 @@ info/elixir.md: latest/elixir.json
 	$(RUN) elixir --version &>/dev/null
 	$(RUN) mix --version &>/dev/null
 	$(call to_info,elixir,$${TAGNAME},elixir programming language)
+	printf '✅ elixir install completed \n'
+
+info/mix.md:
+	mkdir -p $(dir $@)
+	VER=$$($(RUN) mix --version | grep -oP 'Mix \K(\d+\.){2}\d+')
+	$(call to_info,mxi,$${VER},a build tool that ships with Elixir)
+🧰 
+
 
 erlang-rebar3: info/erlang-rebar3.md
 latest/erlang-rebar3.json:
@@ -170,18 +178,19 @@ info/erlang-rebar3.md: latest/erlang-rebar3.json
 	# success|failure check
 	VER=$$($(RUN) rebar3 --version | awk '{print $$2}') 
 	$(call to_info,rebar3,$${VER},a tool for working with Erlang projects)
+	printf '✅ rebar3 install completed \n'
 
 ##[[ GLEAM ]]##
 gleam: info/gleam.md
 
 latest/gleam.json:
-	echo '##[ $@ ]##'
+	# echo '##[ $@ ]##'
 	mkdir -p $(dir $@)
 	$(WGET) https://api.github.com/repos/gleam-lang/gleam/releases/latest -O- |
 	jq -r '.assets[] | select(.name | endswith("x86_64-unknown-linux-musl.tar.gz"))' > $@
 
 files/gleam/gleam: latest/gleam.json
-	echo '##[ $@ ]##'
+	#echo '##[ $@ ]##'
 	mkdir -p $(dir $@)
 	$(RUN) rm -f /usr/local/bin/gleam
 	SRC=$$(jq -r '.browser_download_url' $<)
@@ -191,11 +200,12 @@ files/gleam/gleam: latest/gleam.json
 ####################################################
 
 info/gleam.md: files/gleam/gleam
-	echo '##[ $@ ]##'
+	# echo '##[ $@ ]##'
 	mkdir -p $(dir $@)
 	$(ADD) files/gleam/gleam /usr/local/bin/gleam &>/dev/null
 	$(RUN) chmod +x /usr/local/bin/gleam
 	$(RUN) gleam --version &>/dev/null
 	VER=$$($(RUN) gleam --version | awk '{print $$2}')
 	$(call to_info,gleam,$${VER},Gleam programming language)
+	printf '✅ gleam install completed \n'
 
