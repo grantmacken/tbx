@@ -162,8 +162,7 @@ info/mix.md:
 	mkdir -p $(dir $@)
 	VER=$$($(RUN) mix --version | grep -oP 'Mix \K(\d+\.){2}\d+')
 	$(call to_info,mxi,$${VER},a build tool that ships with Elixir)
-🧰 
-
+	printf '✅ mix install completed \n'
 
 erlang-rebar3: info/erlang-rebar3.md
 latest/erlang-rebar3.json:
