@@ -9,11 +9,11 @@ RUNTIMES := golang nodejs uv
 DB := sqlite
 # - these are listed in the README.md table
 # packages installed via dnf 
-DNF_LIST := $(TOOLS) gh golang nodejs uv ShellCheck
+DNF_LIST := $(TOOLS) $(RUNTIMES)
 # other installed apps that write to the info dir
 INFO_LIST := neovim # erlang elixir erlang-rebar3 gleam
 
-# .PHONY: init install neovim # runtimes_list otp_list coding_list
+.PHONY: TBX-README.md
 
 default: init
 	# printf '✅ %s toolbox built from: %s\n' $@ $(WORKING_CONTAINER)
@@ -22,16 +22,15 @@ default: init
 	# printf '✅ Image pushed to ghcr.io/grantmacken/tbx-%s:latest\n' $@
 
 
-TBX-README.md: # init tools_list # runtimes_list otp_list coding_list
+TBX-README.md:
 	echo '##[ $@ ]##'
-	$(file >> $@,The following applications are included in this toolbox: )
+	printf '%s\n' 'The following applications are included in this toolbox:' > "$@"
 	$(call tr,"Name","Version","Summary", $@)
 	$(call tr,"----","-------","-------", $@)
 	for pkg in $(DNF_LIST)
 	do
 	$(call dnf_to_table_row,$${pkg},$@)
 	done
-	# for files in info/*.md; do
 	for file in info/*.md
 	do
 	NAME=$$(grep -oP '^Name:\s\K.+' $$file  ) || true
