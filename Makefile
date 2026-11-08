@@ -13,7 +13,7 @@ DNF_LIST := $(TOOLS) gh golang nodejs uv ShellCheck
 # other installed apps that write to the info dir
 INFO_LIST := neovim # erlang elixir erlang-rebar3 gleam
 
-.PHONY: init install neovim # runtimes_list otp_list coding_list
+# .PHONY: init install neovim # runtimes_list otp_list coding_list
 
 default: init
 	# printf '✅ %s toolbox built from: %s\n' $@ $(WORKING_CONTAINER)
@@ -58,7 +58,7 @@ init: latest/fedora-toolbox.json
 	echo '✅ Base image pulled and working container created'
 	# mkdir -p info
 	# $(ADD) files/ $(DIR_BIN)/ &>/dev/null
-
+dnf installs completed
 install:
 	# echo '##[ $@ ]##'
 	$(RUN) dnf update -y &>/dev/null
@@ -71,6 +71,7 @@ install:
 ####################################################
 
 neovim: info/neovim.md
+	printf '✅  neovim installed \n'
 
 info/neovim.md:
 	mkdir -p $(dir $@)
