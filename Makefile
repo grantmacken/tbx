@@ -88,10 +88,9 @@ info/neovim.md:
 	$(RUN) which nvim &> /dev/null
 	# get version from the binary
 	VER=$$($(RUN) nvim -v | grep -oP 'NVIM v\K\d+\.\d+\.\d+' )
-	$(file > $@,Name: $${PKG})
-	$(file >> $@,Version: $${VER})
-	$(file >> $@,Summary: Neovim text editor)
-
+	printf 'Name: %s\n' "$${PKG}" > "$@"
+	printf 'Version: %s\n' "$${VER}" >> "$@"
+	printf 'Summary: %s\n' 'Neovim text editor' >> "$@"
 
 ####################################################
 
