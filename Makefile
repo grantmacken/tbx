@@ -58,7 +58,7 @@ init: latest/fedora-toolbox.json
 	echo '✅ Base image pulled and working container created'
 	# mkdir -p info
 	# $(ADD) files/ $(DIR_BIN)/ &>/dev/null
-dnf installs completed
+
 install:
 	# echo '##[ $@ ]##'
 	$(RUN) dnf update -y &>/dev/null
